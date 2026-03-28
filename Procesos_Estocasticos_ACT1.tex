@@ -1,0 +1,1008 @@
+\documentclass[10pt,a4paper]{book}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage[left=2.54cm, right=2.54cm, top=2.54cm, bottom=2.54cm]{geometry}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning}
+\usetikzlibrary{automata, positioning, arrows.meta}
+\usetikzlibrary{babel}
+\title{Entregas Cálculo}
+\author{Ricardo López}
+\begin{document}
+
+\begin{center}
+    {\huge \textbf{Universidad Nacional Autónoma de México}}\\
+    \rule{\linewidth}{2mm}
+    \vspace{3mm}
+    {\large \textbf{Facultad de Estudios Superiores Acatlán}}\\
+    \begin{figure}[h]
+    \centering
+\includegraphics[scale=0.9]{acatlan.png}
+        \end{figure}
+        
+        {\Large\textbf{Matemáticas Aplicadas Y Computación}}\\
+
+        \vspace{0.5CM}
+        
+        {\huge \textbf{Procesos Estocásticos}}
+        
+        \vspace{0.5CM}
+        
+        \rule{\linewidth}{1mm}\\
+        \Large \textit{CADENAS DE MARKOV DISCRETAS}\\
+        
+        \vspace{0.5CM}
+        
+        \Large \textbf{DR.CÉSAR GALINDO.}\\
+\vspace{7cm}
+\rule{\linewidth}{0.5mm}
+\Large \textbf{Alumno:Ricardo López Ramírez}\\
+\Large \textbf{Matricula:423092556}\\
+\Large \textbf{Correo:423092556@pcpuma.acatlan.unam.mx}
+\rule{\linewidth}{0.5mm}
+\end{center}
+\newpage
+
+\centering\section{Cadenas de Markov Discretas}
+
+\vspace{1cm}
+
+\subsection{Ejercicio 1.}Sea $X$ una variable aleatoria discreta con la siguiente PMF (Función de masa de probabilidad)
+
+\[
+P_X(x)=
+\begin{cases}
+\frac{1}{5} & \textit{ para } x=0 \\
+\frac{2}{5} & \textit{ para } x=1 \\
+\frac{2}{5} & \textit{ para } x=2 \\
+ 0 & \textit{ e.o.c. } 
+\end{cases}
+\]
+
+\begin{itemize}
+    \item[\textbf{a)}] \textbf{Encuentre $R_X$, el rango de la variable aleatoria $X$.} \\
+    El rango de una variable aleatoria discreta es el conjunto de valores que tienen una probabilidad mayor a cero. Observando la función de masa de probabilidad (PMF):
+    \[ R_X = \{0, 1, 2\} \]
+
+    \item[\textbf{b)}] \textbf{Encuentre $\mathbb{P}(X \ge 1.5)$.} \\
+    Dado que $X$ solo puede tomar valores en su rango $\{0, 1, 2\}$, el único valor que cumple con la condición $X \ge 1.5$ es $2$.
+    \[ \mathbb{P}(X \ge 1.5) = \mathbb{P}(X = 2) = \frac{2}{5} \]
+
+    \item[\textbf{c)}] \textbf{Encuentre $\mathbb{P}(0 < X < 2)$.} \\
+    El número entero en el rango $\{0, 1, 2\}$ que es estrictamente mayor que $0$ y estrictamente menor que $2$ es el $1$.
+    \[ \mathbb{P}(0 < X < 2) = \mathbb{P}(X = 1) = \frac{2}{5} \]
+
+    \item[\textbf{d)}] \textbf{Encuentre $\mathbb{P}(X = 0 \mid X < 2)$.} \\
+    Utilizando la fórmula de probabilidad condicional $\mathbb{P}(A \mid B) = \frac{\mathbb{P}(A \cap B)}{\mathbb{P}(B)}$:
+    \[ \mathbb{P}(X = 0 \mid X < 2) = \frac{\mathbb{P}(X = 0 \text{ y } X < 2)}{\mathbb{P}(X < 2)} \]
+    
+    El numerador es la probabilidad de que $X = 0$ (ya que $0$ es menor que $2$):
+    \[ \mathbb{P}(X = 0 \cap X < 2) = \mathbb{P}(X = 0) = \frac{1}{5} \]
+    
+    El denominador es la probabilidad de que $X$ tome cualquier valor menor a $2$.
+    \[ \mathbb{P}(X < 2) = \mathbb{P}(X = 0) + \mathbb{P}(X = 1) = \frac{1}{5} + \frac{2}{5} = \frac{3}{5} \]
+    
+    Sustituyendo ambos valores en la fórmula original:
+    \[ \mathbb{P}(X = 0 \mid X < 2) = \frac{\frac{1}{5}}{\frac{3}{5}} = \frac{1}{3} \]
+\end{itemize}
+
+\newpage
+
+\subsection{Ejercicio 2.}Sea $X$ e $Y$ una variable aleatoria independiente con PMF (Función de masa de probabilidad).
+
+\[
+P_X(k)=
+\begin{cases}
+\frac{1}{3} & \textit{ para } k=1 \\
+\frac{1}{6} & \textit{ para } k=2 \\
+\frac{1}{2} & \textit{ para } k=3 \\
+ 0 & \textit{ e.o.c. } 
+\end{cases}
+\]
+
+\[
+P_Y(k)=
+\begin{cases}
+\frac{1}{4} & \textit{ para } k=1 \\
+\frac{1}{4} & \textit{ para } k=2 \\
+\frac{1}{2} & \textit{ para } k=3 \\
+ 0 & \textit{ e.o.c. } 
+\end{cases}
+\]
+
+
+\begin{enumerate}
+    \item \(R_{X}={1,2,3}\)
+    \item \(R_{Y}={1,2,3}\)
+\end{enumerate}
+
+
+\vspace{0.2cm}
+
+Sabemos que $X$ e $Y$ son variables aleatorias independientes.Las probabilidades acumuladas hasta $k=2$:
+
+\[ \mathbb{P}(X \le 2) = \mathbb{P}(X=1) + \mathbb{P}(X=2) = \frac{1}{3} + \frac{1}{6} = \frac{1}{2} \]
+\[ \mathbb{P}(Y \le 2) = \mathbb{P}(Y=1) + \mathbb{P}(Y=2) = \frac{1}{4} + \frac{1}{4} = \frac{1}{2} \]
+
+\begin{itemize}
+    \item[\textbf{a)}] \textbf{Encuentre $\mathbb{P}(X \le 2 \text{ and } Y \le 2)$.} \\
+    Por independencia de $X$ e $Y$, la probabilidad conjunta es el producto de las probabilidades marginales:
+    \[ \mathbb{P}(X \le 2 \text{ and } Y \le 2) = \mathbb{P}(X \le 2) \cdot \mathbb{P}(Y \le 2) = \left(\frac{1}{2}\right) \left(\frac{1}{2}\right) = \frac{1}{4} \]
+
+    \item[\textbf{b)}] \textbf{Encuentre $\mathbb{P}(X > 2 \text{ or } Y > 2)$.} \\
+    Utilizando la regla del complemento. El evento complementario a ``que al menos uno sea mayor a 2'' es ``que ambos sean menores o iguales a 2'':
+    \[ \mathbb{P}(X > 2 \text{ or } Y > 2) = 1 - \mathbb{P}(X \le 2 \text{ and } Y \le 2) \]
+    Sustituyendo el valor del inciso anterior:
+    \[ \mathbb{P}(X > 2 \text{ or } Y > 2) = 1 - \frac{1}{4} = \frac{3}{4} \]
+
+    \item[\textbf{c)}] \textbf{Encuentre $\mathbb{P}(X \le 2 \mid Y \le 2)$.} \\
+    Dado que $X$ e $Y$ son variables aleatorias independientes, la ocurrencia del evento sobre $Y$ no altera la probabilidad del evento sobre $X$:
+    \[ \mathbb{P}(X \le 2 \mid Y \le 2) = \mathbb{P}(X \le 2) = \frac{1}{2} \]
+
+    \item[\textbf{d)}] \textbf{Encuentre $\mathbb{P}(X < Y)$.} \\
+    Los pares $(X, Y)$ donde $X$ toma un valor estrictamente menor que $Y$: $(1, 2)$, $(1, 3)$ y $(2, 3)$. Sumamos las probabilidades conjuntas de estos eventos, que por independencia son el producto de sus probabilidades:
+    \begin{align*}
+        \mathbb{P}(X < Y) &= \mathbb{P}(X=1)\mathbb{P}(Y=2) + \mathbb{P}(X=1)\mathbb{P}(Y=3) + \mathbb{P}(X=2)\mathbb{P}(Y=3) \\
+        &= \left(\frac{1}{3}\right)\left(\frac{1}{4}\right) + \left(\frac{1}{3}\right)\left(\frac{1}{2}\right) + \left(\frac{1}{6}\right)\left(\frac{1}{2}\right) \\
+        &= \frac{1}{12} + \frac{1}{6} + \frac{1}{12} \\
+        &= \frac{1}{12} + \frac{2}{12} + \frac{1}{12} = \frac{4}{12} = \frac{1}{3}
+    \end{align*}
+\end{itemize}
+
+\newpage
+
+\subsection{Ejercicio 3.} Considere dos probabilidades aleatorias $X$ e $Y$ con PMF (Función de masa de probabilidad), dadas en la tabla 1.
+
+\[
+\begin{array}{c|c|c|c}
+ & Y= 2 & Y=4 & Y=5 \\
+\hline
+X=1 & \frac{1}{12} & \frac{1}{24} & \frac{1}{24} \\
+X=2 & \frac{1}{6} & \frac{1}{12} & \frac{1}{8} \\
+X=3 & \frac{1}{4} & \frac{1}{8} & \frac{1}{12}
+\end{array}
+\]
+
+\begin{itemize}
+    \item[\textbf{a)}] \textbf{Encuentre $\mathbb{P}(X \le 2, Y \le 4)$.} \\
+    Sumando las probabilidades conjuntas de la tabla donde $X \in \{1, 2\}$ y $Y \in \{2, 4\}$:
+    \begin{align*}
+        \mathbb{P}(X \le 2, Y \le 4) &= \mathbb{P}(1, 2) + \mathbb{P}(1, 4) + \mathbb{P}(2, 2) + \mathbb{P}(2, 4) \\
+        &= \frac{1}{12} + \frac{1}{24} + \frac{1}{6} + \frac{1}{12} \\
+        &= \frac{2}{24} + \frac{1}{24} + \frac{4}{24} + \frac{2}{24} = \frac{9}{24} = \frac{3}{8}
+    \end{align*}
+
+    \item[\textbf{b)}] \textbf{Encuentre las probabilidades marginales de $X$ e $Y$.} \\
+    Sumando filas para obtener las marginales de $X$:
+    \begin{align*}
+        \mathbb{P}(X=1) &= \frac{1}{12} + \frac{1}{24} + \frac{1}{24} = \frac{1}{6} \\
+        \mathbb{P}(X=2) &= \frac{1}{6} + \frac{1}{12} + \frac{1}{8} = \frac{3}{8} \\
+        \mathbb{P}(X=3) &= \frac{1}{4} + \frac{1}{8} + \frac{1}{12} = \frac{11}{24}
+    \end{align*}
+    Sumando columnas para obtener las marginales de $Y$:
+    \begin{align*}
+        \mathbb{P}(Y=2) &= \frac{1}{12} + \frac{1}{6} + \frac{1}{4} = \frac{1}{2} \\
+        \mathbb{P}(Y=4) &= \frac{1}{24} + \frac{1}{12} + \frac{1}{8} = \frac{1}{4} \\
+        \mathbb{P}(Y=5) &= \frac{1}{24} + \frac{1}{8} + \frac{1}{12} = \frac{1}{4}
+    \end{align*}
+
+    \item[\textbf{c)}] \textbf{Encuentre $\mathbb{P}(Y = 2 \mid X = 1)$.} \\
+    Utilizando la fórmula de probabilidad condicional:
+    \[ \mathbb{P}(Y=2 \mid X=1) = \frac{\mathbb{P}(X=1, Y=2)}{\mathbb{P}(X=1)} = \frac{\frac{1}{12}}{\frac{1}{6}} = \frac{6}{12} = \frac{1}{2} \]
+
+    \item[\textbf{d)}] \textbf{¿$X$ e $Y$ son independientes?} \\
+    Para que sean independientes, debe cumplirse $\mathbb{P}(X, Y) = \mathbb{P}(X)\mathbb{P}(Y)$ para todos los pares. Comprobemos con $(X=2, Y=5)$:
+    \[ \mathbb{P}(X=2, Y=5) = \frac{1}{8} \]
+    \[ \mathbb{P}(X=2)\mathbb{P}(Y=5) = \left(\frac{3}{8}\right)\left(\frac{1}{4}\right) = \frac{3}{32} \]
+    Como $\frac{1}{8} \neq \frac{3}{32}$, demostramos que \textbf{no} son independientes.
+\end{itemize}
+
+\newpage
+
+\subsection{Ejercicio 4.} En cierta ciudad, llueve \(40\%\) de los días. Sea \(R\) el evento \textit{llueve} y \(R^{c}\) el evento \textit{NO llueve}, de modo que.
+
+\begin{itemize}
+    \item[\textbf{a)}] \textbf{Calcule la probabilidad de que no llueva, haya tráfico pesado y llegue a tiempo: $\mathbb{P}(R^c, T, L^c)$.} \\
+    Utilizando la regla de la multiplicación proporcionada, necesitamos primero la probabilidad de llegar a tiempo dado que no llovió y hubo tráfico. Este es el complemento de llegar tarde bajo esas mismas condiciones:
+    \[ \mathbb{P}(L^c \mid R^c, T) = 1 - \mathbb{P}(L \mid R^c, T) = 1 - 0.3 = 0.7 \]
+    Ahora aplicamos la fórmula:
+    \begin{align*}
+        \mathbb{P}(R^c \cap T \cap L^c) &= \mathbb{P}(R^c)\mathbb{P}(T \mid R^c)\mathbb{P}(L^c \mid R^c, T) \\
+        &= (0.6)(0.2)(0.7) \\
+        &= 0.084
+    \end{align*}
+
+    \item[\textbf{b)}] \textbf{Calcule la probabilidad total de llegar tarde al trabajo: $\mathbb{P}(L)$.} \\
+    Por la Ley de Probabilidad Total, sumamos las probabilidades conjuntas de todas las particiones que resultan en el evento $L$:
+    
+    \vspace{0.2cm}
+
+    \begin{center}
+\begin{tikzpicture}[
+    grow=right,
+    level 1/.style={sibling distance=5cm},
+    level 2/.style={sibling distance=3cm},
+    level 3/.style={sibling distance=2cm},
+    edge from parent/.style={draw, -latex},
+    every node/.style={font=\small}
+]
+
+\node {Nodo Raíz}
+child {
+    node {$R$}
+    edge from parent node[above] {$0.4$}
+    child {
+        node {$T$}
+        edge from parent node[above] {$0.6$}
+        child {
+            node {$L$}
+            edge from parent node[above] {$0.7$}
+        }
+        child {
+            node {$L^c$}
+            edge from parent node[below] {$0.3$}
+        }
+    }
+    child {
+        node {$T^c$}
+        edge from parent node[below] {$0.4$}
+        child {
+            node {$L$}
+            edge from parent node[above] {$0.3$}
+        }
+        child {
+            node {$L^c$}
+            edge from parent node[below] {$0.7$}
+        }
+    }
+}
+child {
+    node {$R^c$}
+    edge from parent node[below] {$0.6$}
+    child {
+        node {$T$}
+        edge from parent node[above] {$0.2$}
+        child {
+            node {$L$}
+            edge from parent node[above] {$0.3$}
+        }
+        child {
+            node {$L^c$}
+            edge from parent node[below] {$0.7$}
+        }
+    }
+    child {
+        node {$T^c$}
+        edge from parent node[below] {$0.8$}
+        child {
+            node {$L$}
+            edge from parent node[above] {$0.1$}
+        }
+        child {
+            node {$L^c$}
+            edge from parent node[below] {$0.9$}
+        }
+    }
+};
+
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.2cm}
+    
+    \begin{align*}
+        \mathbb{P}(L) &= \mathbb{P}(R \cap T \cap L) + \mathbb{P}(R \cap T^c \cap L) + \mathbb{P}(R^c \cap T \cap L) + \mathbb{P}(R^c \cap T^c \cap L) \\
+        &= \mathbb{P}(R)\mathbb{P}(T \mid R)\mathbb{P}(L \mid R, T) \\
+        &\quad + \mathbb{P}(R)\mathbb{P}(T^c \mid R)\mathbb{P}(L \mid R, T^c) \\
+        &\quad + \mathbb{P}(R^c)\mathbb{P}(T \mid R^c)\mathbb{P}(L \mid R^c, T) \\
+        &\quad + \mathbb{P}(R^c)\mathbb{P}(T^c \mid R^c)\mathbb{P}(L \mid R^c, T^c) \\
+        &= (0.4)(0.6)(0.7) + (0.4)(0.4)(0.3) + (0.6)(0.2)(0.3) + (0.6)(0.8)(0.1) \\
+        &= 0.168 + 0.048 + 0.036 + 0.048 \\
+        &= 0.3
+    \end{align*}
+
+    \item[\textbf{c)}] \textbf{Dado que llegó tarde, calcule la probabilidad de que haya llovido: $\mathbb{P}(R \mid L)$.} \\
+    Utilizando el Teorema de Bayes:
+    \[ \mathbb{P}(R \mid L) = \frac{\mathbb{P}(R \cap L)}{\mathbb{P}(L)} \]
+    El denominador $\mathbb{P}(L)$ del inciso $b=$ ($0.3$). El numerador $\mathbb{P}(R \cap L)$ es la suma de los caminos donde llueve y llega tarde:
+    \[ \mathbb{P}(R \cap L) = \mathbb{P}(R \cap T \cap L) + \mathbb{P}(R \cap T^c \cap L) = 0.168 + 0.048 = 0.216 \]
+    Sustituyendo:
+    \[ \mathbb{P}(R \mid L) = \frac{0.216}{0.3} = 0.72 \]
+\end{itemize}
+
+\newpage
+
+\subsection{Ejercicio 5.} Se tienen tres cajas, cada una con 100 canicas:
+
+\textbf{Definición de probabilidades previas:} \\
+Sea $C_i$ el evento ``elegir la caja $i$'', con $i \in \{1, 2, 3\}$. Como se eligen al azar con igual probabilidad:
+\[ \mathbb{P}(C_1) = \mathbb{P}(C_2) = \mathbb{P}(C_3) = \frac{1}{3} \]
+Sean $R$ y $B$ los eventos ``extraer canica roja'' y ``extraer canica azul''. Las probabilidades condicionales según el contenido de cada caja son:
+\begin{align*}
+    \mathbb{P}(R \mid C_1) &= \frac{7}{10}, & \mathbb{P}(B \mid C_1) &= \frac{3}{10} \\
+    \mathbb{P}(R \mid C_2) &= \frac{5}{10}, & \mathbb{P}(B \mid C_2) &= \frac{5}{10} \\
+    \mathbb{P}(R \mid C_3) &= \frac{2}{10}, & \mathbb{P}(B \mid C_3) &= \frac{8}{10}
+\end{align*}
+
+\begin{itemize}
+    \item[\textbf{a)}] \textbf{Calcule la probabilidad de que la canica extraída sea roja.} \\
+    Aplicando la Ley de Probabilidad Total:
+    \begin{align*}
+        \mathbb{P}(R) &= \mathbb{P}(R \mid C_1)\mathbb{P}(C_1) + \mathbb{P}(R \mid C_2)\mathbb{P}(C_2) + \mathbb{P}(R \mid C_3)\mathbb{P}(C_3) \\
+        &= \left(\frac{7}{10}\right)\left(\frac{1}{3}\right) + \left(\frac{5}{10}\right)\left(\frac{1}{3}\right) + \left(\frac{2}{10}\right)\left(\frac{1}{3}\right) \\
+        &= \frac{7}{30} + \frac{5}{30} + \frac{2}{30} = \frac{14}{30} = \frac{7}{15}
+    \end{align*}
+
+    \item[\textbf{b)}] \textbf{Dado que la canica extraída es roja, calcule la probabilidad de que haya salido de la Caja 1.} \\
+    Aplicando el Teorema de Bayes:
+    \[ \mathbb{P}(C_1 \mid R) = \frac{\mathbb{P}(R \mid C_1)\mathbb{P}(C_1)}{\mathbb{P}(R)} \]
+    Sustituyendo el numerador y el denominador ya calculado (usando la fracción sin simplificar para facilitar el cálculo):
+    \[ \mathbb{P}(C_1 \mid R) = \frac{\frac{7}{30}}{\frac{14}{30}} = \frac{7}{14} = \frac{1}{2} \]
+
+    \item[\textbf{c)}] \textbf{Dado que la canica extraída es azul, calcule la probabilidad de que haya salido de la Caja 3.} \\
+    Primero encontramos la probabilidad total de extraer una canica azul por complemento:
+    \[ \mathbb{P}(B) = 1 - \mathbb{P}(R) = 1 - \frac{14}{30} = \frac{16}{30} \]
+    Aplicando nuevamente el Teorema de Bayes:
+    \[ \mathbb{P}(C_3 \mid B) = \frac{\mathbb{P}(B \mid C_3)\mathbb{P}(C_3)}{\mathbb{P}(B)} \]
+    \[ \mathbb{P}(C_3 \mid B) = \frac{\left(\frac{8}{10}\right)\left(\frac{1}{3}\right)}{\frac{16}{30}} = \frac{\frac{8}{30}}{\frac{16}{30}} = \frac{8}{16} = \frac{1}{2} \]
+\end{itemize}
+
+\newpage
+
+\subsection{Ejercicio 6.} Una cierta enfermedad afecta aproximadamente a  
+\(1\) de cada \(10,000\) personas. Sea
+$D$ el evento \textit{la persona tiene la enfermedad} y \(D^{c}\) el evento \textit{la persona no tiene la enfermedad}
+de modo que:
+
+\[
+    P(D)=\frac{1}{10000} = 0.0001   \text{ El complemento } P(D^{c} = 0.9999) 
+\]
+
+\begin{itemize}
+    \item[\textbf{a)}] \textbf{Calcule la probabilidad de obtener un resultado positivo en el test, es decir, $\mathbb{P}(T^+)$.} \\
+    Utilizando la Ley de Probabilidad Total, sabemos que un resultado positivo puede provenir de una persona enferma (verdadero positivo) o de una persona sana (falso positivo):
+    \begin{align*}
+        \mathbb{P}(T^+) &= \mathbb{P}(T^+ \mid D)\mathbb{P}(D) + \mathbb{P}(T^+ \mid D^c)\mathbb{P}(D^c) \\
+        &= (0.99)(0.0001) + (0.02)(0.9999) \\
+        &= 0.000099 + 0.019998 \\
+        &= 0.020097
+    \end{align*}
+
+    \item[\textbf{b)}] \textbf{Usando la fórmula de Bayes, calcule la probabilidad de que la persona tenga la enfermedad dado que el test fue positivo, es decir, $\mathbb{P}(D \mid T^+)$.} \\
+    Aplicamos el Teorema de Bayes:
+    \[ \mathbb{P}(D \mid T^+) = \frac{\mathbb{P}(T^+ \mid D)\mathbb{P}(D)}{\mathbb{P}(T^+)} \]
+    El numerador es la probabilidad conjunta de estar enfermo y dar positivo, y el denominador es la probabilidad total calculada en el inciso anterior:
+    \begin{align*}
+        \mathbb{P}(D \mid T^+) &= \frac{0.000099}{0.020097} \\
+        &\approx 0.004926
+    \end{align*}
+    
+\end{itemize}
+
+\newpage
+
+\subsection{Ejercicio 7.} Sean \(X\) e \(Y\) variables aleatorias independientes con: $X \sim \text{Unif}(0, 1)$ e $Y \sim \text{Unif}(0, 1)$
+
+\vspace{0.2cm}
+
+\textbf{Definición de las funciones de densidad marginales:} \\
+Dado que $X \sim \text{Unif}(0, 1)$ e $Y \sim \text{Unif}(0, 1)$, sus funciones de densidad de probabilidad (PDF) son:
+\[ f_X(x) = \begin{cases} 1 & \text{para } 0 \le x \le 1 \\ 0 & \text{e.o.c.} \end{cases} \]
+\[ f_Y(y) = \begin{cases} 1 & \text{para } 0 \le y \le 1 \\ 0 & \text{e.o.c.} \end{cases} \]
+
+\begin{itemize}
+    \item[\textbf{a)}] \textbf{Escriba la fórmula de la convolución para la densidad de $Z$:} \\
+    La fórmula general para la suma de dos variables continuas independientes es:
+    \[ f_Z(z) = \int_{-\infty}^{\infty} f_X(x) f_Y(z - x) \, dx \]
+    Como $f_X(x)$ solo es distinta de cero en el intervalo $[0, 1]$, podemos acotar los límites de integración:
+    \[ f_Z(z) = \int_{0}^{1} (1) \cdot f_Y(z - x) \, dx \]
+
+    \item[\textbf{b)}] \textbf{Calcule $f_Z(z)$ para cada rango de $z$ y obtenga la expresión explícita.} \\
+    Para que el integrando no se anule, se deben cumplir simultáneamente dos condiciones para $x$:
+    \begin{enumerate}
+        \item Por la densidad de $X$: $0 \le x \le 1$
+        \item Por la densidad de $Y$: $0 \le z - x \le 1 \implies z - 1 \le x \le z$
+    \end{enumerate}
+    
+    Dado que $Z = X + Y$, el rango posible para $Z$ es el intervalo $[0, 2]$. Los límites de integración cambian dependiendo de en qué mitad de este intervalo nos encontremos, por lo que analizamos dos casos:
+
+    \textbf{Caso 1: $0 \le z \le 1$} \\
+    La intersección de las condiciones sobre $x$ nos da los límites desde $0$ hasta $z$.
+    \[ f_Z(z) = \int_{0}^{z} 1 \, dx = \Big[ x \Big]_0^z = z \]
+
+    \textbf{Caso 2: $1 < z \le 2$} \\
+    La intersección de las condiciones sobre $x$ nos da los límites desde $z - 1$ hasta $1$.
+    \[ f_Z(z) = \int_{z-1}^{1} 1 \, dx = \Big[ x \Big]_{z-1}^1 = 1 - (z - 1) = 2 - z \]
+
+    \textbf{Expresión explícita final:} \\
+    Agrupando los casos, determinamos que la suma de dos distribuciones uniformes estándar resulta en una distribución triangular definida por:
+    \[ f_Z(z) = \begin{cases}
+        z & \text{para } 0 \le z \le 1 \\
+        2 - z & \text{para } 1 < z \le 2 \\
+        0 & \text{e.o.c.}
+    \end{cases} \]
+\end{itemize}
+
+\newpage
+
+\subsection{Ejercicio 8.} Sean \(X\) una variable aleatoria con distribucion normal.
+
+
+\vspace{0.2cm}
+
+\begin{itemize}
+    \item[\textbf{a)}] \textbf{Escriba $M_X(\lambda)$ como una integral explícita.} \\
+    Sustituyendo la función de densidad de la distribución normal en la definición de la función generadora de momentos, e integrando las funciones exponenciales:
+    \begin{align*}
+        M_X(\lambda) &= \int_{-\infty}^{\infty} e^{\lambda x} \frac{1}{\sqrt{2\pi}\sigma} \exp\left(-\frac{(x-\mu)^2}{2\sigma^2}\right) dx \\
+        &= \frac{1}{\sqrt{2\pi}\sigma} \int_{-\infty}^{\infty} \exp\left(\lambda x - \frac{(x-\mu)^2}{2\sigma^2}\right) dx
+    \end{align*}
+
+    \item[\textbf{b)}] \textbf{Calcule $M_X(\lambda)$ completando el cuadrado y realizando un cambio de variable.} \\
+    Primero, manipulamos algebraicamente el argumento de la función exponencial:
+    \begin{align*}
+        \lambda x - \frac{(x-\mu)^2}{2\sigma^2} &= \frac{2\sigma^2\lambda x - (x^2 - 2\mu x + \mu^2)}{2\sigma^2} \\
+        &= -\frac{1}{2\sigma^2} \left[ x^2 - 2(\mu + \sigma^2\lambda)x + \mu^2 \right]
+    \end{align*}
+    Completamos el cuadrado sumando y restando $(\mu + \sigma^2\lambda)^2$:
+    \begin{align*}
+        &= -\frac{1}{2\sigma^2} \left[ \left(x - (\mu + \sigma^2\lambda)\right)^2 - (\mu + \sigma^2\lambda)^2 + \mu^2 \right] \\
+        &= -\frac{1}{2\sigma^2} \left[ \left(x - (\mu + \sigma^2\lambda)\right)^2 - (\mu^2 + 2\mu\sigma^2\lambda + \sigma^4\lambda^2) + \mu^2 \right] \\
+        &= -\frac{1}{2\sigma^2} \left[ \left(x - (\mu + \sigma^2\lambda)\right)^2 - 2\mu\sigma^2\lambda - \sigma^4\lambda^2 \right] \\
+        &= -\frac{\left(x - (\mu + \sigma^2\lambda)\right)^2}{2\sigma^2} + \mu\lambda + \frac{1}{2}\sigma^2\lambda^2
+    \end{align*}
+
+  Separamos la parte constante y la sacamos de la integral:
+\[
+M_X(\lambda) =
+\exp\left(\mu\lambda + \frac{1}{2}\sigma^2\lambda^2\right)
+\int_{-\infty}^{\infty}
+\frac{1}{\sqrt{2\pi}\sigma}
+\exp\left(
+-\frac{\left(x-(\mu+\sigma^2\lambda)\right)^2}{2\sigma^2}
+\right) dx
+\]
+
+Realizamos el cambio de variable
+\[
+z = \frac{x-(\mu+\sigma^2\lambda)}{\sqrt{2}\sigma},
+\qquad
+dx = \sqrt{2}\sigma\,dz.
+\]
+
+Entonces:
+
+\begin{align*}
+\int_{-\infty}^{\infty}
+\frac{1}{\sqrt{2\pi}\sigma}
+e^{-z^2}(\sqrt{2}\sigma\,dz)
+&=
+\frac{1}{\sqrt{\pi}}
+\int_{-\infty}^{\infty} e^{-z^2} dz.
+\end{align*}
+
+Como la integral gaussiana vale $\sqrt{\pi}$, el término es:
+
+\[
+\frac{1}{\sqrt{\pi}}(\sqrt{\pi})=1.
+\]
+
+Por lo tanto, la función generadora de momentos es:
+
+\[
+M_X(\lambda)=
+\exp\left(\mu\lambda+\frac{1}{2}\sigma^2\lambda^2\right).
+\]
+
+    \item[\textbf{c)}] \textbf{Muestre que el resultado anterior se puede escribir como:} \\
+    Dado que la integral restante evalúa a $1$, la expresión cerrada se obtiene directamente de los términos constantes factorizados en el paso anterior:
+    \[ M_X(\lambda) = \exp\left(\mu\lambda + \frac{1}{2}\sigma^2\lambda^2\right) \]
+
+    \item[\textbf{d)}] \textbf{Interpretación en el contexto de cálculo estocástico.} \\
+    La MGF evaluada en variables específicas es fundamental para encontrar momentos de manera directa sin necesidad de integración compleja. En modelos como el Movimiento Browniano Geométrico, donde un proceso se define como $S_t = S_0 e^{X_t}$ (con $X_t$ normal), el cálculo de valores esperados $\mathbb{E}[S_t]$ requiere evaluar $\mathbb{E}[e^{X_t}]$, lo cual es idéntico a calcular la MGF $M_{X_t}(1)$. Adicionalmente, transformaciones similares son esenciales en el Teorema de Girsanov para realizar cambios de medida (fijar derivadas de Radon-Nikodym) al valuar derivados financieros.
+\end{itemize}
+
+\newpage
+
+\subsection{Ejercicio 9.} Consideramos una cadena de Markov 
+\((X_n)_{n\ge 0}\) en el espacio de estados \(\{1,2,3\}\) a partir del diagrama.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}[
+        > = stealth, 
+        shorten > = 1pt, 
+        auto, 
+        semithick, 
+        node distance = 3.5cm 
+    ]
+
+    
+    \node[state] (1) {1};
+
+    \node[state] (2) [below right=1cm and 3cm of 1] {2};
+   
+    \node[state] (3) [below left=2.5cm and 0.5cm of 2] {3};
+
+
+    \path[->]
+        % Bucles
+        (1) edge [loop left]  node {0.2} (1)
+        (2) edge [loop right] node {0.3} (2)
+        (3) edge [loop below] node {0.4} (3)
+        
+        % Transiciones entre 1 y 2
+        (1) edge [bend left=15] node {0.2} (2)
+        (2) edge [bend left=15] node {0.3} (1)
+        
+        % Transiciones entre 2 y 3
+        (2) edge [bend left=15] node {0.4} (3)
+        (3) edge [bend left=15] node {0.3} (2)
+        
+        % Transiciones entre 3 y 1
+        
+        (3) edge [bend left=15] node[left] {0.3} (1)
+        (1) edge [bend left=15] node[right] {0.6} (3);
+
+    \end{tikzpicture}
+    \caption{Diagrama de transiciones de una cadena de Markov de tres estados.}
+\end{figure}
+
+\begin{itemize}
+    \item[\textbf{a)}] \textbf{Escriba la matriz de transición $P$ de la cadena.} \\
+    A partir de las probabilidades del diagrama de estados, construimos la matriz donde las filas son el estado de origen y las columnas el estado de destino:
+
+\vspace{0.2cm}
+
+Fila 1 (Desde el estado 1): Va a 1 con 0.2 "Bucle", a 2 con 0.2, y a 3 con 0.2+0.4=0.6.
+
+Fila 2 (Desde el estado 2): Va a 1 con 0.3, a 2 con 0.3 "bucle", y a 3 con 0.4.
+
+Fila 3 (Desde el estado 3): Va a 1 con 0.3, a 2 con 0.3, y a 3 con 0.4 "Bucle".
+
+\vspace{0.2cm}
+
+    \[ P = \begin{pmatrix} 0.2 & 0.2 & 0.6 \\ 0.3 & 0.3 & 0.4 \\ 0.3 & 0.3 & 0.4 \end{pmatrix} \]
+    
+\vspace{0.2cm}
+    
+La filas 2 y 3 son idénticas, lo que significa que una vez que llegas a 2 o a 3, el comportamiento hacia el futuro es exactamente el mismo.
+
+    \item[\textbf{b)}] \textbf{Calcule $P^2$ e interprete las entradas $p_{ij}^{(2)}$.} 
+
+    \(
+    \textit{Fila 1: }p_{11}^{(2)} = (0.2)(0.2) + (0.2)(0.3) + (0.6)(0.3) = 0.04 + 0.06 + 0.18 = 0.28 
+    \)\\
+    \(
+    p_{12}^{(2)} = (0.2)(0.2) + (0.2)(0.3) + (0.6)(0.3) = 0.28 
+    \)\\
+    \(
+    p_{13}^{(2)} = (0.2)(0.6) + (0.2)(0.4) + (0.6)(0.4) = 0.12 + 0.08 + 0.24 = 0.44
+    \)\\
+    \(
+    \textit{Fila 2: }p_{21}^{(2)} = (0.3)(0.2) + (0.3)(0.3) + (0.4)(0.3) = 0.06 + 0.09 + 0.12 = 0.27
+    \)\\
+    \(
+     p_{22}^{(2)} = (0.3)(0.2) + (0.3)(0.3) + (0.4)(0.3) = 0.27
+    \)\\
+    \(
+    p_{23}^{(2)} = (0.3)(0.6) + (0.3)(0.4) + (0.4)(0.4) = 0.18 + 0.12 + 0.16 = 0.46
+    \)
+
+    \vspace{0.2cm}
+    
+    Multiplicando la matriz $P$ por sí misma obtenemos:
+    \[ P^2 = \begin{pmatrix} 
+    0.2(0.2)+0.2(0.3)+0.6(0.3) & 0.2(0.2)+0.2(0.3)+0.6(0.3) & 0.2(0.6)+0.2(0.4)+0.6(0.4) \\ 
+    0.3(0.2)+0.3(0.3)+0.4(0.3) & 0.3(0.2)+0.3(0.3)+0.4(0.3) & 0.3(0.6)+0.3(0.4)+0.4(0.4) \\ 
+    0.3(0.2)+0.3(0.3)+0.4(0.3) & 0.3(0.2)+0.3(0.3)+0.4(0.3) & 0.3(0.6)+0.3(0.4)+0.4(0.4) 
+    \end{pmatrix} \]
+    \[ P^2 = \begin{pmatrix} 0.28 & 0.28 & 0.44 \\ 0.27 & 0.27 & 0.46 \\ 0.27 & 0.27 & 0.46 \end{pmatrix} \]
+    \textbf{Interpretación:} La entrada $p_{ij}^{(2)}$ representa la probabilidad de transición de la cadena desde el estado $i$ hasta el estado $j$ en exactamente 2 pasos.
+
+    \item[\textbf{c)}] \textbf{Dada la matriz $P^2$ y el vector $\lambda = (\frac{1}{3}, \frac{2}{3}, 0)$, calcule $\mathbb{P}(X_2 = 2)$.} \\
+    Multiplicamos el vector de estado inicial por la segunda columna de la matriz $P^2$:
+    \begin{align*}
+        \mathbb{P}(X_2 = 2) &= (\lambda P^2)_2 = \left(\frac{1}{3}\right)(0.28) + \left(\frac{2}{3}\right)(0.27) + (0)(0.27) \\
+        &= \frac{0.28}{3} + \frac{0.54}{3} = \frac{0.82}{3} = \frac{41}{150} \approx 0.2733
+    \end{align*}
+
+    \item[\textbf{d)}] \textbf{Si $\mathbb{P}(X_0 = 1) = \frac{1}{3}$, halle $\mathbb{P}(X_0 = 1, X_1 = 2)$.} \\
+    Usando la propiedad de la cadena, es la probabilidad inicial multiplicada por la probabilidad de transición de 1 a 2:
+    \[ \mathbb{P}(X_0 = 1, X_1 = 2) = \mathbb{P}(X_0 = 1) p_{12} = \left(\frac{1}{3}\right)(0.2) = \frac{1}{15} \approx 0.0667 \]
+
+    \item[\textbf{e)}] \textbf{Bajo la misma condición inicial, halle $\mathbb{P}(X_0 = 1, X_1 = 2, X_2 = 3)$.} \\
+    Multiplicamos la probabilidad inicial por las respectivas probabilidades de transición de cada paso:
+    \[ \mathbb{P}(X_0 = 1, X_1 = 2, X_2 = 3) = \mathbb{P}(X_0 = 1) p_{12} p_{23} = \left(\frac{1}{3}\right)(0.2)(0.4) = \frac{0.08}{3} = \frac{2}{75} \approx 0.0267 \]
+
+    \item[\textbf{f)}] \textbf{Expresión de $\mathbb{P}(X_{m+n} = 3 \mid X_m = 2)$.} \\
+    Debido a la propiedad de homogeneidad en el tiempo de la Cadena de Markov, esta probabilidad es equivalente a $\mathbb{P}(X_n = 3 \mid X_0 = 2)$. 
+    Utilizando el vector $\delta_2 = (0, 1, 0)$, el estado en el tiempo $n$ está dado por $\delta_2 P^n$. La probabilidad de estar en el estado 3 corresponde a la tercera componente de este vector fila resultante.
+    Esta probabilidad se identifica directamente como la entrada en la fila 2 y columna 3 de la matriz $n$-ésima, es decir, $p_{23}^{(n)}$.
+\end{itemize}
+
+\newpage
+
+\subsection{Ejercicio 10.} Considera la siguiente matriz de transición.
+
+\vspace{0.2cm}
+
+    \[ P = \begin{pmatrix} 
+    0.2 & 0.8 \\ 
+    0.4 & 0.6 
+    \end{pmatrix} \]
+    
+\vspace{0.2cm}
+
+\begin{itemize}
+    \item[\textbf{a)}] \textbf{Calcule los eigenvalores de $P$ resolviendo $\det(P - \lambda I) = 0$.} \\
+    El polinomio característico es:
+    \begin{align*}
+        \det \begin{pmatrix} 0.2 - \lambda & 0.8 \\ 0.4 & 0.6 - \lambda \end{pmatrix} &= (0.2 - \lambda)(0.6 - \lambda) - (0.8)(0.4) = 0 \\
+        0.12 - 0.8\lambda + \lambda^2 - 0.32 &= 0 \\
+        \lambda^2 - 0.8\lambda - 0.2 &= 0
+    \end{align*}
+    Factorizando, obtenemos $(\lambda - 1)(\lambda + 0.2) = 0$, por lo que los eigenvalores son $\lambda_1 = 1$ y $\lambda_2 = -0.2$.
+
+    \item[\textbf{b)}] \textbf{Halle un autovector derecho no nulo $v$ para cada eigenvalor.} \\
+    Para $\lambda_1 = 1$:
+    \[ \begin{pmatrix} -0.8 & 0.8 \\ 0.4 & -0.4 \end{pmatrix} \begin{pmatrix} x \\ y \end{pmatrix} = \begin{pmatrix} 0 \\ 0 \end{pmatrix} \implies -0.8x + 0.8y = 0 \implies x = y \implies v_1 = \begin{pmatrix} 1 \\ 1 \end{pmatrix} \]
+    Para $\lambda_2 = -0.2$:
+    \[ \begin{pmatrix} 0.4 & 0.8 \\ 0.4 & 0.8 \end{pmatrix} \begin{pmatrix} x \\ y \end{pmatrix} = \begin{pmatrix} 0 \\ 0 \end{pmatrix} \implies 0.4x + 0.8y = 0 \implies x = -2y \implies v_2 = \begin{pmatrix} -2 \\ 1 \end{pmatrix} \]
+
+    \item[\textbf{c)}] \textbf{Construya la matriz de eigenvectores $S$ y calcule $S^{-1}$.} \\
+    \[ S = \begin{pmatrix} 1 & -2 \\ 1 & 1 \end{pmatrix} \]
+    Dado que $\det(S) = (1)(1) - (-2)(1) = 3$, la inversa es:
+    \[ S^{-1} = \frac{1}{3} \begin{pmatrix} 1 & 2 \\ -1 & 1 \end{pmatrix} = \begin{pmatrix} 1/3 & 2/3 \\ -1/3 & 1/3 \end{pmatrix} \]
+
+    \item[\textbf{d)}] \textbf{Use la diagonalización para calcular explícitamente $P^5$.} \\
+
+    \vspace{0.2cm}
+
+    La matriz diagonal $D$ se forma con los eigenvalores:
+
+    \[
+    \lambda_{1} = 1 
+    \]
+    \[
+    \lambda_{2} = -0.2
+    \]
+    
+    \[  = \begin{pmatrix} 1 & 0 \\ 0 & -0.2 \end{pmatrix} \]
+    
+    
+    \[ P^5 = S D^5 S^{-1} = \begin{pmatrix} 1 & -2 \\ 1 & 1 \end{pmatrix} \begin{pmatrix} 1^5 & 0 \\ 0 & (-0.2)^5 \end{pmatrix} \frac{1}{3} \begin{pmatrix} 1 & 2 \\ -1 & 1 \end{pmatrix} \]
+    \[ P^5 = \frac{1}{3} \begin{pmatrix} 1 & -2 \\ 1 & 1 \end{pmatrix} \begin{pmatrix} 1 & 2 \\ 0.00032 & -0.00032 \end{pmatrix} = \frac{1}{3} \begin{pmatrix} 0.99936 & 2.00064 \\ 1.00032 & 1.99968 \end{pmatrix} = \begin{pmatrix} 0.33312 & 0.66688 \\ 0.33344 & 0.66656 \end{pmatrix} \]
+
+    \item[\textbf{e)}] 
+
+\vspace{0.2cm}
+        
+    \textbf{Calcule el límite $\lim_{n \to \infty} P^n$ y explique qué representa.}
+    
+\vspace{0.2cm}
+     
+    Dado que $\lim_{n \to \infty} (-0.2)^n = 0$:
+    \[ \lim_{n \to \infty} P^n = S \begin{pmatrix} 1 & 0 \\ 0 & 0 \end{pmatrix} S^{-1} = \frac{1}{3} \begin{pmatrix} 1 & -2 \\ 1 & 1 \end{pmatrix} \begin{pmatrix} 1 & 0 \\ 0 & 0 \end{pmatrix} \begin{pmatrix} 1 & 2 \\ -1 & 1 \end{pmatrix} = \frac{1}{3} \begin{pmatrix} 1 & 0 \\ 1 & 0 \end{pmatrix} \begin{pmatrix} 1 & 2 \\ -1 & 1 \end{pmatrix} = \begin{pmatrix} 1/3 & 2/3 \\ 1/3 & 2/3 \end{pmatrix} \]
+    \textbf{Interpretación:} Este límite representa la distribución estacionaria de la cadena de Markov. A largo plazo, el estado inicial del sistema deja de importar; las filas idénticas nos indican que el sistema tenderá a estabilizarse pasando un $33.3\%$ del tiempo en el estado 1 y un $66.6\%$ en el estado 2.
+\end{itemize}
+
+\newpage
+
+\subsection*{Ejercicio 11.} Considera una cadena de Markov con espacio de estados $\{0,1,2\}$ y la matriz de transición.
+
+\vspace{0.2cm}
+
+\[ P = \begin{pmatrix} 
+0.5 &  0.5 & 0 \\ 
+0   &  0   & 1 \\
+1   &  0   & 0
+\end{pmatrix} \]
+
+\vspace{0.2cm}
+
+\begin{itemize}
+    \item[\textbf{a)}] \textbf{Dibuje el diagrama de transición de la cadena.}
+    \begin{center}
+    \begin{tikzpicture}[> = stealth, shorten > = 1pt, auto, semithick, node distance = 3cm]
+        \node[state] (0) {0};
+        \node[state] (1) [below right=1.5cm and 2cm of 0] {1};
+        \node[state] (2) [below left=1.5cm and 2cm of 0] {2};
+
+        \path[->]
+            (0) edge [loop above] node {0.5} (0)
+            (0) edge [bend left=15] node {0.5} (1)
+            (1) edge [bend left=15] node {1} (2)
+            (2) edge [bend left=15] node {1} (0);
+    \end{tikzpicture}
+    \end{center}
+
+    \vspace{0.2cm}
+
+    Desde el Estado 0 \\
+    (Fila 1): Tienes $0.5$ de probabilidad de quedarte en el $0$ (auto-bucle) y $0.5$ de ir al estado $1$.Desde el Estado 1 \\
+    (Fila 2): Tienes un $1$ en la última columna. Esto significa que desde el $1$ siempre saltas al estado $2$ con probabilidad $100\%$.Desde el Estado 2\\
+    (Fila 3): Tienes un $1$ en la primera columna. Esto significa que desde el $2$ siempre regresas al estado $0$ con probabilidad $100\%$.
+
+    \vspace{0.2cm}
+  
+    \item[\textbf{b)}] \textbf{Clasifique los estados en transitorios, recurrentes y determine su periodo.} \\
+    A partir del diagrama, observamos que $0 \to 1 \to 2 \to 0$. Todos los estados se comunican entre sí, por lo que la cadena está compuesta por una única clase de comunicación (es \textbf{irreducible}).
+    Al ser una cadena finita e irreducible, todos sus estados son \textbf{recurrentes positivos} (no hay estados transitorios).
+    Dado que el estado $0$ tiene una transición a sí mismo ($p_{00} > 0$), su periodo es $1$. Como el periodo es una propiedad de clase, todos los estados son \textbf{aperiódicos} ($d=1$).
+
+    \item[\textbf{c)}] \textbf{Utilice Chapman-Kolmogorov para calcular $P^{(2)}$.} \\
+    La ecuación de Chapman-Kolmogorov establece que la matriz de transición en $n$ pasos se obtiene multiplicando la matriz $P$ por sí misma. Calculamos $P^2 = P \times P$:
+    \begin{align*}
+        P^{(2)} &= \begin{pmatrix} 0.5 & 0.5 & 0 \\ 0 & 0 & 1 \\ 1 & 0 & 0 \end{pmatrix} 
+        \begin{pmatrix} 0.5 & 0.5 & 0 \\ 0 & 0 & 1 \\ 1 & 0 & 0 \end{pmatrix} \\  
+        &= \begin{pmatrix} 
+        (0.5)^2+(0.5)(0)+0 & (0.5)^2+0+0 & 0+(0.5)(1)+0 \\ 
+        0+0+(1)(1) & 0+0+0 & 0+0+0 \\ 
+        (1)(0.5)+0+0 & (1)(0.5)+0+0 & 0+0+0 
+        \end{pmatrix} \\
+        &= \begin{pmatrix} 0.25 & 0.25 & 0.5 \\ 1 & 0 & 0 \\ 0.5 & 0.5 & 0 
+        \end{pmatrix}
+    \end{align*}
+
+\newpage
+
+\item[\textbf{d)}] \textbf{Si $X_0 = 1$, calcule $\mathbb{P}(X_3 = 0)$.} \\
+    Buscamos la probabilidad de ir del estado 1 al estado 0 en 3 pasos ($p_{10}^{(3)}$). Evaluando el único camino posible desde $X_0=1$:
+    \[ \mathbb{P}(X_1=2 \mid X_0=1) = 1 \]
+    \[ \mathbb{P}(X_2=0 \mid X_1=2) = 1 \]
+    \[ \mathbb{P}(X_3=0 \mid X_2=0) = 0.5 \]
+    Multiplicando las probabilidades de la ruta: $1 \cdot 1 \cdot 0.5 = 0.5$. 
+    Por lo tanto, $\mathbb{P}(X_3 = 0 \mid X_0 = 1) = 0.5$.
+
+    \vspace{0.5cm}
+    \item[\textbf{e)}] \textbf{Calcule $\mathbb{P}(X_5 = 2 \mid X_2 = 1)$ de dos maneras diferentes.} \\
+    Por homogeneidad temporal, $\mathbb{P}(X_5 = 2 \mid X_2 = 1) = \mathbb{P}(X_3 = 2 \mid X_0 = 1) = p_{12}^{(3)}$.
+    
+    \textbf{Método 1 (Propiedad de Markov):} Analizamos la ruta desde el estado 1 en 3 pasos.
+    La ruta determinista inicial es $1 \to 2 \to 0$. Estando en el estado 0 en el último paso, las únicas transiciones posibles son hacia 0 o hacia 1. Es imposible alcanzar el estado 2 en exactamente 3 pasos desde el 1. Por lo tanto, la probabilidad es $0$.
+    
+    \textbf{Método 2 (Usando la matriz $P^{(3)}$):} 
+    Solo necesitamos calcular la entrada $(1, 2)$ de la matriz $P^3$. Esto se obtiene multiplicando la fila 1 de $P^2$ por la columna 2 de $P$:
+    \[ p_{12}^{(3)} = \begin{pmatrix} 1 & 0 & 0 \end{pmatrix} \begin{pmatrix} 0 \\ 1 \\ 0 \end{pmatrix} = (1)(0) + (0)(1) + (0)(0) = 0 \]
+    Ambos métodos confirman que el resultado es $0$.
+\end{itemize}
+
+\newpage
+
+\subsection*{Ejercicio 12.} Sea \(\{ X_{n}\}\) Una cadena de Markov con espacio de estados \(S=\{0,1,2,3\}\) y la matriz de transicion.
+
+\vspace{0.2cm}
+
+\[ P = \begin{pmatrix} 
+1   &  0   & 0   & 0 & 0  \\ 
+0.2 & 0.3  & 0.5 & 0 & 0  \\
+0   & 0.4  & 0.2 & 0.4 & 0  \\
+0   &  0   & 0.6 & 0.1 & 0.3  \\
+0  &  0 & 0 & 0 & 1  
+\end{pmatrix} \]
+
+\vspace{0.2cm}
+
+\begin{center}
+\begin{tikzpicture}[> = stealth, shorten > = 1pt, auto, semithick]
+
+  
+    \node[state] (1) at (0, 2) {1};
+    \node[state] (2) at (3, 0) {2};
+    \node[state] (3) at (0, -2) {3};
+    
+   
+    \node[state] (0) at (-3, 2) {0};
+    \node[state] (4) at (-3, -2) {4};
+
+    \path[->]
+        
+        (0) edge [loop left]  node {1}   (0)
+        (1) edge [loop above] node {0.3} (1)
+        (2) edge [loop right] node {0.2} (2)
+        (3) edge [loop below] node {0.1} (3)
+        (4) edge [loop left]  node {1}   (4)
+        
+      
+        (1) edge node [above] {0.2} (0)
+        (3) edge node [above] {0.3} (4)
+        
+  
+        (1) edge [bend left=15] node [above right] {0.5} (2)
+        (2) edge [bend left=15] node [below left]  {0.4} (1)
+        
+        (2) edge [bend left=15] node [below right] {0.4} (3)
+        (3) edge [bend left=15] node [above left]  {0.6} (2);
+
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.2cm}
+
+\begin{itemize}
+    \item[\textbf{a)}] \textbf{Identifique las clases de comunicación, los estados absorbentes y los estados transitorios.} \\
+    Analizando la matriz de transición $P$, observamos las filas correspondientes a cada estado:
+    \begin{itemize}
+        \item Las filas de los estados $0$ y $4$ tienen un $1$ en la diagonal principal ($p_{00} = 1$ y $p_{44} = 1$), lo que indica que una vez alcanzados, la cadena no puede salir de ellos. Estos son \textbf{estados absorbentes}.
+        \item Los estados $1, 2$ y $3$ se comunican entre sí ($1 \leftrightarrow 2 \leftrightarrow 3$), formando una sola clase de comunicación. Sin embargo, como tienen probabilidades positivas de transitar hacia los estados absorbentes (ej. $p_{10} = 0.2$ y $p_{34} = 0.3$), eventualmente el sistema saldrá de ellos de manera definitiva. Por lo tanto, $\{1, 2, 3\}$ son \textbf{estados transitorios}.
+    \end{itemize}
+    \textbf{Conclusión:} Las clases de comunicación son $\{0\}$, $\{4\}$ y $\{1, 2, 3\}$. Estados absorbentes: $0$ y $4$. Estados transitorios: $1, 2$ y $3$.
+
+    \item[\textbf{b)}] \textbf{Plantee el sistema de ecuaciones lineales para $a_1, a_2, a_3$.} \\
+    Sea $a_i$ la probabilidad de ser absorbido en el estado $0$ iniciando en el estado $i$. Sabemos por definición que $a_0 = 1$ y $a_4 = 0$.
+
+    \vspace{0.2cm}
+    
+    Utilizando la ley de probabilidad total (Análisis de Primer Paso), planteamos $a_i = \sum_{j=0}^{4} p_{ij}a_j$ para los estados transitorios:
+    \begin{align*}
+        a_1 &= 0.2(1) + 0.3a_1 + 0.5a_2 + 0a_3 + 0(0) &\implies a_1 &= 0.2 + 0.3a_1 + 0.5a_2 \\
+        a_2 &= 0(1) + 0.4a_1 + 0.2a_2 + 0.4a_3 + 0(0) &\implies a_2 &= 0.4a_1 + 0.2a_2 + 0.4a_3 \\
+        a_3 &= 0(1) + 0a_1 + 0.6a_2 + 0.1a_3 + 0.3(0) &\implies a_3 &= 0.6a_2 + 0.1a_3
+    \end{align*}
+
+    \newpage
+    \item[\textbf{c)}] \textbf{Resuelva el sistema para encontrar $a_1, a_2, a_3$.} \\
+    Reordenando y simplificando las ecuaciones del inciso anterior:
+    \begin{align}
+        7a_1 - 5a_2 &= 2 \\
+        -a_1 + 2a_2 - a_3 &= 0 \\
+        -6a_2 + 9a_3 &= 0 \implies a_3 = \frac{2}{3}a_2 
+    \end{align}
+    Sustituyendo (3) en (2):
+    \[ -a_1 + 2a_2 - \left(\frac{2}{3}a_2\right) = 0 \implies a_1 = \frac{4}{3}a_2 \]
+    Sustituyendo $a_1$ en (1):
+    \[ 7\left(\frac{4}{3}a_2\right) - 5a_2 = 2 \implies \frac{28}{3}a_2 - \frac{15}{3}a_2 = 2 \implies \frac{13}{3}a_2 = 2 \implies a_2 = \frac{6}{13} \]
+    Calculando $a_1$ y $a_3$:
+    \[ a_1 = \frac{4}{3}\left(\frac{6}{13}\right) = \frac{8}{13}, \quad a_3 = \frac{2}{3}\left(\frac{6}{13}\right) = \frac{4}{13} \]
+
+\textbf{Solución:} $a_1 = \frac{8}{13}$, $a_2 = \frac{6}{13}$, $a_3 = \frac{4}{13}$
+
+\vspace{0.5cm}
+
+\item[\textbf{d)}] \textbf{Calcule la probabilidad de ser absorbido en el estado 4 empezando desde el estado 2.} \\
+    En una cadena de Markov donde el conjunto de estados absorbentes es finito y alcanzable desde cualquier estado transitorio, la suma de las probabilidades de absorción en todos los estados absorbentes posibles debe ser 1.
+    Dado que los únicos estados absorbentes son $0$ y $4$:
+    \[ \mathbb{P}(\text{absorbido en } 0 \mid X_0 = 2) + \mathbb{P}(\text{absorbido en } 4 \mid X_0 = 2) = 1 \]
+    \[ a_2 + b_2 = 1 \]
+    Sustituyendo el valor encontrado previamente:
+    \[ \frac{6}{13} + b_2 = 1 \implies b_2 = 1 - \frac{6}{13} = \frac{7}{13} \]
+    \textbf{Respuesta:} La probabilidad es $\frac{7}{13}$.
+\end{itemize}
+
+\newpage
+
+\subsection*{Ejercicio 13.} Considere la misma cadena de Markov del Ejercicio 12.
+
+\vspace{0.2cm}
+
+\begin{itemize}
+    \item[\textbf{a)}] \textbf{Plantee el sistema de ecuaciones para $t_1, t_2, t_3$.} \\
+    Sea $t_i$ el tiempo medio (número esperado de pasos) hasta la absorción iniciando en el estado transitorio $i$. Utilizando el análisis de primer paso, la ecuación general es $t_i = 1 + \sum_{j} p_{ij} t_j$, donde la suma se realiza sobre los estados transitorios (ya que el tiempo restante al llegar a un estado absorbente es cero). 
+    A partir de la matriz de transición del Ejercicio 12, obtenemos:
+    \begin{align*}
+        t_1 &= 1 + 0.3t_1 + 0.5t_2 \\
+        t_2 &= 1 + 0.4t_1 + 0.2t_2 + 0.4t_3 \\
+        t_3 &= 1 + 0.6t_2 + 0.1t_3
+    \end{align*}
+
+    \item[\textbf{b)}] \textbf{Resuelva el sistema. ¿Cuál es el tiempo medio de absorción si comenzamos en el estado 2?} \\
+    Procedemos a agrupar términos semejantes y despejar variables para resolver el sistema mediante sustitución:
+    \begin{align}
+        0.7t_1 - 0.5t_2 &= 1 \implies t_1 = \frac{10 + 5t_2}{7} \\
+        -0.4t_1 + 0.8t_2 - 0.4t_3 &= 1 \implies 4t_2 = 5 + 2t_1 + 2t_3 \\
+        -0.6t_2 + 0.9t_3 &= 1 \implies t_3 = \frac{10 + 6t_2}{9}
+    \end{align}
+    Sustituyendo (1) y (3) en la ecuación (2):
+    \[ 4t_2 = 5 + 2\left(\frac{10 + 5t_2}{7}\right) + 2\left(\frac{10 + 6t_2}{9}\right) \]
+    Multiplicando toda la ecuación por $63$ (mínimo común múltiplo de $7$ y $9$) para eliminar los denominadores:
+    \begin{align*}
+        252t_2 &= 315 + 9(20 + 10t_2) + 7(20 + 12t_2) \\
+        252t_2 &= 315 + 180 + 90t_2 + 140 + 84t_2 \\
+        252t_2 &= 635 + 174t_2 \\
+        78t_2 &= 635 \\
+        t_2 &= \frac{635}{78} \approx 8.141
+    \end{align*}
+    Calculando el resto de los tiempos para tener el sistema completo:
+    \[ t_1 = \frac{10 + 5(635/78)}{7} = \frac{565}{78} \approx 7.243 \]
+    \[ t_3 = \frac{10 + 6(635/78)}{9} = \frac{510}{78} \approx 6.538 \]
+    \textbf{Respuesta:} Si el sistema comienza en el estado 2, el tiempo medio esperado hasta ser absorbido es de $t_2 = \frac{635}{78}$ pasos (aproximadamente $8.14$ pasos).
+\end{itemize}
+
+\newpage
+
+\subsection*{Ejercicio 14.} Considere una caminata aleatoria (Nacimiento-Muerte) en los enteros no negativos \( \{0,1,2,3,.... \}\)
+con la probabilidad de transición.
+
+\vspace{0.2cm}
+
+\begin{itemize}
+    \item[\textbf{a)}] \textbf{Escriba la matriz de transición (de dimensión infinita) de forma implícita.} \\
+    Dado que el espacio de estados es $\{0, 1, 2, \dots\}$, la matriz es de dimensión infinita. Utilizando las reglas $p_{0,1} = 1$ y $p_{i,i+1} = p, \ p_{i,i-1} = q$ para $i \ge 1$:
+    \[ P = \begin{pmatrix} 
+    0 & 1 & 0 & 0 & 0 & \dots \\ 
+    q & 0 & p & 0 & 0 & \dots \\ 
+    0 & q & 0 & p & 0 & \dots \\ 
+    0 & 0 & q & 0 & p & \dots \\ 
+    \vdots & \vdots & \vdots & \ddots & \ddots & \ddots 
+    \end{pmatrix} \]
+
+    \item[\textbf{b)}] \textbf{Demuestre que todos los estados se comunican. ¿Es la cadena irreducible?} \\
+    Para cualquier par de estados $i, j$ tal que $j > i$:
+    \begin{itemize}
+        \item Es posible ir de $i$ a $j$ dando $j-i$ pasos hacia la derecha, con probabilidad $p^{j-i} > 0$ (dado que $0 < p < 1$).
+        \item Es posible regresar de $j$ a $i$ dando $j-i$ pasos hacia la izquierda, con probabilidad $q^{j-i} > 0$ (dado que $q = 1-p > 0$).
+    \end{itemize}
+    El estado $0$ se comunica con el estado $1$ por definición ($p_{0,1} = 1 > 0$) y, por transitividad, con todos los demás. Como $i \leftrightarrow j$ para todo $i, j$, existe una única clase de comunicación. \textbf{Sí, la cadena es irreducible.}
+
+    \item[\textbf{c)}] \textbf{Aplique el criterio para determinar las condiciones de recurrencia.} \\
+    Se nos da la serie para el criterio de divergencia:
+    \[ \sum_{k=1}^{\infty} \prod_{m=1}^{k} \frac{q_m}{p_m} \]
+    Para nuestra caminata, $p_m = p$ y $q_m = q$ son constantes para todo $m \ge 1$. El producto interno se simplifica a:
+    \[ \prod_{m=1}^{k} \frac{q}{p} = \left(\frac{q}{p}\right)^k \]
+    Por lo tanto, la serie a analizar es la serie geométrica $\sum_{k=1}^{\infty} \left(\frac{q}{p}\right)^k$. 
+    Para que esta serie geométrica diverja, su razón debe ser mayor o igual a 1:
+    \[ \frac{q}{p} \ge 1 \implies q \ge p \]
+    Sabiendo que $q = 1 - p$:
+    \[ 1 - p \ge p \implies 1 \ge 2p \implies p \le \frac{1}{2} \]
+    \textbf{Condición:} La cadena es recurrente si y solo si $p \le 1/2$ (es decir, $p \le q$).
+
+    \item[\textbf{d)}] \textbf{¿Cuándo es la cadena transitoria? Interprete el resultado.} \\
+    La cadena es transitoria cuando la serie converge, lo cual ocurre si la razón geométrica es menor a 1:
+    \[ \frac{q}{p} < 1 \implies q < p \implies 1 - p < p \implies p > \frac{1}{2} \]
+    \textbf{Interpretación en la caminata aleatoria semi-infinita:} 
+    Si $p > 1/2$, la probabilidad de dar un paso hacia la derecha es estrictamente mayor que la de retroceder hacia la izquierda. Esto genera una ``deriva'' positiva en el sistema. Físicamente, significa que la partícula tenderá a alejarse hacia el infinito. Dado que el espacio hacia la derecha es infinito, pero hacia la izquierda está acotado por una barrera reflectante en el $0$, la partícula eventualmente escapará hacia la derecha y la probabilidad de que regrese a visitar cualquier estado finito se vuelve cero, volviéndolos estados transitorios.
+\end{itemize}
+
+\newpage
+
+\subsection*{Ejercicio 15.} Considere la cadena de Markov de 2 estados con matriz ed transición:
+
+\vspace{0.2cm}
+
+\[
+ P=
+ \begin{pmatrix}
+     0 & 1 \\
+     1 & 0
+ \end{pmatrix}
+\]
+
+\begin{itemize}
+    \item[\textbf{a)}] \textbf{Dibuje el diagrama de estados. Determine el periodo de cada estado.}
+    \begin{center}
+    \begin{tikzpicture}[> = stealth, shorten > = 1pt, auto, semithick, node distance = 3cm]
+        \node[state] (1) {1};
+        \node[state] (2) [right of=1] {2};
+
+        \path[->]
+            (1) edge [bend left=15] node {1} (2)
+            (2) edge [bend left=15] node {1} (1);
+    \end{tikzpicture}
+    \end{center}
+    Dado que las transiciones son deterministas ($1 \to 2 \to 1$), un retorno al estado inicial solo es posible en un número par de pasos ($2, 4, 6, \dots$). El máximo común divisor de los tiempos de retorno posibles es $2$, por lo que el periodo de ambos estados es $d = 2$. La cadena es periódica (bipartita).
+
+    \item[\textbf{b)}] \textbf{Calcule $P^{(2)}$ y $P^{(3)}$. ¿Qué observa sobre el comportamiento de la cadena en pasos pares e impares?} \\
+    Calculando las potencias de la matriz:
+    \[ P^{(2)} = P \times P = \begin{pmatrix} 0 & 1 \\ 1 & 0 \end{pmatrix} \begin{pmatrix} 0 & 1 \\ 1 & 0 \end{pmatrix} = \begin{pmatrix} 1 & 0 \\ 0 & 1 \end{pmatrix} = I \]
+    \[ P^{(3)} = P^{(2)} \times P = I \times P = \begin{pmatrix} 0 & 1 \\ 1 & 0 \end{pmatrix} = P \]
+    \textbf{Observación:} La cadena oscila. En un número par de pasos ($n=2k$), la matriz de transición es la Identidad ($I$), indicando retorno seguro al estado inicial. En un número impar de pasos ($n=2k+1$), la matriz es $P$, indicando transición segura al estado contrario.
+
+    \item[\textbf{c)}] \textbf{Calcule el tiempo medio de retorno $\mu_i = \mathbb{E}[T_i \mid X_0 = i]$ para $i = 1, 2$.} \\
+    Como el sistema oscila determinísticamente, siempre toma exactamente $2$ pasos regresar al estado de origen. Por lo tanto, $T_i = 2$ con probabilidad $1$.
+    \[ \mu_1 = 2, \quad \mu_2 = 2 \]
+    \textbf{Conclusión:} Sí coincide con la intuición. Teóricamente, la proporción asintótica del tiempo pasado en un estado es $\frac{1}{\mu_i}$. Como $\frac{1}{2} = 0.5$, esto confirma que la cadena pasa exactamente la mitad del tiempo en cada estado.
+
+    \item[\textbf{d)}] \textbf{Convergencia de $P^{(n)}$ y límite en el sentido de Cesàro.} \\
+    Dado que la cadena es periódica ($d=2$), el límite ordinario $\lim_{n \to \infty} P^{(n)}$ \textbf{no existe} porque la matriz oscila entre $I$ y $P$. 
+    Sin embargo, la distribución límite en el sentido de Cesàro (promedios temporales) sí existe y converge al promedio aritmético de las matrices del ciclo:
+    \[ \lim_{N \to \infty} \frac{1}{N} \sum_{n=1}^{N} P^{(n)} = \frac{I + P}{2} = \frac{1}{2} \left[ \begin{pmatrix} 1 & 0 \\ 0 & 1 \end{pmatrix} + \begin{pmatrix} 0 & 1 \\ 1 & 0 \end{pmatrix} \right] = \begin{pmatrix} 0.5 & 0.5 \\ 0.5 & 0.5 \end{pmatrix} \]
+    Esto indica que la distribución estacionaria a largo plazo es $\pi = (0.5, 0.5)$.
+\end{itemize}
+
+\end{document}

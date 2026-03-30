@@ -1,51 +1,162 @@
 \documentclass[10pt,a4paper]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage[spanish]{babel}
-\usepackage{amsmath, amsfonts, amssymb}
+\usepackage[spanish, es-tabla]{babel}
+\usepackage{amsmath, amsfonts, amssymb, amsthm}
 \usepackage{graphicx}
 \usepackage[left=2.54cm, right=2.54cm, top=2.54cm, bottom=2.54cm]{geometry}
 \usepackage{tikz}
+\usepackage{soul}
+\usepackage{listings}
+\usepackage[most]{tcolorbox}
 \usetikzlibrary{arrows.meta, positioning, automata}
+
+
+
+%--------------------------------------------------------------------------------
+\newtcbtheorem[number within=section]{ejercicio}{Ejercicio}{
+    enhanced,
+    colback=white,
+    colframe=gray!30!black,
+    fonttitle=\bfseries,
+    colbacktitle=gray!10!white,
+    coltitle=black,
+    arc=5pt,
+    attach title to upper={\\[1mm]},
+    left=2mm, right=2mm, top=2mm, bottom=2mm,
+    separator sign={.}
+}{ej}
+
+% Bloque de Teoremas 
+\newtcbtheorem[number within=section]{mytheo}{Teorema}{
+    enhanced, sharp corners, boxrule=0pt, leftrule=5pt,
+    colframe=blue!70!black, colback=blue!5!white,
+    fonttitle=\bfseries, coltitle=blue!70!black,
+    attach title to upper, separator sign={.\ }
+}{th}
+
+% Bloque de Alerta
+\newtcolorbox{alerta}[1]{
+    enhanced, colback=red!5!white, colframe=red!75!black,
+    fonttitle=\bfseries, title=#1,
+    attach boxed title to top left={xshift=3mm, yshifttext=-1mm},
+    boxed title style={colback=red!75!black}, arc=0mm, drop shadow
+}
+
+% Bloque de Nota
+\newtcolorbox{nota}[1]{
+    enhanced, colback=yellow!10!white, colframe=orange!80!black,
+    fonttitle=\bfseries, title=#1, coltitle=black,
+    attach boxed title to top left={xshift=3mm, yshifttext=-1mm},
+    boxed title style={colback=yellow!40!orange}, arc=2mm
+}
+
+% ---------------------------------------------------------------------------------------------
 \begin{document}
+
 \begin{titlepage}
-\centering
-{\huge \textbf{Universidad Nacional Autónoma de México}}\\[0.3cm]
-\rule{\linewidth}{2mm}\\[0.3cm]
-{\large \textbf{Facultad de Estudios Superiores Acatlán}}\\[1cm]
-\includegraphics[width=6cm]{imagenes/acatlan.png}\
-\[1cm]
-{\Large \textbf{Matemáticas Aplicadas y Computación}}\\[1cm]
-{\huge \textbf{Procesos Estocásticos}}\\[0.5cm]
-\rule{\linewidth}{1mm}\\[0.3cm]
-{\Large \textit{Cadenas de Markov Discretas}}\\[0.5cm]
-{\Large \textbf{Dr. César Galindo}}\\[2cm]
-\vfill
-\rule{\linewidth}{0.5mm}\\[0.3cm]
-{\Large \textit{Alumno: Ricardo López Ramírez}}\\
-\rule{\linewidth}{0.5mm}
-\small
-Elaboró: Ricardo López Ramírez 
-\hfill
-Fecha de actualización: \today
-\hfill
-Página: \thepage
+    \centering
+    {\huge \textbf{Universidad Nacional Autónoma de México}}\\[0.3cm]
+    \rule{\linewidth}{2mm}\\[0.3cm]
+    {\large \textbf{Facultad de Estudios Superiores Acatlán}}\\[1cm]
+    
+    \includegraphics[width=6cm]{../../Archivos/LOGOS_IMG/acatlan.png}\\[1cm]
+    
+    {\Large \textbf{Matemáticas Aplicadas y Computación}}\\[1cm]
+    {\huge \textbf{Procesos Estocásticos}}\\[0.5cm]
+    \rule{\linewidth}{1mm}\\[0.3cm]
+    {\Large \textit{Cadenas de Markov Discretas}}\\[0.5cm]
+    {\Large \textbf{Prof. Dr. César Galindo}}\\[2cm]
+    
+    \vfill
+    
+    \rule{\linewidth}{0.5mm}\\[0.3cm]
+    {\Large \textit{Alumno: Ricardo López Ramírez}}\\
+    \rule{\linewidth}{0.5mm}\\[0.8cm]
+    
+    \small
+    Actualización: \today \hfill Página: \thepage
 \end{titlepage}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\cleardoublepage
+
+% ÍNDICE 
 \pagenumbering{roman}
 \tableofcontents
-
 \cleardoublepage
 \pagenumbering{arabic}
+\setcounter{page}{1}
 
-\section{Ejercicio 1}
-adsS
+% CONTENIDO 
+
+\section{Propiedad de Markov y funciones armónicas}
+
+\begin{ejercicio}{Propiedad de Markov}{1.1a}
+    Sea $(X_n)_{n \geq 0}$ una cadena de Markov en $S$ con probabilidades $p(x,y)$. 
+    Demuestre la propiedad de Markov: para toda $f: S \to \mathbb{R}$ acotada $\forall n \geq 0$:
+    \[
+    E^{x}[f(X_{n+1}) \mid X_0, X_1, \ldots, X_n] = E^x[f(X_{n+1}) \mid X_n]
+    \]
+\end{ejercicio}
+
+\vspace{5mm}
+
+    Por la definición de ESPERANZA CONDICIONAL.
+
+    El valor esperado condicional de una función aplicada a una variable aleatoria
+
+    discreta \( \left( X_{n+1}  \right) \) es igual a la suma de la función evaluada en cada posible \textit{estado} \( y \in S\), multiplicada por la probabilidad de llegada
 
 
+\begin{proof}[\textbf{Demostración}]
+    Por la definición de \textbf{esperanza condicional} para variables discretas:
+    
+    \[E^{x}\left[ f(X_{n+1}) \mid X_0, X_1, \ldots, X_n \right] = \sum_{y \in S} f(y) * \mathbb{P}(X_{n+1}=y \mid x_{0} \dots x_{n})  \]
+
+    \begin{alerta}{Punto Clave}
+        La propiedad de Markov dicta que el futuro ($X_{n+1}$) solo depende del presente ($X_n$), ignorando el pasado ($X_0, \dots, X_{n-1}$).
+    \end{alerta}
+
+    \begin{nota}{Notación}
+        La notación estándar de la probabilidad de transición de un estado \( x \) a un estado \( \left( x_{n} \right) \)
+
+        a un estado \(y\) en un paso  se denota como:
+
+    \[ \boxed{\mathbb{P}\left(x_{n},y\right) } = \mathbb{P}(X_{n+1}=y \mid X_n)\]
+    \end{nota}
 
 
+    
+    Sustituyendo, obtenemos la conclusión deseada:
+   \[ E^{x}\left[ f(X_{n+1}) \mid X_0, X_1, \ldots, X_n \right] =  \sum_{y} f(y) * \mathbb{P}\left(x_{n},y\right) \]
+\end{proof}
 
+\newpage
+
+\begin{ejercicio}{Funciones Armónicas y Martingalas}{1.1b}
+    Una función $h$ es \textit{armónica} en $A \subseteq S$ si $\sum_{y \in S} p(x,y) h(y) = h(x)$ para todo $x \in A$. 
+    Demuestre que $(h(X_n))_{n \geq 0}$ es una martingala si $h$ es armónica en todo $S$.
+\end{ejercicio}
+
+\vspace{2mm}
+
+ Se plantea el objetivo $Y_{n} = h\left(x_{n}\right) $ es una \ul{Martingala}, debemos probar que su valor esperado 
+ condicional dado el pasado es igual a su valor actual.
+
+ \vspace{2mm}
+
+\begin{alerta}{Punto Clave}
+    Para que $Y_n = h(X_n)$ sea una \textbf{Martingala}, debe cumplir:
+    $E[Y_{n+1} \mid X_0, \dots, X_n] = Y_n$.
+\end{alerta}
+
+\begin{proof}[\textbf{Demostración}]
+    Calculamos el valor esperado condicional:
+    \[ E[h(X_{n+1}) \mid X_0, \dots, X_n] \stackrel{\text{Markov}}{=} E[h(X_{n+1}) \mid X_n] \]
+    Usando la definición de esperanza para la transición desde el estado actual $X_n = x$:
+    \[ E[h(X_{n+1}) \mid X_n = x] = \sum_{y \in S} p(x, y) h(y) \]
+    Como $h$ es \textbf{armónica}:
+    \[ \sum_{y \in S} p(x, y) h(y) = h(x) \implies h(X_n) \]
+    $\therefore (h(X_n))_{n \geq 0}$ es una Martingala.
+\end{proof}
 
 
 \end{document}

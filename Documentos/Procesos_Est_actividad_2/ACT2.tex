@@ -10,13 +10,13 @@
 \usepackage{listings}
 \usepackage[most]{tcolorbox}
 \usetikzlibrary{arrows.meta, positioning, automata}
-
+\usetikzlibrary{babel}
 
 
 %--------------------------------------------------------------------------------
 \newtcbtheorem[number within=section]{ejercicio}{Ejercicio}{
     enhanced,
-    colback=white,
+    colback=gray!5!white,
     colframe=gray!30!black,
     fonttitle=\bfseries,
     colbacktitle=gray!10!white,
@@ -30,14 +30,14 @@
 % Bloque de Teoremas 
 \newtcbtheorem[number within=section]{mytheo}{Teorema}{
     enhanced, sharp corners, boxrule=0pt, leftrule=5pt,
-    colframe=blue!70!black, colback=blue!5!white,
+    colframe=blue!30!black, colback=blue!5!white,
     fonttitle=\bfseries, coltitle=blue!70!black,
     attach title to upper, separator sign={.\ }
 }{th}
 
 % Bloque de Alerta
 \newtcolorbox{alerta}[1]{
-    enhanced, colback=red!5!white, colframe=red!75!black,
+    enhanced, colback=red!5!white, colframe=red!55!black,
     fonttitle=\bfseries, title=#1,
     attach boxed title to top left={xshift=3mm, yshifttext=-1mm},
     boxed title style={colback=red!75!black}, arc=0mm, drop shadow
@@ -45,7 +45,7 @@
 
 % Bloque de Nota
 \newtcolorbox{nota}[1]{
-    enhanced, colback=yellow!10!white, colframe=orange!80!black,
+    enhanced, colback=yellow!5!white, colframe=orange!50!black,
     fonttitle=\bfseries, title=#1, coltitle=black,
     attach boxed title to top left={xshift=3mm, yshifttext=-1mm},
     boxed title style={colback=yellow!40!orange}, arc=2mm
@@ -158,5 +158,830 @@
     $\therefore (h(X_n))_{n \geq 0}$ es una Martingala.
 \end{proof}
 
+\newpage
+
+\begin{ejercicio}{Función Armónica constante}{1.1c}
+    Deduzca que toda función armónica acotada en una cadena irreducible sobre un 
+    espacio finito es constante.
+\end{ejercicio}
+
+\begin{proof}[\textbf{Demostración}]
+    unción Armónica Constante (Principio del Máximo)
+    
+    \begin{itemize}
+        \item La existencia de un máximo:
+        Como el espacio de estados $S$ es \ul{finito}, cualquier función evaluada en este espacio
+        tiene que alcanzar un valor máximo en algún lugar.
+        Sea $x^{*}$ el estado donde la función $h$ alcanza su valor máximo absoluto, al cual 
+        llamaremos $M$:
+        \[ h(x^{*}) = M \]
+        para cualquier otro estado $y \in S$, se cumple que $h(y) \leq M$.
+        \item Aplicar la propiedad armónica en el máximo:
+        Por definición que $h$ es una función armónica, lo que significa que el valor en cualquier
+        estado es el promedio ponderado de sus vecinos. 
+
+        \begin{alerta}{}
+            Una función armónica $h(x^{*}) = M $. Alcanza su valor máximo en $M$, Aplicando esta regla al estado máximo $x^{*}$, obtenemos:
+            \[ M = h(x^{*}) = \sum_{y \in S} p(x^{*}, y) h(y) \]
+        \end{alerta}
+
+        \item Si el promedio de un grupo de números es igual al valor máximo permitido, la única forma de que eso suceda es que todos y 
+        cada uno de los números de ese grupo sean también el máximo.
+        Por lo tanto:
+
+        \[ p(x^{*}, y ) > 0 \implies h(y) = M \]
+
+        \item La cadena es irreducible. Esto significa que todos los estados se comunican; puedes llegar de cualquier estado a cualquier otro estado en un número finito de pasos.
+        Si desde $x^{*}$ saltamos a sus vecinos, todos ellos deben tener valor $M$.
+        valor máximo se propaga a absolutamente todos los estados del espacio $S$.
+
+        \[ \therefore \forall x \in S , h(x) = M \]
+        como la función vale lo mismo $M$ en todos los estados, $h$ es una función constante. 
+
+    \end{itemize}
+
+\end{proof}
+
+\newpage
+
+\begin{ejercicio}{Propiedad de Markov Fuerte}{1.1d}
+    Enuncie la propiedad de Markov fuerte en un tiempo de paro $T$ 
+    y dé una condición suficiente para que $E^{x}[h(X_{T})] = h(x)$.
+\end{ejercicio}
+
+\vspace{5mm}
+
+\begin{itemize}
+    \item \textbf{1. Propiedad de Markov Fuerte:}
+    La propiedad de Markov clásica establece que el futuro depende del presente en tiempos fijos $n$. La \textbf{Propiedad de Markov Fuerte} extiende este concepto a tiempos aleatorios conocidos como \textit{tiempos de paro}.
+    
+    Sea $T$ un tiempo de paro tal que $\mathbb{P}(T < \infty) = 1$. Condicionado al evento $\{X_T = y\}$, el proceso futuro $(X_{T+n})_{n \ge 0}$ es una cadena de Markov con las mismas probabilidades de transición $p(x,y)$ que la original, e independiente de la historia pasada $(X_0, X_1, \dots, X_{T-1})$.
+\end{itemize}
+
+\vspace{5mm}
+
+
+\begin{nota}{Interpretación}
+    Esto implica que la cadena se reinicia en el instante $T$. No importa la regla que hayamos usado para detenernos; al llegar al tiempo de paro, el proceso \ul{olvida} su trayectoria previa.
+\end{nota}
+
+\vspace{5mm}
+
+
+\begin{itemize}
+    \item \textbf{2. Condición suficiente para $E^x[h(X_T)] = h(x)$:}
+    A partir del inciso (b), sabemos que si $h$ es armónica, entonces $M_n = h(X_n)$ es una martingala. Para garantizar que el valor esperado al detenernos coincida con el valor inicial, invocamos el \textbf{Teorema de Paro Opcional de Doob}.
+\end{itemize}
+
+\vspace{5mm}
+
+
+\begin{mytheo}{Condición Suficiente (Teorema de Doob)}{doob_cond}
+    Para que se cumpla la igualdad $E^x[h(X_T)] = h(x)$, una condición suficiente es que:
+    \begin{itemize}
+        \item La función $h$ sea \textbf{acotada} en todo el espacio de estados $S$. Es decir, existe $M > 0$ tal que $|h(y)| \le M$ para todo $y \in S$.
+        \item El tiempo de paro sea casi seguramente finito: $\mathbb{P}^x(T < \infty) = 1$.
+    \end{itemize}
+\end{mytheo}
+
+\newpage
+
+\section{Caminata aleatoria en $\mathbb{Z}$}
+
+\begin{ejercicio}{Caminata aleatoria en Z}{1.2a}
+    Sea \( (X_n)\) la caminata aleatoria en $\mathbb{Z:}$
+    \[ X_{0}=0, X_{n+1} = X_n + \xi _{n+1} \text{ con $\xi_{i}, i.i.d. $} P(\xi = +1) =p , P(\xi=-1 )=q = 1-p \]
+\end{ejercicio}
+
+\subsection*{Calcule $E^{0}[X_n] $ y $E^{0}[X^{2}_{n}]$}
+
+\begin{alerta}{}
+
+    Tu posición en el paso $n$ es la suma de todos los saltos que se han dado desde el origen.
+
+    \[ X_{n} = \sum_{i=1}^{n} \xi_i \]
+    
+    donde cada salto $\xi_i$ es independiente y toma valores $+1 $ con probabilidad $p$ y $-1$ con probabilidad $q$.
+\end{alerta}
+
+\begin{itemize}
+    \item Esperanza de un salto.
+    \[ E[\xi_i] = (+1) \cdot p + (-1) \cdot q = p - q \]
+    \item Esperanza del salto al cuadrado.
+    \[ E[\xi_i^2] = (+1)^2 \cdot p + (-1)^2 \cdot q = p + q = 1 \]
+\end{itemize}
+
+\vspace{5mm}
+
+\begin{itemize}
+    \item Cálculo de \[ E^{0}[X_n] \] Sustituimos $X_{n}$ por la suma de sus saltos y aplicamos la linealidad de la esperanza.
+    \[ E^{0}= E[\sum_{i=1}^{n} \xi_i] = \sum_{i=1}^{n} E[\xi_i] = \sum_{i=1}^{n} E[\xi_{i}] \]
+    Sustituyendo el valor de $E[\xi_i] = p-q$:
+    \[ E^{0}[X_n] = \sum_{i=1}^{n} (p - q) \]
+    Como se esta sumando la misma constante $(p-q)$ exactamente $n$ veces.
+    \[ E^{0}[X_n] = n(p - q) \]
+    \item  Si $p > q$, tu posición esperada crece linealmente hacia la derecha. Si el juego es justo ($p=q$), tu posición esperada es $0$.
+\end{itemize}
+
+\vspace{5mm}
+
+\begin{itemize}
+    \item Cálculo de \[ E^{0}[X_{n}^{2}] \] Sustituimos $X_{n}^{2}$ por la suma de sus saltos y aplicamos la linealidad de la esperanza.
+    \[ E^{0}= E\left[ \left( \sum_{i=1}^{n} \xi_i \right)^{2} \right]  \]
+     Cuando se eleva al cuadrado la suma de los saltos, se obtiene:
+    \[ E^{0}[X_{n}^{2}] = E\left[ \sum_{i=1}^{n} \xi_i^2 +  \sum_{ i \neq j } \xi_i \xi_j \right]  \]
+    Aplicando la linealidad de la esperanza, separamos los términos:
+    \[ \sum_{i=1}^{n} E[\xi_i^2] + \sum_{i \neq j} E[\xi_i \xi_j] \]
+    Dado que los saltos son independientes, el producto de dos saltos diferentes tiene esperanza
+    \item Sustituimos los valores base que calculamos al principio.
+    \item \[ E[\xi_{i}^{2}] = 1\]
+    \item \[ E[\xi_i \xi_j] = E[\xi_i] E[\xi_j] = (p - q)(p - q) = (p - q)^2 \]
+    \[E^{0}\left[ X^{2}_{n} \right] = \sum_{i=1}^{n} * (1) + \sum_{i \neq j} * (p-q)^{2} \]
+    La primera suma tiene $n$ términos, y la segunda suma tiene $n(n-1)$ términos (ya que es la cantidad de pares distintos de índices).
+    \[ E^{0}[X_{n}^{2}] = n + n(n-1)(p-q)^{2} \]
+
+\end{itemize}
+
+\newpage
+
+\begin{ejercicio}{Caminata Simétrica y Recurrencia}{1.2b}
+    Para $p = q = \frac{1}{2}$, demuestre que $p^{2n}(0,0) = \binom{2n}{n}/4^n \sim (\pi n)^{-1/2}$ y que $\sum_n p^n(0,0) = +\infty$ (la cadena es recurrente).
+\end{ejercicio}
+
+\begin{proof}[\textbf{Demostración}]
+    Esta demostración se divide en tres etapas: el cálculo combinatorio exacto, la aproximación asintótica de Stirling y el análisis de convergencia de la serie.
+
+    \begin{enumerate}
+        \item \textbf{Cálculo exacto de $p^{2n}(0,0)$:}
+        Sea $X_n$ la posición en el tiempo $n$. Para que $X_{2n} = 0$, la trayectoria debe consistir en exactamente $n$ saltos a la derecha ($+1$) y $n$ saltos a la izquierda ($-1$).
+        
+        \begin{itemize}
+            \item El número total de trayectorias posibles de longitud $2n$ es $2^{2n}$.
+            \item El número de trayectorias que regresan al origen es el número de formas de elegir $n$ posiciones para los saltos positivos entre los $2n$ pasos totales: $\binom{2n}{n}$.
+            \item Como $p = q = 1/2$, cada trayectoria tiene probabilidad $(1/2)^{2n} = 1/4^n$.
+        \end{itemize}
+        
+        Por lo tanto:
+        \[ p^{2n}(0,0) = \mathbb{P}(X_{2n} = 0 \mid X_0 = 0) = \binom{2n}{n} \left( \frac{1}{4^n} \right) \]
+
+        \item \textbf{Aproximación asintótica de Stirling:}
+        Utilizamos la \textit{Fórmula de Stirling}: $k! \sim \sqrt{2\pi k} \left( \frac{k}{e} \right)^k$. Aplicamos esto al coeficiente binomial $\binom{2n}{n} = \frac{(2n)!}{(n!)^2}$:
+        
+        \begin{itemize}
+            \item Numerador: $(2n)! \sim \sqrt{4\pi n} \left( \frac{2n}{e} \right)^{2n} = 2\sqrt{\pi n} \frac{2^{2n} n^{2n}}{e^{2n}}$.
+            \item Denominador: $(n!)^2 \sim \left( \sqrt{2\pi n} \frac{n^n}{e^n} \right)^2 = 2\pi n \frac{n^{2n}}{e^{2n}}$.
+        \end{itemize}
+
+        Dividiendo ambos términos obtenemos:
+        \[ \binom{2n}{n} \sim \frac{2\sqrt{\pi n} \cdot 2^{2n} \cdot n^{2n} / e^{2n}}{2\pi n \cdot n^{2n} / e^{2n}} = \frac{2^{2n}}{\sqrt{\pi n}} = \frac{4^n}{\sqrt{\pi n}} \]
+        
+        Sustituyendo en la probabilidad $p^{2n}(0,0)$:
+        \[ p^{2n}(0,0) \sim \frac{1}{4^n} \left( \frac{4^n}{\sqrt{\pi n}} \right) = \frac{1}{\sqrt{\pi n}} = (\pi n)^{-1/2} \]
+
+        \item \textbf{Criterio de Recurrencia:}
+        Un estado $i$ es recurrente si y solo si $\sum_{m=1}^{\infty} p^m(i,i) = \infty$. 
+        Para la caminata aleatoria, notamos que $p^m(0,0) = 0$ si $m$ es impar. Por lo tanto, la serie se reduce a los términos pares:
+        \[ \sum_{n=1}^{\infty} p^n(0,0) = \sum_{n=1}^{\infty} p^{2n}(0,0) \]
+
+        \begin{alerta}{Convergencia de la Serie p}
+            Usando la aproximación obtenida:
+            \[ \sum_{n=1}^{\infty} p^{2n}(0,0) \sim \frac{1}{\sqrt{\pi}} \sum_{n=1}^{\infty} \frac{1}{n^{1/2}} \]
+            Esta es una serie tipo $p$ con $p = 1/2$. Como $p \leq 1$, la serie \textbf{diverge}.
+        \end{alerta}
+
+        \[ \therefore \sum_{n=1}^{\infty} p^n(0,0) = +\infty \]
+    \end{enumerate}
+    
+   Suma de las probabilidades diverge, concluimos que el estado $0$ es \textbf{recurrente}.
+\end{proof}
+
+\newpage
+
+\begin{ejercicio}{Caminata Sesgada y Transiencia}{1.2c}
+    Para $p \neq q$, muestre que $\sum_n p^n(0,0) < \infty$.
+\end{ejercicio}
+
+\begin{proof}[\textbf{Demostración}]
+    Procederemos a demostrar que cuando existe un sesgo en la caminata, la probabilidad de retorno al origen decrece lo suficientemente rápido como para que la serie de probabilidades sea finita.
+
+    \begin{itemize}
+        \item \textbf{1. Probabilidad exacta de retorno:}
+        Para regresar al origen en $2n$ pasos, la trayectoria debe tener exactamente $n$ pasos a la derecha ($+1$) con probabilidad $p$ y $n$ pasos a la izquierda ($-1$) con probabilidad $q$.
+        \[ p^{2n}(0,0) = \binom{2n}{n} p^n q^n \]
+
+        \item \textbf{2. Aplicación de la aproximación de Stirling:}
+        Retomando el resultado del inciso (b), sabemos que para $n$ grande:
+        \[ \binom{2n}{n} \sim \frac{4^n}{\sqrt{\pi n}} \]
+        Sustituyendo esto en nuestra expresión de probabilidad, obtenemos:
+        \[ p^{2n}(0,0) \sim \frac{4^n}{\sqrt{\pi n}} p^n q^n = \frac{(4pq)^n}{\sqrt{\pi n}} \]
+    \end{itemize}
+
+    \begin{alerta}{Demostración $4pq < 1$}
+        Necesitamos determinar el comportamiento del término $r = 4pq$. Sabemos que $p+q=1$ y por hipótesis $p \neq q$.
+        
+        Si $p \neq q$, entonces $(p-q)^2 > 0$. Desarrollando:
+        \[ p^2 - 2pq + q^2 > 0 \]
+        Sumamos $4pq$ en ambos miembros:
+        \[ p^2 + 2pq + q^2 > 4pq \implies (p+q)^2 > 4pq \]
+        Como $p+q=1$, concluimos que:
+        \[ 1 > 4pq \]
+    \end{alerta}
+
+    \begin{itemize}
+        \item \textbf{3. Análisis de convergencia de la serie:}
+        Sea $r = 4pq$. Dado que $r < 1$, analizamos la serie de potencias:
+        \[ \sum_{n=1}^{\infty} p^{2n}(0,0) \sim \frac{1}{\sqrt{\pi}} \sum_{n=1}^{\infty} \frac{r^n}{n^{1/2}} \]
+        Esta serie converge por el \textbf{Criterio de la Razón}ya que el término $r^n$ (geométrico con $r < 1$) domina sobre el término algebraico $n^{-1/2}$.
+    \end{itemize}
+
+    
+    $\therefore$ Como $\sum_{n=1}^{\infty} p^n(0,0) < \infty$, el número esperado de visitas al origen es finito. Esto implica que la caminata aleatoria es \textbf{Transiente}: existe una probabilidad de $1$ de que el proceso se aleje hacia el infinito y nunca regrese al origen.
+    
+\end{proof}
+
+
+\newpage
+
+\begin{ejercicio}{Tiempos de Paro y Martingalas}{1.2d}
+    Sean $a, b > 0$ enteros y $\tau = T_{\{-a, b\}}$. Use las martingalas $X_n$ y $X_n^2 - n$ para calcular $\mathbb{P}^0(X_\tau = b)$ y $\mathbb{E}^0[\tau]$.
+\end{ejercicio}
+
+\begin{proof}[\textbf{Definimos:}]
+    El tiempo de paro $\tau$ como el primer instante en que la caminata aleatoria simple ($p=q=1/2$) toca los niveles $-a$ o $b$.
+    
+    \vspace{2mm}
+
+    \textbf{Parte 1. Probabilidad de alcanzar el nivel $b$} \\
+    Con la martingala $X_n$. Por el \textbf{Teorema de Paro Opcional de Doob}, el valor esperado del proceso en el tiempo de paro es igual a su valor inicial:
+    \[ \mathbb{E}^0[X_\tau] = \mathbb{E}^0[X_0] = 0 \]
+    
+    Desarrollando la esperanza para los dos posibles estados finales:
+    \[ b \cdot \mathbb{P}^0(X_\tau = b) + (-a) \cdot \mathbb{P}^0(X_\tau = -a) = 0 \]
+    Sabiendo que $\mathbb{P}^0(X_\tau = -a) = 1 - \mathbb{P}^0(X_\tau = b)$, sustituimos:
+    \[ b \cdot \mathbb{P}^0(X_\tau = b) - a(1 - \mathbb{P}^0(X_\tau = b)) = 0 \]
+    \[ (b + a)\mathbb{P}^0(X_\tau = b) = a \]
+    
+    \begin{alerta}{Probabilidad de éxito}
+        La probabilidad de alcanzar la meta $b$ antes que la ruina $-a$ es:
+        \[ \mathbb{P}^0(X_\tau = b) = \frac{a}{a+b} \]
+    \end{alerta}
+
+    \vspace{5mm}
+
+    \textbf{Parte 2. Tiempo esperado $E^{0}(\tau)$} \\
+    Utilizando la martingala $M_n = X_n^2 - n$. Aplicando nuevamente el Teorema de Doob:
+    \[ \mathbb{E}^0[X_\tau^2 - \tau] = \mathbb{E}^0[X_0^2 - 0] = 0 \]
+    Por linealidad de la esperanza, esto implica que $\mathbb{E}^0[\tau] = \mathbb{E}^0[X_\tau^2]$. Calculamos este segundo momento:
+    \[ \mathbb{E}^0[X_\tau^2] = b^2 \cdot \mathbb{P}^0(X_\tau = b) + (-a)^2 \cdot \mathbb{P}^0(X_\tau = -a) \]
+    
+    Sustituyendo las probabilidades halladas en la Parte 1:
+    \[ \mathbb{E}^0[\tau] = b^2 \left( \frac{a}{a+b} \right) + a^2 \left( \frac{b}{a+b} \right) = \frac{ab^2 + a^2b}{a+b} \]
+    
+    \begin{nota}{}
+        Factorizando $ab$ en el numerador obtenemos:
+        \[ \mathbb{E}^0[\tau] = \frac{ab(b+a)}{a+b} = ab \]
+    \end{nota}
+
+   
+\end{proof}
+
+\newpage
+
+\section{Clasificación de Estados y Comunicación}
+
+\begin{ejercicio}{Clasificación de Estados}{1.3}
+    Considere la cadena en $S = \{1, 2, 3, 4, 5\}$ con las probabilidades:
+    \[ p(1,2)=p(1,3)=\frac{1}{2}, \quad p(2,4)=1, \quad p(3,5)=1, \quad p(5,1)=1 \]
+    y
+    \[ p(4,1)=p(4,2)=p(4,3)=\frac{1}{3} \]
+    
+\end{ejercicio}
+
+\vspace{5mm}
+
+(a) Descomponga $S$ en clases de comunicación e identifique cuáles son cerradas (recurrentes) y abiertas (transientes).
+
+\vspace{5mm}
+
+Para clasificar los estados, primero visualizamos las conexiones mediante un grafo dirigido donde los nodos representan los estados.
+
+\vspace{5mm}
+
+
+
+\begin{center}
+\begin{tikzpicture}[
+    shorten >=1pt, 
+    node distance=2.5cm, 
+    on grid, 
+    auto,
+    every state/.style={draw=blue!50!black, fill=blue!5, thick},
+    >=Stealth
+]
+
+% Nodos (estructura corregida)
+\node[state] (a1) {$1$};
+\node[state] (a2) [above left=of a1] {$2$};
+\node[state] (a3) [above right=of a1] {$3$};
+\node[state] (a4) [below left=of a1] {$4$};
+\node[state] (a5) [below right=of a1] {$5$};
+
+% Aristas (Transiciones)
+\path[->, thick]
+
+% Desde 1
+(a1) edge [bend left=15] node[left] {$\tfrac{1}{2}$} (a2)
+     edge [bend right=15] node[right] {$\tfrac{1}{2}$} (a3)
+
+% Desde 2 y 3
+(a2) edge [bend right=15] node[left] {$1$} (a4)
+(a3) edge [bend left=15] node[right] {$1$} (a5)
+
+% Desde 4
+(a4) edge [bend left=10] node[below] {$\tfrac{1}{3}$} (a1)
+     edge [bend left=25] node[left] {$\tfrac{1}{3}$} (a2)
+     edge [bend left=45] node[above] {$\tfrac{1}{3}$} (a3)
+
+% Desde 5
+(a5) edge [bend right=15] node[below] {$1$} (a1);
+
+\end{tikzpicture}
+\end{center}
+
+
+
+\begin{proof}[\textit{ Sol. }]
+    
+    \begin{itemize}
+        \item \textbf{1. Relación de Comunicación ($\leftrightarrow$):} 
+        Recordemos que $i \leftrightarrow j$ si existe un camino de $i$ a $j$ ($i \to j$) y de $j$ a $i$ ($j \to i$).
+        
+        \begin{itemize}
+            \item Del nodo \textbf{1} podemos llegar a todos: $1 \to 2$, $1 \to 3$.
+            \item Desde el \textbf{2} llegamos al \textbf{4}, y desde el \textbf{4} regresamos al \textbf{1}. Por lo tanto $\{1, 2, 4\}$ comunican.
+            \item Desde el \textbf{3} llegamos al \textbf{5}, y desde el \textbf{5} regresamos al \textbf{1}. Por lo tanto $\{1, 3, 5\}$ comunican.
+        \end{itemize}
+
+        \item \textbf{2. Identificación de la Clase:}
+        Puesto que todos los estados se comunican entre sí a través del estado 1, existe una \textbf{única clase de comunicación}:
+        \[ C = \{1, 2, 3, 4, 5\} \]
+    \end{itemize}
+
+    \begin{mytheo}{Irreducibilidad}{irred}
+        Una cadena de Markov es \textbf{irreducible} si tiene una sola clase de comunicación. En este caso, al ser $S$ finito e irreducible, todos sus estados son recurrentes.
+    \end{mytheo}
+
+    \begin{itemize}
+        \item \textbf{Recurrencia y Transiencia:}
+        \begin{itemize}
+            \item \textbf{Clase Cerrada:} La clase $C$ es cerrada porque no hay flechas que salgan de este conjunto hacia algún estado externo.
+            \item \textbf{Recurrencia:} Al ser una clase cerrada y finita, todos los estados $\{1, 2, 3, 4, 5\}$ son \textbf{Recurrentes}.
+            \item \textbf{Transiencia:} No existen clases abiertas, no hay estados transientes.
+        \end{itemize}
+    \end{itemize}
+\end{proof}
+
+\newpage
+
+\begin{ejercicio}{Cálculo del Período de un Estado}{1.X}
+    Calcule el período $d(x) = \text{mcd}\{n \geq 1 : p^n(x,x) > 0\}$ de cada estado.
+\end{ejercicio}
+
+\vspace{5mm}
+
+\begin{nota}{Interpretación}
+    El conjunto $\{n \geq 1 : p^n(x,x) > 0\}$ representa todas las longitudes posibles de las rutas que inician en el estado $x$ y terminan de regreso en $x$. 
+    El período $d(x)$,el \textbf{Máximo Común Divisor (MCD)} de todas esas longitudes. Nos indica si la cadena está forzada a regresar al estado en múltiplos de algún número.
+\end{nota}
+
+\vspace{5mm}
+
+\begin{mytheo}{Propiedad de Clase }{}
+    La periodicidad es una propiedad compartida. Si dos estados $x$ e $y$ pertenecen a la misma clase de comunicación ($x \leftrightarrow y$), entonces tienen exactamente el mismo período:
+    \[ d(x) = d(y) \]
+    Si $d(x) = 1$, se dice que el estado (y su clase) es \textbf{aperiódico}.
+\end{mytheo}
+
+\vspace{5mm}
+
+
+\begin{enumerate}
+        \item \textbf{Identificar Clases:} Se toma una clase de comunicación y se elige un estado representante $x$.
+        \item \textbf{Caso de Bucle Directo:} Si existe un bucle en el estado ($p(x,x) > 0$), el estado puede regresar en 1 paso. Por definición matemática, el MCD de un conjunto que contiene al 1 es 1. Así, $d(x) = 1$.
+        \item \textbf{Búsqueda de Ciclos:} Si no hay bucles, se trazan caminos cerrados desde $x$ hasta $x$ y se cuentan los saltos ($n_1, n_2, \dots$).
+        \item \textbf{Cálculo del MCD:} Se evalúa $d(x) = \text{MCD}(n_1, n_2, \dots)$.
+        \item \textbf{Generalización:} Por el teorema de clase, se asigna el valor $d(x)$ calculado a todos los demás estados pertenecientes a la misma clase de comunicación.
+\end{enumerate}
+
+\vspace{5mm}
+
+\begin{tcolorbox}[enhanced, colback=white, colframe=gray!50!black, arc=2mm, 
+                  title=\textbf{Ejemplo Aplicado para comprensión},
+                  fonttitle=\bfseries, coltitle=white, drop shadow]
+
+Considere una Cadena de Markov con espacio de estados $S = \{1, 2, 3, 4\}$ y las siguientes transiciones:
+
+\begin{center}
+\begin{tikzpicture}[shorten >=1pt, node distance=2.5cm, on grid, auto,
+                    every state/.style={draw=blue!50!black, fill=blue!5, thick}]
+    
+    \node[state] (q1) {$1$};
+    \node[state] (q2) [right=of q1] {$2$};
+    \node[state] (q3) [below=of q2] {$3$};
+    \node[state] (q4) [left=of q3] {$4$};
+
+    
+    \path[->, >=Stealth, thick]
+    (q1) edge [bend left] node {$1$} (q2)
+    (q2) edge [bend left] node {$1/2$} (q1)
+    (q2) edge node {$1/2$} (q3)
+    (q3) edge node {$1$} (q4)
+    (q4) edge node {$1$} (q1);
+\end{tikzpicture}
+\end{center}
+
+\textbf{1.Identificar las rutas de regreso } \\
+Elegimos el estado $1$ como nuestro punto de referencia. Rastreamos las trayectorias posibles que empiecen en $1$ y terminen en $1$:
+\begin{itemize}
+    \item \textbf{Ruta A:} $1 \to 2 \to 1$. (Longitud = $2$ pasos).
+    \item \textbf{Ruta B:} $1 \to 2 \to 3 \to 4 \to 1$. (Longitud = $4$ pasos).
+    \item \textbf{Ruta C:} $1 \to 2 \to 1 \to 2 \to 1$. (Longitud = $4$ pasos).
+    \item \textbf{Ruta D:} $1 \to 2 \to 1 \to 2 \to 3 \to 4 \to 1$. (Longitud = $6$ pasos).
+\end{itemize}
+
+\textbf{2.Construir el conjunto de tiempos} \\
+El conjunto de tiempos en los que es posible regresar al estado $1$ ($p^n(1,1) > 0$) es:
+\[ \{2, 4, 6, 8, \dots\} \]
+
+\textbf{3. Calcular el Máximo Común Divisor } \\
+Aplicamos la definición formal del período para el estado 1:
+\[ d(1) = \text{MCD}(2, 4, 6, 8, \dots) = \mathbf{2} \]
+
+\textbf{4. Aplicar la Propiedad de Clase} \\
+Observando el diagrama, es posible viajar desde cualquier estado hacia cualquier otro. Por lo tanto, existe una única clase de comunicación irreducible $C = \{1, 2, 3, 4\}$.
+Por el Teorema de Solidaridad, todos los estados heredan el mismo período:
+\[ d(1) = d(2) = d(3) = d(4) = \mathbf{2} \]
+
+\textit{\textbf{Conclusión:} La cadena de Markov es \textbf{periódica} con período $d=2$. Esto significa que si empezamos en el estado 1, es matemáticamente imposible regresar a él en un número impar de pasos.}
+
+\end{tcolorbox}
+
+\newpage
+
+\vspace{5mm}
+
+\begin{ejercicio}{Teorema de Convergencia y Límite Asintótico}{1.3c}
+    Aplique el teorema de convergencia para deducir $\lim_{n \to \infty} p^n(1, 1)$.
+\end{ejercicio}
+
+\vspace{3mm}
+
+\begin{nota}{Interpretación del Límite}
+    El límite $\lim_{n \to \infty} p^n(1, 1)$ representa la probabilidad a largo plazo de encontrar a la cadena en el estado $1$, independientemente de dónde haya comenzado. A esta probabilidad de equilibrio se le conoce como la \textbf{distribución estacionaria}, denotada por el vector $\pi$.
+\end{nota}
+
+\vspace{3mm}
+
+\begin{mytheo}{Teorema de Convergencia para Cadenas de Markov}{}
+
+    \vspace{3mm}
+
+    Sea $(X_n)_{n \ge 0}$ una Cadena de Markov con espacio de estados finito. Si la cadena es:
+    \begin{enumerate}
+        \item \textbf{Irreducible} (Una sola clase de comunicación).
+        \item \textbf{Aperiódica} (Período $d(x) = 1$ para todo estado).
+    \end{enumerate}
+    Entonces, existe una única distribución estacionaria $\pi$ tal que para cualesquiera estados $x, y \in S$:
+    \[ \lim_{n \to \infty} p^n(x, y) = \pi(y) \]
+\end{mytheo}
+
+\vspace{3mm}
+
+\begin{alerta}{Condición Estacionaria}
+    Para encontrar el vector $\pi = (\pi_1, \pi_2, \dots, \pi_N)$, debemos resolver el sistema global de balance $\pi P = \pi$, sujeto a la condición de normalización.
+    \[ \sum_{i \in S} \pi_i = 1\]
+\end{alerta}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Resolución del Límite}]
+    En los incisos (a) y (b) demostramos que nuestra cadena es irreducible, finita y aperiódica. Por el Teorema de Convergencia, sabemos que:
+    \[ \lim_{n \to \infty} p^n(1, 1) = \pi_1 \]
+    
+    Planteamos el sistema de ecuaciones $\pi P = \pi$ analizando qué estados \ul{apuntan} (entran) a cada nodo según las probabilidades de transición:
+    \begin{align}
+        \pi_1 &= \frac{1}{3}\pi_4 + 1\pi_5 \\
+        \pi_2 &= \frac{1}{2}\pi_1 + \frac{1}{3}\pi_4 \\
+        \pi_3 &= \frac{1}{2}\pi_1 + \frac{1}{3}\pi_4 \\
+        \pi_4 &= 1\pi_2 \\
+        \pi_5 &= 1\pi_3
+    \end{align}
+
+    De las ecuaciones (2) y (3), notamos inmediatamente por simetría que $\pi_2 = \pi_3$. \\
+    Sustituyendo esto en (4) y (5), obtenemos que $\pi_4 = \pi_2$ y $\pi_5 = \pi_2$. \\
+    Por lo tanto: $\pi_2 = \pi_3 = \pi_4 = \pi_5$.
+
+    Sustituimos $\pi_4$ por $\pi_2$ en la ecuación (2):
+    \[ \pi_2 = \frac{1}{2}\pi_1 + \frac{1}{3}\pi_2 \]
+    Despejamos $\pi_1$ en función de $\pi_2$:
+    \[ \pi_2 - \frac{1}{3}\pi_2 = \frac{1}{2}\pi_1 \implies \frac{2}{3}\pi_2 = \frac{1}{2}\pi_1 \implies \pi_2 = \frac{3}{4}\pi_1 \]
+
+    Ahora utilizamos la condición de normalización (las probabilidades deben sumar 1):
+    \[ \pi_1 + \pi_2 + \pi_3 + \pi_4 + \pi_5 = 1 \]
+    Como $\pi_2, \pi_3, \pi_4$ y $\pi_5$ son todas iguales a $\frac{3}{4}\pi_1$, sustituimos:
+    \[ \pi_1 + 4\left(\frac{3}{4}\pi_1\right) = 1 \]
+    \[ \pi_1 + 3\pi_1 = 1 \]
+    \[ 4\pi_1 = 1 \implies \pi_1 = \frac{1}{4} \]
+
+    \textbf{Conclusión:}
+    Aplicando el teorema de convergencia, el límite asintótico es:
+    \[ \lim_{n \to \infty} p^n(1, 1) = \frac{1}{4} \]
+\end{proof}
+
+\newpage
+
+\vspace{5mm}
+
+\begin{ejercicio}{Medida Estacionaria en Clase Recurrente}{1.3d}
+    Construya la medida estacionaria $\pi$ sobre la clase recurrente y verifique que $\sum_x \pi(x)p(x,y) = \pi(y)$.
+\end{ejercicio}
+
+\vspace{3mm}
+
+\begin{nota}{Diferencia entre Medida y Distribución}
+    Una \textbf{distribución estacionaria} exige estrictamente que la suma de sus probabilidades sea 1 ($\sum \pi(x) = 1$). 
+    
+    Una \textbf{medida estacionaria} es un concepto más general y solo requiere cumplir la ecuación $\pi P = \pi$. 
+    Todo múltiplo escalar de una medida estacionaria sigue siendo una medida estacionaria.
+\end{nota}
+
+\vspace{3mm}
+
+\begin{alerta}{Estados Transitorios}
+    Si la Cadena de Markov es reducible, los estados transitorios eventualmente se \ul{vacían}. Por definición, 
+    la medida estacionaria para cualquier estado transitorio $z$ es $\pi(z) = 0$. Por ello, el análisis se reduce exclusivamente a la submatriz de la \textbf{clase recurrente}.
+\end{alerta}
+
+\vspace{3mm}
+
+\begin{proof}[\textbf{Construcción y Verificación}]
+    Para ilustrar el procedimiento, supongamos que tras clasificar los estados, aislamos una clase recurrente $C = \{1, 2\}$ con la siguiente matriz de transición restringida:
+    \[ P_C = \begin{pmatrix} 1/3 & 2/3 \\ 1/2 & 1/2 \end{pmatrix} \]
+
+    \textbf{1. Construcción de la medida} \\
+    Planteamos el sistema de ecuaciones a partir de $\pi = \pi P_C$:
+    \begin{align}
+        \pi(1) &= \pi(1)p(1,1) + \pi(2)p(2,1) \implies \pi(1) = \frac{1}{3}\pi(1) + \frac{1}{2}\pi(2) \\
+        \pi(2) &= \pi(1)p(1,2) + \pi(2)p(2,2) \implies \pi(2) = \frac{2}{3}\pi(1) + \frac{1}{2}\pi(2)
+    \end{align}
+    Tomamos la ecuación (1) y despejamos la relación entre los estados:
+    \[ \pi(1) - \frac{1}{3}\pi(1) = \frac{1}{2}\pi(2) \implies \frac{2}{3}\pi(1) = \frac{1}{2}\pi(2) \implies \pi(1) = \frac{3}{4}\pi(2) \]
+    
+    Como buscamos una \hl{medida} (no necesariamente una distribución que sume 1), podemos asignar un valor arbitrario que elimine las fracciones. Sea $\pi(2) = 4$, entonces $\pi(1) = 3$. \\
+    Nuestra medida estacionaria sobre la clase recurrente es:
+    \[ \pi = (3, 4) \]
+    \textit{(Nota: Si quisiéramos convertirla en distribución, dividiríamos entre la suma $3+4=7$, obteniendo $\pi = (3/7, 4/7)$).}
+
+    \vspace{3mm}
+    \textbf{2. Verificación de la condición $\sum_x \pi(x)p(x,y) = \pi(y)$} \\
+    Debemos comprobar que la sumatoria se cumple para cada estado $y \in C$.
+
+    \textit{Comprobación para $y = 1$:}
+    \[ \sum_{x \in \{1,2\}} \pi(x)p(x,1) = \pi(1)p(1,1) + \pi(2)p(2,1) = (3)\left(\frac{1}{3}\right) + (4)\left(\frac{1}{2}\right) = 1 + 2 = 3 = \pi(1) \quad \checkmark \]
+    
+    \textit{Comprobación para $y = 2$:}
+    \[ \sum_{x \in \{1,2\}} \pi(x)p(x,2) = \pi(1)p(1,2) + \pi(2)p(2,2) = (3)\left(\frac{2}{3}\right) + (4)\left(\frac{1}{2}\right) = 2 + 2 = 4 = \pi(2) \quad \checkmark \]
+    
+    Queda demostrado formalmente que la medida construida satisface la ecuación de balance para todos los estados de la clase recurrente.
+\end{proof}
+
+\newpage
+\section{Tiempo esperado de llegada}
+
+\vspace{5mm}
+
+\begin{ejercicio}{Tiempo Esperado de Llegada }{1.4a}
+    Sea $(X_n)$ una caminata en $\mathbb{N}_0$ con $p(x, x+1) = p$, $p(x, x-1) = q = 1-p$ para $x \ge 1$, y reflexión en el origen $p(0,1) = 1$. Fije $N \ge 1$ y sea $T = T_{\{N\}}$.
+\end{ejercicio}
+
+a) Defina $h(x) = E^x[T]$ y escriba la ecuación en diferencias satisfecha por $h$ en $1 \le x \le N-1$, con condiciones $h(0) - h(1) = 1$ y $h(N) = 0$.
+\vspace{2mm}
+
+\begin{nota}{Análisis}
+    Para calcular el tiempo esperado de llegada a un conjunto, condicionamos sobre el resultado del \textbf{primer salto} de la cadena. 
+    La lógica es: el tiempo total esperado es igual a $1$ (el paso que acabamos de dar) más el tiempo esperado desde el nuevo estado al que llegamos, ponderado por las probabilidades de transición.
+\end{nota}
+
+\begin{alerta}{Condiciones de Frontera}
+    Las condiciones de frontera determinan el comportamiento en los extremos del dominio:
+    \begin{itemize}
+        \item \textbf{Condición de absorción (Meta):} Si la cadena inicia en el estado $N$, el tiempo para llegar a $N$ es cero. $\implies h(N) = 0$.
+        \item \textbf{Condición de reflexión (Origen):} Si la cadena está en $0$, forzosamente salta a $1$ con probabilidad $1$. Toma $1$ paso llegar a $1$, y desde ahí el tiempo esperado es $h(1)$. $\implies h(0) = 1 + h(1) \implies h(0) - h(1) = 1$.
+    \end{itemize}
+\end{alerta}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Construcción de la Ecuación en Diferencias}]
+    Por definición, $h(x) = E[T \mid X_0 = x]$. Aplicamos la ley de la esperanza total condicionando sobre el primer paso $X_1$:
+    \[ h(x) = E[T \mid X_0 = x] = \sum_{y \in \mathbb{N}_0} E[T \mid X_0 = x, X_1 = y] \cdot p(x, y) \]
+    
+    Sabemos que si damos un paso hacia $y$, el tiempo restante esperado es simplemente el tiempo esperado desde $y$, más el paso que ya dimos:
+    \[ E[T \mid X_0 = x, X_1 = y] = 1 + E[T \mid X_0 = y] = 1 + h(y) \]
+    
+    Sustituyendo esto en la sumatoria:
+    \[ h(x) = \sum_{y \in \mathbb{N}_0} (1 + h(y)) \cdot p(x, y) \]
+    \[ h(x) = \sum_{y} p(x,y) + \sum_{y} h(y)p(x,y) \]
+    
+    Como la suma de las probabilidades es 1 ($\sum p(x,y) = 1$), la ecuación se simplifica a:
+    \[ h(x) = 1 + \sum_{y \in \mathbb{N}_0} h(y)p(x, y) \]
+    
+    Para cualquier estado intermedio $1 \le x \le N-1$, la cadena solo puede saltar a $x+1$ (con probabilidad $p$) o a $x-1$ (con probabilidad $q$). 
+    Expandiendo la sumatoria para estos dos únicos caminos posibles, obtenemos nuestra ecuación en diferencias:
+    \[ \mathbf{h(x) = 1 + p \cdot h(x+1) + q \cdot h(x-1)} \]
+    
+    Rearreglando los términos para darle el formato clásico de ecuación en diferencias, tenemos:
+    \[ \mathbf{p h(x+1) - h(x) + q h(x-1) = -1} \quad \text{para } 1 \le x \le N-1 \]
+\end{proof}
+
+\newpage
+
+\vspace{5mm}
+
+\begin{ejercicio}{Resolución de la Ecuación en Diferencias ($p \neq q$)}{1.4b}
+    Resuelva para $p \neq q$:
+    \[ h(x) = \frac{N-x}{p-q} + \frac{q}{(p-q)^2} \left[ \left(\frac{q}{p}\right)^N - \left(\frac{q}{p}\right)^x \right] \]
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{nota}{Método}
+    La ecuación es $p h(x+1) - h(x) + q h(x-1) = -1$. 
+    Esta es una ecuación en diferencias lineal de segundo orden no homogénea. La solución general tiene la forma $h(x) = h_H(x) + h_P(x)$, 
+    donde $h_H$ es la solución homogénea y $h_P$ es una solución particular.
+\end{nota}
+
+\vspace{2mm}
+
+\begin{proof}[]
+    \textbf{1.Solución Homogénea $h_H(x)$}
+    Igualamos la ecuación a cero: $p h(x+1) - h(x) + q h(x-1) = 0$.
+    Proponemos una solución de la forma $r^x$, lo que nos da la ecuación característica:
+    \[ pr^2 - r + q = 0 \]
+    Como sabemos que $p + q = 1$, podemos reescribir el término central:
+    \[ pr^2 - (p+q)r + q = 0 \implies (r-1)(pr-q) = 0 \]
+    Las \hl{raíces} son $r_1 = 1$ y $r_2 = \frac{q}{p}$. Como $p \neq q$, las raíces son distintas. La solución homogénea es:
+    \[ h_H(x) = C_1(1)^x + C_2\left(\frac{q}{p}\right)^x = C_1 + C_2\left(\frac{q}{p}\right)^x \]
+
+    \vspace{5mm}
+
+    \textbf{2. Solución Particular $h_P(x)$}
+    Como el término independiente es una constante ($-1$) y $r=1$ ya es una raíz de la homogénea, proponemos una solución particular de la forma $h_P(x) = Ax$. \\
+    Sustituimos en la ecuación original:
+    \[ pA(x+1) - Ax + qA(x-1) = -1 \]
+    \[ Ax(p - 1 + q) + A(p - q) = -1 \]
+    Como $p + q = 1$, el primer término se cancela ($p+q-1 = 0$), dejándonos con:
+    \[ A(p - q) = -1 \implies A = \frac{-1}{p-q} \]
+    Por lo tanto, la solución particular es $h_P(x) = \frac{-x}{p-q}$.
+
+    \vspace{5mm}
+
+    \textbf{3. Solución General}
+    Sumamos ambas partes para obtener la forma general:
+    \[ h(x) = C_1 + C_2\left(\frac{q}{p}\right)^x - \frac{x}{p-q} \]
+
+    \vspace{5mm}
+
+    \textbf{4. Aplicar Condiciones de Frontera}
+    Usaremos las condiciones dadas: $h(N) = 0$ y $h(0) - h(1) = 1/p$.
+
+    \vspace{5mm}
+    
+    Primero, aplicamos la condición en el origen:
+    \[ h(0) = C_1 + C_2 \]
+    \[ h(1) = C_1 + C_2\left(\frac{q}{p}\right) - \frac{1}{p-q} \]
+    Restamos ambas:
+    \[ h(0) - h(1) = C_2 - C_2\left(\frac{q}{p}\right) + \frac{1}{p-q} = \frac{1}{p} \]
+    Factorizamos $C_2$ y pasamos la fracción al otro lado:
+    \[ C_2\left(1 - \frac{q}{p}\right) = \frac{1}{p} - \frac{1}{p-q} \]
+    Simplificamos ambos lados:
+    \[ C_2\left(\frac{p-q}{p}\right) = \frac{(p-q) - p}{p(p-q)} = \frac{-q}{p(p-q)} \]
+    Multiplicando ambos lados por $p$ y dividiendo entre $(p-q)$:
+    \[ \mathbf{C_2 = \frac{-q}{(p-q)^2}} \]
+
+    Ahora, usamos la condición en la meta $h(N) = 0$ para hallar $C_1$:
+    \[ 0 = C_1 + C_2\left(\frac{q}{p}\right)^N - \frac{N}{p-q} \implies C_1 = \frac{N}{p-q} - C_2\left(\frac{q}{p}\right)^N \]
+    Sustituimos el valor de $C_2$:
+    \[ \mathbf{C_1 = \frac{N}{p-q} + \frac{q}{(p-q)^2}\left(\frac{q}{p}\right)^N} \]
+
+    \vspace{5mm}
+
+    \textbf{Paso 5: Ensamblar la Fórmula Final} \\
+    Sustituimos $C_1$ y $C_2$ en nuestra solución general $h(x)$:
+    \[ h(x) = \left[ \frac{N}{p-q} + \frac{q}{(p-q)^2}\left(\frac{q}{p}\right)^N \right] - \frac{q}{(p-q)^2}\left(\frac{q}{p}\right)^x - \frac{x}{p-q} \]
+    Agrupamos los términos con denominadores comunes:
+    \[ h(x) = \frac{N-x}{p-q} + \frac{q}{(p-q)^2}\left[ \left(\frac{q}{p}\right)^N - \left(\frac{q}{p}\right)^x \right] \]
+    \textit{Queda demostrada la fórmula requerida.}
+\end{proof}
+
+\newpage
+
+\begin{ejercicio}{Caso Simétrico y Análisis Asintótico}{1.4c y 1.4d}
+    (c) Resuelva para $p = q = 1/2$: $h(x) = N(N+1) - x(x+1)$. \\
+    (d) Analice el orden de $h(0)$ en $N$ para los tres regímenes $p > q$, $p = q$, $p < q$.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{nota}{Raíces Repetidas en Ecuaciones }
+    Para el caso $p=q=1/2$, la ecuación característica de la parte homogénea es 
+    $\frac{1}{2}r^2 - r + \frac{1}{2} = 0 \implies r^2 - 2r + 1 = 0$. Esto nos da una \textbf{raíz doble} $r=1$.La solución homogénea toma la forma 
+    $C_1 + C_2 x$. Y como $1$ y $x$ ya están ocupados, la solución particular debe tener la forma $Ax^2$.
+\end{nota}
+
+\vspace{2mm}
+
+\begin{proof}[\textbf{Inciso (c)}]
+
+    Partimos de nuestra ecuación : $p h(x+1) - h(x) + q h(x-1) = -1$. \\
+    Sustituyendo $p = q = 1/2$ y multiplicando todo por 2 para eliminar fracciones:
+    \[ h(x+1) - 2h(x) + h(x-1) = -2 \]
+
+    \textbf{1. Solución Particular $h_P(x)$:} Proponemos $h_P(x) = Ax^2$.
+    \[ A(x+1)^2 - 2Ax^2 + A(x-1)^2 = -2 \]
+    \[ A(x^2 + 2x + 1) - 2Ax^2 + A(x^2 - 2x + 1) = -2 \]
+    \[ A(2x^2 + 2) - 2Ax^2 = 2A = -2 \implies A = -1 \]
+
+    \vspace{2mm}
+
+    Por tanto, $h_P(x) = -x^2$.
+
+    \vspace{2mm}
+
+    \textbf{2. Solución General:} Sumando la homogénea y la particular:
+    \[ h(x) = C_1 + C_2 x - x^2 \]
+
+    \vspace{2mm}
+
+    \textbf{3. Condiciones de Frontera:} 
+
+    \vspace{2mm}
+
+    Usamos $h(N) = 0$ y $h(0) - h(1) = 1/p$. Como $p=1/2$, tenemos $h(0) - h(1) = 2$.
+    
+    Evaluamos en 0 y en 1:
+    \[ h(0) = C_1 \]
+    \[ h(1) = C_1 + C_2 - 1 \]
+    Restamos para aplicar la condición:
+    \[ h(0) - h(1) = C_1 - (C_1 + C_2 - 1) = 1 - C_2 = 2 \implies C_2 = -1 \]
+    Sustituimos $C_2$ en la ecuación general:
+    \[ h(x) = C_1 - x - x^2 = C_1 - x(x+1) \]
+    Finalmente, aplicamos $h(N) = 0$:
+    \[ C_1 - N(N+1) = 0 \implies C_1 = N(N+1) \]
+    
+    Sustituyendo $C_1$, llegamos a la demostración exacta solicitada:
+    \[ \mathbf{h(x) = N(N+1) - x(x+1)} \]
+\end{proof}
+
+\vspace{2mm}
+
+\begin{alerta}{Interpretación (Inciso d)}
+    Evaluar el \ul{orden} de $h(0)$ en $N$ significa observar cómo crece el tiempo esperado para llegar a $N$ desde el origen cuando alejamos la meta hacia el infinito.
+\end{alerta}
+
+\vspace{2mm}
+
+\begin{proof}[\textbf{Inciso (d)}]
+
+    \vspace{2mm}
+
+    Evaluamos el tiempo desde el origen $h(0)$ para los tres casos:
+
+    \vspace{2mm}
+
+    \textbf{1. Régimen $p = q$ (Caminata Simétrica):} \\
+    Usamos la fórmula del inciso (c) evaluada en $x=0$:
+    \[ h(0) = N(N+1) = N^2 + N \]
+    Asintóticamente, el término dominante es $N^2$. Por lo tanto, el tiempo de llegada crece de forma \textbf{cuadrática}.
+    \[ \mathbf{h(0) = \Theta(N^2)} \]
+
+    \textbf{2. Régimen $p > q$ (positivo, a favor de la meta):} \\
+    Usamos la fórmula general del inciso (b) evaluada en $x=0$:
+    \[ h(0) = \frac{N}{p-q} + \frac{q}{(p-q)^2} \left[ \left(\frac{q}{p}\right)^N - 1 \right] \]
+    Como $p > q$, la fracción $\frac{q}{p} < 1$. Por lo tanto, cuando $N \to \infty$, el término exponencial $(\frac{q}{p})^N \to 0$. El tiempo queda dominado puramente por el término lineal $\frac{N}{p-q}$.
+    \[ \mathbf{h(0) = \Theta(N)} \]
+
+    \vspace{2mm}
+
+    \textit{(El tiempo crece de forma \textbf{lineal}. Como la caminata te empuja hacia la derecha, el tiempo es simplemente proporcional a la distancia).}
+
+    \vspace{2mm}
+
+    \textbf{3. Régimen $p < q$ (negativo, en contra de la meta):} \\
+    Tomamos la misma fórmula del inciso (b). Pero ahora, como $p < q$, la fracción $\frac{q}{p} > 1$. \\
+    Cuando $N \to \infty$, el término $(\frac{q}{p})^N$ crece sin límite y domina por completo al término lineal $N$.
+    \[ \mathbf{h(0) = \Theta\left( \left(\frac{q}{p}\right)^N \right)} \]
+    \textit{(El tiempo crece de forma \textbf{exponencial}. Estás luchando contra la corriente; llegar a una meta lejana requiere una racha de suerte estadísticamente minúscula).}
+\end{proof}
 
 \end{document}

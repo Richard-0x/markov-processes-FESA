@@ -14,41 +14,66 @@
 
 
 %--------------------------------------------------------------------------------
+
 \newtcbtheorem[number within=section]{ejercicio}{Ejercicio}{
     enhanced,
-    colback=gray!5!white,
+    sharp corners,
+    boxrule=0pt,
+    leftrule=5pt,
     colframe=gray!30!black,
+    colback=gray!5!white,
+    coltitle=white,
     fonttitle=\bfseries,
-    colbacktitle=gray!10!white,
-    coltitle=black,
-    arc=5pt,
-    attach title to upper={\\[1mm]},
-    left=2mm, right=2mm, top=2mm, bottom=2mm,
-    separator sign={.}
+    separator sign={.\ },
+    before skip=10pt,
+    after skip=10pt
 }{ej}
 
-% Bloque de Teoremas 
+
+
+% Bloque de Teoremas
 \newtcbtheorem[number within=section]{mytheo}{Teorema}{
-    enhanced, sharp corners, boxrule=0pt, leftrule=5pt,
-    colframe=blue!30!black, colback=blue!5!white,
-    fonttitle=\bfseries, coltitle=blue!70!black,
-    attach title to upper, separator sign={.\ }
+    enhanced,
+    sharp corners,
+    boxrule=0pt,
+    leftrule=5pt,
+    colframe=blue!40!black,
+    colback=blue!5!white,
+    coltitle=white,
+    fonttitle=\bfseries,
+    separator sign={.\ },
+    before skip=10pt,
+    after skip=10pt
 }{th}
 
-% Bloque de Alerta
+ % Bloque de Alerta
 \newtcolorbox{alerta}[1]{
-    enhanced, colback=red!5!white, colframe=red!55!black,
-    fonttitle=\bfseries, title=#1,
-    attach boxed title to top left={xshift=3mm, yshifttext=-1mm},
-    boxed title style={colback=red!75!black}, arc=0mm, drop shadow
+    enhanced,
+    sharp corners,
+    boxrule=0pt,
+    leftrule=5pt,
+    colframe=red!40!black,
+    colback=red!5!white,
+    coltitle=white,
+    fonttitle=\bfseries,
+    title=#1,
+    before skip=10pt,
+    after skip=10pt
 }
 
-% Bloque de Nota
+% Bloque de Notas
 \newtcolorbox{nota}[1]{
-    enhanced, colback=yellow!5!white, colframe=orange!50!black,
-    fonttitle=\bfseries, title=#1, coltitle=black,
-    attach boxed title to top left={xshift=3mm, yshifttext=-1mm},
-    boxed title style={colback=yellow!40!orange}, arc=2mm
+    enhanced,
+    sharp corners,
+    boxrule=0pt,
+    leftrule=5pt,
+    colframe=orange!40!black,
+    colback=yellow!5!white,
+    coltitle=white,
+    fonttitle=\bfseries,
+    title=#1,
+    before skip=10pt,
+    after skip=10pt
 }
 
 % ---------------------------------------------------------------------------------------------
@@ -87,7 +112,9 @@
 
 % CONTENIDO 
 
-\section{Propiedad de Markov y funciones armónicas}
+\section{Cadenas de Markov a tiempo discreto — Fundamentos}
+
+\subsection{Propiedad de Markov y funciones armónicas}
 
 \begin{ejercicio}{Propiedad de Markov}{1.1a}
     Sea $(X_n)_{n \geq 0}$ una cadena de Markov en $S$ con probabilidades $p(x,y)$. 
@@ -246,7 +273,7 @@
 
 \newpage
 
-\section{Caminata aleatoria en $\mathbb{Z}$}
+\subsection{Caminata aleatoria en $\mathbb{Z}$}
 
 \begin{ejercicio}{Caminata aleatoria en Z}{1.2a}
     Sea \( (X_n)\) la caminata aleatoria en $\mathbb{Z:}$
@@ -447,7 +474,7 @@
 
 \newpage
 
-\section{Clasificación de Estados y Comunicación}
+\subsection{Clasificación de Estados y Comunicación}
 
 \begin{ejercicio}{Clasificación de Estados}{1.3}
     Considere la cadena en $S = \{1, 2, 3, 4, 5\}$ con las probabilidades:
@@ -466,8 +493,6 @@
 Para clasificar los estados, primero visualizamos las conexiones mediante un grafo dirigido donde los nodos representan los estados.
 
 \vspace{5mm}
-
-
 
 \begin{center}
 \begin{tikzpicture}[
@@ -756,7 +781,8 @@ Por el Teorema de Solidaridad, todos los estados heredan el mismo período:
 \end{proof}
 
 \newpage
-\section{Tiempo esperado de llegada}
+
+\subsection{Tiempo esperado de llegada}
 
 \vspace{5mm}
 
@@ -982,6 +1008,917 @@ a) Defina $h(x) = E^x[T]$ y escriba la ecuación en diferencias satisfecha por $
     Cuando $N \to \infty$, el término $(\frac{q}{p})^N$ crece sin límite y domina por completo al término lineal $N$.
     \[ \mathbf{h(0) = \Theta\left( \left(\frac{q}{p}\right)^N \right)} \]
     \textit{(El tiempo crece de forma \textbf{exponencial}. Estás luchando contra la corriente; llegar a una meta lejana requiere una racha de suerte estadísticamente minúscula).}
+\end{proof}
+
+\newpage
+
+\subsection{Probabilidad de ruina (jugador)}
+
+\begin{ejercicio}{Probabilidad de Ruina del Jugador}{1.5a}
+    Con la misma cadena del Ejercicio 1.4, sea $u(x) = P^x(T_{\{N\}} < T^+_{\{0\}})$.
+\end{ejercicio}
+
+(a) Escriba la ecuación en diferencias para $u(x)$ con condiciones $u(0) = 0$ y $u(N) = 1$.
+
+\vspace{2mm}
+
+\begin{nota}{Análisis (Probabilidades)}
+    A diferencia del cálculo del tiempo esperado (donde sumábamos $1$ por cada paso dado), 
+    cuando calculamos \textbf{probabilidades de absorción}, no acumulamos tiempo. 
+    Simplemente multiplicamos la probabilidad de dar un salto hacia un estado adyacente por 
+    la probabilidad de \ul{ganar} desde ese nuevo estado.
+\end{nota}
+
+\begin{alerta}{Condiciones de Frontera (Ruina y Meta)}
+    Las condiciones definen cuándo termina el juego:
+    \begin{itemize}
+        \item \textbf{Meta ($u(N) = 1$):} Si empiezas en $N$, ya llegaste a $N$ antes que a $0$. Ganar es un evento seguro, la probabilidad es $1$.
+        \item \textbf{Ruina ($u(0) = 0$):} Si empiezas en $0$, ya perdiste. Es imposible llegar a $N$ antes de tocar el fondo, la probabilidad es $0$.
+    \end{itemize}
+\end{alerta}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Construcción de la Ecuación}]
+    Por definición, $u(x)$ es la probabilidad de que la cadena alcance el estado $N$ antes de regresar o tocar el estado $0$, asumiendo que empezamos en el estado \ul{$x$} ($1 \le x \le N-1$).
+    
+    Aplicamos la Ley de Probabilidad Total condicionando sobre el resultado del primer paso $X_1$:
+    \[ u(x) = \sum_{y} P(T_{\{N\}} < T^+_{\{0\}} \mid X_1 = y) \cdot p(x, y) \]
+    
+    Por la propiedad de Markov (el futuro solo depende del estado actual $y$), la probabilidad de ganar desde el estado $y$ es simplemente $u(y)$. Sustituimos:
+    \[ u(x) = \sum_{y} u(y) p(x, y) \]
+
+    Expandimos esta suma escribiendo término por término, se vería algo así (imaginando los estados alrededor de $x$)
+
+
+    \[ u(x) = \dots + u(x-2)p(x, x-2) + u(x-1)p(x, x-1) + u(x)p(x, x) + u(x+1)p(x, x+1) + u(x+2)p(x, x+2) + \dots \]
+
+    \vspace{2mm}
+    
+    Sabemos que desde un estado intermedio $x$, la cadena solo tiene dos caminos posibles en el siguiente instante:
+    \begin{enumerate}
+        \item Probabilidad de avanzar un paso \(p(x,x+1)=p\)
+        \item Probabilidad de retroceder un paso \(p(x,x-1)=q\)
+        \item Probabilidad de quedarse quieto: \(p(x,x)=0 \) (no hay auto-transiciones)
+        \item Probabilidad de saltar a cualquier otro estado: $p(x,y)=0$ para cualquier $y$.
+    \end{enumerate}
+
+    Sustituimos estos valores:
+
+    \[ u(x) = \dots + u(x-2)(0) + u(x-1)(q) + u(x)(0) + u(x+1)(p) + u(x+2)(0) + \dots \]
+    
+    Expandiendo la sumatoria para estos dos únicos saltos:
+    \[ \mathbf{u(x) = p \cdot u(x+1) + q \cdot u(x-1)} \]
+    
+    Para darle la forma estándar de una ecuación en diferencias lineal homogénea, pasamos $u(x)$ al lado derecho (o igualamos a cero):
+    \[ \mathbf{p u(x+1) - u(x) + q u(x-1) = 0} \quad \text{para } 1 \le x \le N-1 \]
+ 
+\end{proof}
+
+\newpage
+
+\begin{ejercicio}{Probabilidad de Ruina}{1.5b}
+    Resuelva para $p \neq q$:
+    \[ u(x) = \frac{1 - (q/p)^x}{1 - (q/p)^N} \]
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{nota}{Martingalas}
+    Fórmula es idéntica al resultado obtenido al aplicar el Teorema de Paro Opcional de Doob a la martingala exponencial $M_n = (q/p)^{X_n}$. 
+    Aquí demostraremos el mismo resultado utilizando la teoría de ecuaciones en diferencias lineales homogéneas.
+\end{nota}
+
+\vspace{2mm}
+
+\begin{proof}[\textbf{Resolución de la Ecuación en Diferencias}]
+
+    Partimos de la ecuación obtenida en el inciso (a):
+    \[ p u(x+1) - u(x) + q u(x-1) = 0 \]
+    
+    \textbf{1.Ecuación Característica} \\
+    Como es una ecuación lineal homogénea, proponemos una solución de la forma $u(x) = r^x$. Sustituyendo, obtenemos el polinomio característico:
+    \[ p r^2 - r + q = 0 \]
+    Dado que sabemos por definición que $p + q = 1$, podemos reescribir el término central:
+    \[ p r^2 - (p+q)r + q = 0 \implies p r^2 - pr - qr + q = 0 \]
+    Factorizando por agrupación:
+    \[ p r(r - 1) - q(r - 1) = 0 \implies (pr - q)(r - 1) = 0 \]
+    
+    Las raíces características son:
+    \[ r_1 = 1 \quad \text{y} \quad r_2 = \frac{q}{p} \]
+    
+    \textbf{2.Solución General} \\
+    Como la condición del problema establece que $p \neq q$, las dos raíces son distintas. Por teoría, la solución general es una combinación lineal de ambas:
+    \[ u(x) = C_1(r_1)^x + C_2(r_2)^x \]
+    \[ u(x) = C_1(1)^x + C_2\left(\frac{q}{p}\right)^x = C_1 + C_2\left(\frac{q}{p}\right)^x \]
+
+    \textbf{3.Aplicar Condiciones de Frontera} \\
+    Utilizamos las condiciones $u(0) = 0$ (ruina segura) y $u(N) = 1$ (meta alcanzada).
+    
+    Primero evaluamos en el origen ($x=0$):
+    \[ u(0) = C_1 + C_2\left(\frac{q}{p}\right)^0 = C_1 + C_2 = 0 \implies C_1 = -C_2 \]
+    
+    Sustituimos esta relación en nuestra solución general:
+    \[ u(x) = -C_2 + C_2\left(\frac{q}{p}\right)^x = C_2 \left[ \left(\frac{q}{p}\right)^x - 1 \right] \]
+    
+    Ahora evaluamos en la meta ($x=N$):
+    \[ u(N) = C_2 \left[ \left(\frac{q}{p}\right)^N - 1 \right] = 1 \]
+    Despejamos la constante $C_2$:
+    \[ C_2 = \frac{1}{\left(\frac{q}{p}\right)^N - 1} \]
+
+    \textbf{4.Ensamblar la Fórmula Final} \\
+    Sustituimos el valor de $C_2$ de regreso en nuestra ecuación para $u(x)$:
+    \[ u(x) = \left( \frac{1}{\left(\frac{q}{p}\right)^N - 1} \right) \left[ \left(\frac{q}{p}\right)^x - 1 \right] \]
+    
+    Para que coincida exactamente con la presentación clásica de la fórmula (donde los términos positivos van primero), multiplicamos el numerador y el denominador por $-1$:
+    \[ u(x) = \frac{1 - \left(\frac{q}{p}\right)^x}{1 - \left(\frac{q}{p}\right)^N} \]
+    
+\end{proof}
+
+\newpage
+
+\vspace{5mm}
+
+\begin{ejercicio}{Ruina en Juego Simétrico y Análisis de Transitoriedad}{1.5c y 1.5d}
+    (c) Para $p = q = 1/2$, obtenga $u(x) = x/N$.
+
+    (d) Analice $u(1)$ cuando $N \to \infty$ en cada régimen. ¿Cómo se relaciona con la recurrencia o transencia de la cadena?
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{nota}{Raíz de Probabilidades}
+     $p = q = 1/2$, 
+    la ecuación característica de la relación de recurrencia tiene una raíz doble 
+    $r=1$. Para ecuaciones lineales homogéneas, la solución general toma la forma 
+    $u(x) = C_1 + C_2 x$.
+\end{nota}
+
+\vspace{2mm}
+
+\begin{proof}[\textbf{Inciso (c)}]
+    Partimos de la solución general para el caso de raíz repetida:
+    \[ u(x) = C_1 + C_2 x \]
+    
+    Aplicamos las condiciones de frontera $u(0) = 0$ y $u(N) = 1$:
+    
+    1. Evaluamos en el origen:
+    \[ u(0) = C_1 + C_2(0) = 0 \implies C_1 = 0 \]
+    
+    2. Sustituimos $C_1$ y evaluamos en la meta:
+    \[ u(N) = 0 + C_2(N) = 1 \implies C_2 = \frac{1}{N} \]
+    
+    3. Solución final:
+    \[ \mathbf{u(x) = \frac{x}{N}} \]
+    
+\end{proof}
+
+\vspace{5mm}
+
+\begin{alerta}{Probabilidad al Infinito}
+    En nuestra cadena sobre $\mathbb{N}_0$, estando en $0$ saltamos al $1$ con probabilidad $1$. El retorno al origen depende de lo que pase desde el estado $1$.
+    La probabilidad de \textbf{nunca regresar al origen} (escapar al infinito) empezando en $1$ es exactamente el límite $\lim_{N \to \infty} u(1)$.
+    \begin{itemize}
+        \item Si $\lim u(1) = 0 \implies$ El retorno es seguro. La cadena es \textbf{Recurrente}.
+        \item Si $\lim u(1) > 0 \implies$ Existe probabilidad de escape. La cadena es \textbf{Transitoria}.
+    \end{itemize}
+\end{alerta}
+
+\vspace{3mm}
+
+\begin{proof}[\textbf{Inciso (d)}]
+    Evaluamos el límite $\lim_{N \to \infty} u(1)$ para los tres regímenes:
+
+    \textbf{1. Régimen $p = q = 1/2$ (Juego Simétrico):}
+    Usamos la fórmula del inciso (c):
+    \[ \lim_{N \to \infty} u(1) = \lim_{N \to \infty} \frac{1}{N} = 0 \]
+    \textit{Conclusión:} La probabilidad de escapar al infinito es $0$. 
+    La partícula siempre será arrastrada de vuelta al origen tarde o temprano. 
+    La cadena es \textbf{Recurrente}.
+
+    \vspace{3mm}
+
+    \textbf{2. Régimen $p < q$ :}
+    Usamos la fórmula del inciso (b) evaluada en $x=1$. Como $p < q$, entonces $\frac{q}{p} > 1$.
+    \[ \lim_{N \to \infty} u(1) = \lim_{N \to \infty} \frac{1 - (q/p)^1}{1 - (q/p)^N} \]
+    Como el término $(q/p)^N$ tiende a infinito, el denominador crece sin límite:
+    \[ \lim_{N \to \infty} \frac{1 - q/p}{-\infty} = 0 \]
+    \textit{Conclusión:} La probabilidad de escapar hacia la derecha es nula. 
+    La cadena es \textbf{Recurrente} (específicamente, positiva recurrente).
+
+    \vspace{3mm}
+
+    \textbf{3. Régimen $p > q$ :}
+    Como $p > q$, entonces $\frac{q}{p} < 1$.
+    \[ \lim_{N \to \infty} u(1) = \lim_{N \to \infty} \frac{1 - (q/p)^1}{1 - (q/p)^N} \]
+    Como la base es menor a $1$, el término $(q/p)^N$ tiende a $0$ cuando $N \to \infty$:
+    \[ \lim_{N \to \infty} \frac{1 - q/p}{1 - 0} = 1 - \frac{q}{p} \]
+    \textit{Conclusión:} Dado que $q/p < 1$, el resultado $1 - q/p$ 
+    es un número estrictamente \textbf{mayor a cero}. 
+    Esto significa que hay una probabilidad real de que la partícula se vaya al 
+    infinito y jamás regrese a tocar el origen. Por lo tanto, la cadena es 
+    \textbf{Transitoria}.
+\end{proof}
+
+\newpage
+
+
+\section{Medidas estacionarias, recurrencia y ergodicidad}
+
+\subsection{Existencia, unicidad y tiempo de retorno}
+
+\begin{ejercicio}{Existencia, unicidad y tiempo de retorno}{2.1a}
+    Sea $(X_n)$ una cadena irreducible en un espacio de estados $S$ numerable.
+\end{ejercicio}
+
+\vspace{2mm}
+
+(a) Demuestre que $\pi(x) = 1/E^x[T_x^+]$ define una medida estacionaria positiva.
+
+\vspace{2mm}
+
+\begin{mytheo}{El Teorema de Kac y la Medida de Excursión : }
+      Construir primero una \textbf{medida de excursión} $\gamma_x(y)$. Esta medida cuenta el número de veces esperado que la cadena visita el estado $y$ entre dos visitas consecutivas al estado $x$.
+    \[ \gamma_x(y) = E^x \left[ \sum_{k=1}^{T_x^+} \mathbf{1}_{\{X_k = y\}} \right] \]
+    Por teoría de Markov, se sabe que esta medida $\gamma_x$ siempre es invariante (cumple $\gamma_x P = \gamma_x$).
+\end{mytheo}
+
+\begin{alerta}{Condición de Positividad}
+    Para que la medida $\pi(x)$ sea estrictamente positiva y válida como distribución, el tiempo esperado de retorno debe ser finito ($E^x[T_x^+] < \infty$). Esto ocurre sí y solo sí la cadena irreducible es \textbf{recurrente positiva}.
+\end{alerta}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Demostración del Límite Estacionario}]
+    \textbf{1.La masa total de la medida de excursión.} \\
+    Si sumamos el número esperado de visitas a \textit{todos} 
+    los estados $y \in S$ durante una excursión desde $x$ hasta regresar a $x$, 
+    obtendremos exactamente el tiempo total que duró la excursión.
+    Matemáticamente, por linealidad de la esperanza:
+
+    \[ \sum_{y \in S} \gamma_x(y) = E^x \left[ \sum_{y \in S} \sum_{k=1}^{T_x^+} \mathbf{1}_{\{X_k = y\}} \right] = E^x \left[ \sum_{k=1}^{T_x^+} 1 \right] = E^x[T_x^+] \]
+    
+    \textbf{2. Normalización para crear una distribución.} \\
+    Dado que $\gamma_x$ es una medida estacionaria ($\gamma_x P = \gamma_x$), 
+    cualquier múltiplo escalar de ella también lo es. Para convertirla en 
+    una \textit{distribución de probabilidad} estacionaria $\pi$, dividimos 
+    la medida de cada estado entre la masa total de la excursión:
+    \[ \pi(y) = \frac{\gamma_x(y)}{\sum_{z \in S} \gamma_x(z)} = \frac{\gamma_x(y)}{E^x[T_x^+]} \]
+    
+    Como $\gamma_x P = \gamma_x$, se cumple automáticamente que $\pi P = \pi$, por lo que $\pi$ es efectivamente una medida estacionaria.
+
+    \textbf{3. Evaluación en el estado $x$ (El Teorema de Kac).} \\
+    Ahora analizamos qué ocurre específicamente en el estado de referencia $y = x$. 
+    Por definición, $\gamma_x(x)$ es el número de veces que visitamos el estado $x$ durante el trayecto desde $x$ hasta el primer retorno a $x$. Evidentemente, esto ocurre exactamente \textbf{una sola vez} (justo en el instante de retorno $T_x^+$).
+    \[ \gamma_x(x) = 1 \]
+    
+    Sustituyendo este valor en nuestra distribución normalizada $\pi$, obtenemos:
+    \[ \pi(x) = \frac{\gamma_x(x)}{E^x[T_x^+]} = \frac{1}{E^x[T_x^+]} \]
+    
+    \textbf{Conclusión:}
+    Como la cadena es irreducible (si un estado es recurrente positivo, todos lo son), 
+    $0 < E^x[T_x^+] < \infty$. Por lo tanto, $\pi(x) = \frac{1}{E^x[T_x^+]}$ 
+    está bien definida, cumple $\pi P = \pi$, y es estrictamente positiva. Queda demostrado.
+\end{proof}
+
+\newpage
+
+\vspace{5mm}
+
+\begin{ejercicio}{Conclusión: Teorema Fundamental de Cadenas de Markov}{2.1b}
+    Concluya: $(X_n)$ es recurrente positiva si y solo si existe una probabilidad estacionaria $\pi$. En ese caso, $\pi$ es única y $\pi(x) = 1/E^x[T_x^+]$.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{nota}{Demostración}
+    Al ser una implicación bidireccional ($\iff$), la demostración exige dos caminos lógicos rigurosos:
+    \begin{enumerate}
+        \item \textbf{Ida ($\implies$):} Asumir que la cadena es recurrente positiva y demostrar que $\pi$ es una distribución de probabilidad válida.
+        \item \textbf{Regreso ($\impliedby$):} Asumir que $\pi$ existe como distribución y demostrar que la cadena está obligada a ser recurrente positiva.
+    \end{enumerate}
+\end{nota}
+
+\vspace{2mm}
+
+\begin{proof}[\textbf{Demostración}]
+    \textbf{1. Ida ($\implies$): Recurrente positiva $\implies \exists \pi$ distribución estacionaria.} \\
+    Si la cadena es recurrente positiva, por definición su tiempo esperado de retorno es finito: $E^x[T_x^+] < \infty$. \\
+    En el inciso (a), construimos la medida estacionaria $\pi(y) = \frac{\gamma_x(y)}{E^x[T_x^+]}$. Para garantizar que existe como una \textit{probabilidad} (y no solo como una medida), debemos probar que la suma de todos sus elementos es exactamente 1. \\
+    Sumamos sobre todo el espacio de estados $S$:
+    \[ \sum_{y \in S} \pi(y) = \sum_{y \in S} \frac{\gamma_x(y)}{E^x[T_x^+]} = \frac{1}{E^x[T_x^+]} \sum_{y \in S} \gamma_x(y) \]
+    Sabemos que la suma de todas las visitas de la excursión $\sum \gamma_x(y)$ es igual al tiempo total del viaje $E^x[T_x^+]$. Sustituyendo esto:
+    \[ \sum_{y \in S} \pi(y) = \frac{E^x[T_x^+]}{E^x[T_x^+]} = 1 \]
+    Por lo tanto, $\pi$ es una probabilidad estacionaria bien definida.
+
+    \vspace{3mm}
+    \textbf{2. Regreso ($\impliedby$): $\exists \pi \implies$ Recurrente positiva.} \\
+    Supongamos que existe una probabilidad estacionaria $\pi$. Al ser una distribución sobre una cadena irreducible, todos los estados deben tener probabilidad estrictamente positiva ($\pi(x) > 0$). \\
+    Por la relación del Lema de Kac obtenida en (a), sabemos que el peso de $\pi$ en un estado está dictado por su tiempo de retorno:
+    \[ \pi(x) = \frac{1}{E^x[T_x^+]} > 0 \]
+    Para que esta fracción sea estrictamente mayor a cero (como lo exige una distribución de probabilidad irreducible), el denominador \textbf{no puede ser infinito}. 
+    \[ E^x[T_x^+] < \infty \]
+    Tener un tiempo de retorno esperado finito es la definición matemática exacta de ser una cadena \textbf{recurrente positiva}.
+
+    \vspace{3mm}
+    \textbf{3. Unicidad:} \\
+    La unicidad se deriva directamente de la irreducibilidad de la cadena. Al estar todos los estados comunicados, la medida de excursión $\gamma_x$ respecto a un estado $x$ está unívocamente determinada por la matriz de transición $P$. Como la fórmula $\pi(x) = 1/E^x[T_x^+]$ fija el valor exacto para cada estado basándose en una "constante física" de la red (su tiempo de retorno), es imposible que el sistema de ecuaciones $\pi P = \pi$ con $\sum \pi = 1$ tenga otra solución linealmente independiente. La distribución es única.
+\end{proof}
+
+\newpage
+
+\vspace{5mm}
+
+\begin{ejercicio}{Ley Ergódica y Contraejemplo Nulo Recurrente}{2.1c y 2.1d}
+    (c) Enuncie y demuestre la ley ergódica: si $\pi(f) < \infty$, entonces $(1/n) \sum_{k=0}^{n-1} f(X_k) \to \pi(f)$ casi seguramente. \\
+    (d) Dé un ejemplo en $S = \mathbb{N}_0$ de cadena irreducible recurrente nula. Verifique que no existe probabilidad estacionaria.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{nota}{Intuición de la Ley Ergódica}
+    La Ley Ergódica establece que \textbf{el promedio temporal iguala al promedio espacial}. Es decir, el promedio de una función evaluada a lo largo de la trayectoria de la cadena (lo que observamos empíricamente) converge al valor esperado de esa función respecto a la distribución estacionaria $\pi$ (la teoría).
+\end{nota}
+
+\begin{proof}[\textbf{Demostración (Esbozo analítico de la Ley Ergódica)}]
+    Sea una cadena recurrente positiva con distribución estacionaria $\pi$. Elegimos un estado de referencia $x$ y dividimos la trayectoria de la cadena en "excursiones" (los bloques de tiempo entre visitas consecutivas a $x$).
+    
+    Por la propiedad fuerte de Markov, el comportamiento de la cadena en cada excursión es independiente de las demás y tiene la misma distribución (son variables i.i.d.).
+    Sea $Y_i$ la suma de $f(X_k)$ durante la $i$-ésima excursión, y $\tau_i$ la duración de esa excursión.
+    
+    Aplicando la Ley Fuerte de los Grandes Números (SLLN) a estas variables independientes, a medida que el número de pasos $n \to \infty$, el promedio a lo largo de los pasos converge al cociente de las esperanzas en una sola excursión:
+    \[ \frac{1}{n} \sum_{k=0}^{n-1} f(X_k) \xrightarrow{c.s.} \frac{E^x\left[ \sum_{k=1}^{T_x^+} f(X_k) \right]}{E^x[T_x^+]} \]
+    
+    Recordando nuestro Teorema de Kac (inciso a), el término de abajo es $1/\pi(x)$, y el término de arriba es la suma respecto a la medida de excursión $\gamma_x(f)$. Al multiplicar por $\pi(x)$, obtenemos exactamente la esperanza respecto a $\pi$:
+    \[ \xrightarrow{c.s.} \sum_{y \in S} f(y) \pi(y) = \pi(f) \]
+    \textit{Queda demostrada la convergencia casi segura.}
+\end{proof}
+
+\vspace{5mm}
+
+\begin{alerta}{El peligro de los espacios infinitos}
+    En espacios finitos, si una cadena es irreducible, automáticamente es recurrente positiva. Sin embargo, en espacios infinitos (como $\mathbb{N}_0$), la cadena puede "perder el tiempo" viajando infinitamente lejos, haciendo que el tiempo promedio de retorno sea infinito, volviéndola \textbf{recurrente nula}.
+\end{alerta}
+
+\begin{proof}[\textbf{Ejemplo de Cadena Recurrente Nula (Inciso d)}]
+    \textbf{1. Propuesta de Cadena:} \\
+    Consideramos la caminata aleatoria simétrica sobre $\mathbb{N}_0$ con reflexión en el origen. Sus probabilidades de transición son:
+    \begin{itemize}
+        \item $p(x, x+1) = 1/2 \quad \text{y} \quad p(x, x-1) = 1/2 \quad \text{para } x \ge 1$
+        \item $p(0, 1) = 1$
+    \end{itemize}
+    Esta cadena es \textbf{irreducible} (todos se comunican) y \textbf{recurrente} (al ser simétrica en 1D, siempre regresa). Veamos si es nula.
+
+    \textbf{2. Verificación de inexistencia de $\pi$:} \\
+    Supongamos, por contradicción, que existe una distribución estacionaria $\pi$ tal que $\pi P = \pi$ y $\sum \pi(x) = 1$.
+    Planteamos las ecuaciones de balance:
+    \begin{align*}
+        \text{Para } x = 0: \quad \pi(0) &= \pi(1) p(1,0) = \frac{1}{2}\pi(1) \implies \pi(1) = 2\pi(0) \\
+        \text{Para } x = 1: \quad \pi(1) &= \pi(0) p(0,1) + \pi(2) p(2,1) = \pi(0) + \frac{1}{2}\pi(2)
+    \end{align*}
+    Sustituimos $\pi(1)$ en la segunda ecuación:
+    \[ 2\pi(0) = \pi(0) + \frac{1}{2}\pi(2) \implies \pi(0) = \frac{1}{2}\pi(2) \implies \pi(2) = 2\pi(0) \]
+    
+    Si continuamos de forma inductiva para todo $x \ge 1$:
+    \[ \pi(x) = \frac{1}{2}\pi(x-1) + \frac{1}{2}\pi(x+1) \]
+    Se puede demostrar que la única solución a esta relación de recurrencia que cumple las condiciones de frontera iniciales es que todas las probabilidades sean constantes:
+    \[ \pi(x) = 2\pi(0) \quad \text{para todo } x \ge 1 \]
+    
+    \textbf{3. La contradicción matemática:} \\
+    Para que $\pi$ sea una probabilidad, debe sumar 1:
+    \[ \sum_{x=0}^{\infty} \pi(x) = \pi(0) + \sum_{x=1}^{\infty} 2\pi(0) = \pi(0) + 2\pi(0) + 2\pi(0) + \dots \]
+    Si $\pi(0) > 0$, esta suma diverge a infinito (nunca suma 1). \\
+    Si $\pi(0) = 0$, entonces todos los $\pi(x) = 0$, y la suma es 0 (tampoco suma 1).
+    
+    \textbf{Conclusión:} Es matemáticamente imposible construir una distribución de probabilidad estacionaria para esta cadena. Por el Teorema Fundamental (inciso b), concluimos que esta cadena es \textbf{irreducible recurrente nula}.
+\end{proof}
+
+\newpage
+\subsection{Cadena de nacimiento y muerte discreta}
+
+\vspace{5mm}
+
+\begin{ejercicio}{Cadena de nacimiento-muerte discreta }{2.2a}
+    Sea $(X_n)$ en $\mathbb{N}_0$: $p(x, x+1) = p_x$, $p(x, x-1) = q_x = 1 - p_x$ para $x \ge 1$, y reflexión $p(0,1) = 1$. \\
+    (a) Demuestre que toda medida estacionaria satisface el \textit{balance detallado} $\pi(x)p(x, x+1) = \pi(x+1)q_{x+1}$, y obtenga $\pi(x) = \pi(0) \prod_{k=0}^{x-1} \frac{p_k}{q_{k+1}}$.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{nota}{Balance Global vs. Balance Detallado}
+    \begin{itemize}
+        \item \textbf{Balance Global:} $\pi(y) = \sum_x \pi(x)p(x,y)$. Todo lo que entra a $y$ desde cualquier parte, iguala a todo lo que sale de $y$.
+        \item \textbf{Balance Detallado:} $\pi(x)p(x,y) = \pi(y)p(y,x)$. El flujo que va específicamente de $x$ a $y$ es exactamente igual al flujo que regresa de $y$ a $x$. 
+        Si una medida cumple esto, la cadena es \textit{reversible}.
+    \end{itemize}
+\end{nota}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Demostración por Inducción}]
+    Para encontrar la medida estacionaria $\pi$, partimos de las ecuaciones de balance global $\pi P = \pi$. Evaluamos nodo por nodo:
+    
+    \textbf{1. Caso base (Nodo $y = 0$):} \\
+    A la posición $0$ solo se puede llegar desde la posición $1$ (dando un paso hacia atrás con probabilidad $q_1$). Por lo tanto, la ecuación de balance global es:
+    \[ \pi(0) = \pi(1) p(1, 0) = \pi(1) q_1 \]
+    Como por definición $p(0, 1) = 1$, podemos multiplicar el lado izquierdo por $1$ sin alterarlo:
+    \[ \pi(0) p(0, 1) = \pi(1) q_1 \]
+    \textit{(¡Este es exactamente el balance detallado para $x = 0$! Definiremos $p_0 = 1$ para mantener la notación).}
+
+    \textbf{2. Siguiente nodo (Nodo $y = 1$):} \\
+    Al nodo $1$ se puede llegar desde el $0$ (avanzando) o desde el $2$ (retrocediendo). La ecuación global es:
+    \[ \pi(1) = \pi(0) p(0, 1) + \pi(2) p(2, 1) \]
+    Sustituyendo $p(0,1) = p_0$ y $p(2,1) = q_2$:
+    \[ \pi(1) = \pi(0) p_0 + \pi(2) q_2 \]
+    Del paso anterior, sabemos que $\pi(0) p_0 = \pi(1) q_1$. Sustituimos esto en la ecuación:
+    \[ \pi(1) = \pi(1) q_1 + \pi(2) q_2 \]
+    Pasamos $\pi(1) q_1$ restando al lado izquierdo y factorizamos $\pi(1)$:
+    \[ \pi(1)(1 - q_1) = \pi(2) q_2 \]
+    Como $p_1 + q_1 = 1$, sabemos que $1 - q_1 = p_1$. Sustituyendo:
+    \[ \pi(1) p_1 = \pi(2) q_2 \]
+    \textit{(¡Queda demostrado el balance detallado para $x = 1$!)}
+
+    \textbf{3. Paso Inductivo (Para un nodo $x$ genérico):} \\
+    Supongamos que el balance detallado se cumple para el nodo anterior, es decir, $\pi(x-1) p_{x-1} = \pi(x) q_x$.
+    Planteamos el balance global para el estado $x$:
+    \[ \pi(x) = \pi(x-1) p_{x-1} + \pi(x+1) q_{x+1} \]
+    Aplicamos nuestra hipótesis de inducción sustituyendo el primer término:
+    \[ \pi(x) = \pi(x) q_x + \pi(x+1) q_{x+1} \]
+    Agrupamos los términos con $\pi(x)$:
+    \[ \pi(x)(1 - q_x) = \pi(x+1) q_{x+1} \]
+    Como $1 - q_x = p_x$, concluimos:
+    \[ \mathbf{\pi(x) p_x = \pi(x+1) q_{x+1}} \]
+    \textit{Queda demostrado que toda medida estacionaria en esta cadena cumple el balance detallado.}
+
+    \vspace{3mm}
+    \textbf{4. Obtención de la Fórmula de Productoria:} \\
+    A partir de la ecuación de balance detallado, despejamos $\pi(x+1)$:
+    \[ \pi(x+1) = \pi(x) \frac{p_x}{q_{x+1}} \]
+    Si "desenrollamos" esta relación recursiva desde $x$ hasta $0$, obtenemos:
+    \begin{align*}
+        \pi(1) &= \pi(0) \frac{p_0}{q_1} \\
+        \pi(2) &= \pi(1) \frac{p_1}{q_2} = \pi(0) \frac{p_0}{q_1} \frac{p_1}{q_2} \\
+        \pi(3) &= \pi(2) \frac{p_2}{q_3} = \pi(0) \frac{p_0}{q_1} \frac{p_1}{q_2} \frac{p_2}{q_3} \\
+        &\vdots \\
+        \pi(x) &= \pi(0) \left( \frac{p_0}{q_1} \right) \left( \frac{p_1}{q_2} \right) \cdots \left( \frac{p_{x-1}}{q_x} \right)
+    \end{align*}
+    Escrito de forma compacta usando la notación de productoria ($\prod$):
+    \[ \mathbf{\pi(x) = \pi(0) \prod_{k=0}^{x-1} \frac{p_k}{q_{k+1}}} \]
+    \textit{(Asumiendo $p_0 = p(0,1) = 1$). Queda obtenida la fórmula deseada.}
+\end{proof}
+
+\newpage
+
+
+
+\begin{ejercicio}{Condición de Probabilidad Estacionaria}{2.2b}
+    Dé la condición sobre $\sum_x \pi(x)$ para que exista probabilidad estacionaria.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{alerta}{Normalización de la Medida}
+    Como demostramos teóricamente en el Teorema de Kac, una medida estacionaria $\pi(x)$ se convierte en una \textbf{distribución de probabilidad} válida si y solo si podemos normalizarla. Esto exige estrictamente que la suma de todos sus términos sobre el espacio de estados sea finita.
+\end{alerta}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Determinación de la Condición}]
+    Para que $\pi$ sea una distribución de probabilidad, debe cumplir el axioma fundamental de Kolmogorov:
+    \[ \sum_{x=0}^{\infty} \pi(x) = 1 \]
+
+    Sustituimos la fórmula de la medida estacionaria obtenida mediante balance detallado en el inciso (a):
+    \[ \sum_{x=0}^{\infty} \left( \pi(0) \prod_{k=0}^{x-1} \frac{p_k}{q_{k+1}} \right) = 1 \]
+
+    Dado que $\pi(0)$ es una constante que no depende del índice $x$, la podemos factorizar fuera de la sumatoria. Recordando que para el término $x=0$ el producto vacío se define como $1$, separamos ese primer término:
+    \[ \pi(0) \left[ 1 + \sum_{x=1}^{\infty} \prod_{k=0}^{x-1} \frac{p_k}{q_{k+1}} \right] = 1 \]
+
+    Despejamos el valor base $\pi(0)$ pasándolo a dividir:
+    \[ \pi(0) = \frac{1}{1 + \sum_{x=1}^{\infty} \prod_{k=0}^{x-1} \frac{p_k}{q_{k+1}}} \]
+
+    Para que la probabilidad inicial $\pi(0)$ sea un valor real válido, estrictamente mayor que cero (lo cual garantiza que la cadena completa sea recurrente positiva y la distribución exista), el denominador \textbf{no puede ser infinito}. 
+
+    \textbf{Conclusión:}
+    La condición necesaria y suficiente es que la serie de productos converja a un valor finito. Escrito formalmente:
+    \[ \mathbf{\sum_{x=1}^{\infty} \prod_{k=0}^{x-1} \frac{p_k}{q_{k+1}} < \infty} \]
+\end{proof}
+
+
+\newpage
+
+
+\begin{ejercicio}{Distribución Geométrica en Equilibrio}{2.2c}
+    Tome $p_x = p < q$ constantes. Calcule $\pi$ y muestre que es geométrica de parámetro $p/q$.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{proof}[\textbf{Cálculo de la Distribución}]
+    Partimos de la fórmula general obtenida en el inciso (a):
+    \[ \pi(x) = \pi(0) \prod_{k=0}^{x-1} \frac{p_k}{q_{k+1}} \]
+    
+    El problema nos indica que $p_x = p$ y $q_x = q$ (donde $p < q$) para los estados regulares $x \ge 1$. Recordando la condición de frontera en el origen, $p(0,1) = 1$, por lo que $p_0 = 1$.
+    
+    Para cualquier $x \ge 1$, el producto se desarrolla así:
+    \[ \pi(x) = \pi(0) \left( \frac{p_0}{q_1} \right) \left( \frac{p_1}{q_2} \right) \cdots \left( \frac{p_{x-1}}{q_x} \right) \]
+    Sustituyendo los valores constantes:
+    \[ \pi(x) = \pi(0) \left( \frac{1}{q} \right) \left( \frac{p}{q} \right) \cdots \left( \frac{p}{q} \right) \]
+    Dado que hay $x$ fracciones en total, y la primera es distinta, agrupamos las $x-1$ fracciones restantes:
+    \[ \pi(x) = \pi(0) \frac{1}{q} \left(\frac{p}{q}\right)^{x-1} \]
+    
+    Para darle la forma canónica de una progresión geométrica dependiente de $(p/q)^x$, multiplicamos y dividimos por $p$:
+    \[ \pi(x) = \pi(0) \frac{1}{q} \frac{q}{p} \left(\frac{p}{q}\right)^x = \frac{\pi(0)}{p} \left(\frac{p}{q}\right)^x \]
+    
+    \textbf{Conclusión del inciso (c):}
+    Dado que la probabilidad de estar en el estado $x$ es directamente proporcional a la potencia $(p/q)^x$, la medida estacionaria tiene la forma exacta de una \textbf{distribución geométrica} modificada en el origen, con razón (o parámetro) $r = p/q$. Como $p < q$, la razón $r < 1$, lo que garantiza que la serie converge y la distribución existe.
+\end{proof}
+
+\vspace{5mm}
+
+\begin{ejercicio}{Reversibilidad en el Tiempo}{2.2d}
+    Demuestre que la cadena es reversible: en equilibrio, $(X_0, \dots, X_n)$ y $(X_n, \dots, X_0)$ tienen la misma distribución.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{nota}{El Concepto de Reversibilidad}
+    Un proceso estocástico es \textit{reversible} si, al grabar su comportamiento en video y reproducirlo en reversa, las probabilidades de observar esa secuencia de eventos son matemáticamente indistinguibles de reproducirlo hacia adelante. Esto es una consecuencia directa de cumplir el Balance Detallado en equilibrio.
+\end{nota}
+
+\begin{proof}[\textbf{Demostración Analítica de Reversibilidad}]
+    Queremos demostrar que la probabilidad de observar una trayectoria hacia adelante en estado estacionario es igual a la probabilidad de observarla hacia atrás:
+    \[ \mathbb{P}_\pi(X_0=x_0, X_1=x_1, \dots, X_n=x_n) = \mathbb{P}_\pi(X_0=x_n, X_1=x_{n-1}, \dots, X_n=x_0) \]
+
+    Desarrollamos el lado izquierdo utilizando la definición de probabilidad conjunta para una Cadena de Markov (probabilidad inicial por las probabilidades de transición):
+    \[ \text{Lado Izquierdo} = \pi(x_0) p(x_0, x_1) p(x_1, x_2) \dots p(x_{n-1}, x_n) \]
+
+    Ahora, aplicamos la ecuación de \textbf{balance detallado} (demostrada en el inciso a), la cual nos dice que $\pi(x)p(x,y) = \pi(y)p(y,x)$. 
+    Aplicamos esto al \textbf{primer par} de términos de nuestra cadena:
+    \[ [ \pi(x_0) p(x_0, x_1) ] = \pi(x_1) p(x_1, x_0) \]
+    Sustituyendo en la trayectoria original:
+    \[ = \pi(x_1) p(x_1, x_0) p(x_1, x_2) p(x_2, x_3) \dots p(x_{n-1}, x_n) \]
+    
+    Reordenamos para agrupar $\pi(x_1)$ con el siguiente salto hacia la derecha:
+    \[ = p(x_1, x_0) [ \pi(x_1) p(x_1, x_2) ] p(x_2, x_3) \dots p(x_{n-1}, x_n) \]
+    
+    Aplicamos de nuevo el balance detallado al nuevo corchete $[ \pi(x_1) p(x_1, x_2) ] = \pi(x_2) p(x_2, x_1)$:
+    \[ = p(x_1, x_0) \pi(x_2) p(x_2, x_1) p(x_2, x_3) \dots p(x_{n-1}, x_n) \]
+    
+    Continuamos este proceso iterativo, "empujando" la distribución $\pi$ hacia la derecha y "volteando" cada probabilidad de transición $p(x_i, x_{i+1})$ a $p(x_{i+1}, x_i)$. Al llegar al final de la cadena, obtenemos:
+    \[ = p(x_1, x_0) p(x_2, x_1) \dots p(x_n, x_{n-1}) \pi(x_n) \]
+
+    Reordenando los términos algebraicamente (poniendo $\pi(x_n)$ al principio y leyendo los saltos de derecha a izquierda), tenemos:
+    \[ = \pi(x_n) p(x_n, x_{n-1}) p(x_{n-1}, x_{n-2}) \dots p(x_1, x_0) \]
+
+    ¡Y esta es exactamente la definición por propiedad de Markov de la trayectoria leída en reversa!
+    \[ = \mathbb{P}_\pi(X_0=x_n, X_1=x_{n-1}, \dots, X_n=x_0) \]
+    
+    \textit{Queda formalmente demostrado que, en equilibrio, la cadena es reversible.}
+\end{proof}
+
+\newpage
+\subsection{Convergencia al equilibrio}
+
+\vspace{5mm}
+
+\begin{ejercicio}{Convergencia al equilibrio y Brecha Espectral}{2.3a}
+    Sea $(X_n)$ irreducible y aperiódica en $S$ finito, con probabilidad estacionaria $\pi$. \\
+    (a) Defina la distancia en variación total $||\mu - \nu|| = \frac{1}{2} \sum_x |\mu(x) - \nu(x)|$ y demuestre que $||p^n(x, \cdot) - \pi|| \le C|\lambda_2|^n$, donde $\lambda_2$ es el segundo valor propio más grande en valor absoluto de $p$.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{nota}{Descomposición Espectral y la Brecha}
+    Si asumimos que la matriz de transición $P$ es diagonalizable (lo cual es estándar para cadenas reversibles), podemos escribirla en función de sus valores propios $\lambda_k$ y sus vectores propios (izquierdos y derechos). 
+    Ordenamos los valores propios por su magnitud: $1 = \lambda_1 > |\lambda_2| \ge |\lambda_3| \dots \ge |\lambda_{|S|}|$. 
+    El término correspondiente a $\lambda_1 = 1$ representa el estado estacionario $\pi$. Los demás términos representan transitorios que decaen a cero.
+\end{nota}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Demostración de la Cota de Convergencia}]
+    \textbf{1. Expansión de la matriz de transición $P^n$:} \\
+    Mediante la descomposición espectral, la probabilidad de transición en $n$ pasos desde $x$ hasta $y$ se puede expresar como una combinación lineal de las potencias de sus eigenvalores:
+    \[ p^n(x,y) = \sum_{k=1}^{|S|} \lambda_k^n U_{xk} U^{-1}_{ky} \]
+    
+    \textbf{2. Separación del término estacionario:} \\
+    Sabemos que el eigenvalor principal es $\lambda_1 = 1$, y su término asociado en la descomposición corresponde exactamente a la distribución estacionaria $\pi(y)$ (independiente del estado inicial $x$). Separamos este término de la sumatoria:
+    \[ p^n(x,y) = \pi(y) + \sum_{k=2}^{|S|} \lambda_k^n U_{xk} U^{-1}_{ky} \]
+    
+    Pasamos $\pi(y)$ restando para encontrar la diferencia (el "error" o la distancia hacia el equilibrio):
+    \[ p^n(x,y) - \pi(y) = \sum_{k=2}^{|S|} \lambda_k^n U_{xk} U^{-1}_{ky} \]
+
+    \textbf{3. Aplicación de la Distancia en Variación Total:} \\
+    Sustituimos esta diferencia en la definición de distancia en variación total proporcionada por el problema:
+    \[ ||p^n(x, \cdot) - \pi|| = \frac{1}{2} \sum_{y \in S} | p^n(x,y) - \pi(y) | \]
+    \[ = \frac{1}{2} \sum_{y \in S} \left| \sum_{k=2}^{|S|} \lambda_k^n U_{xk} U^{-1}_{ky} \right| \]
+
+    \textbf{4. Acotación mediante Desigualdad del Triángulo:} \\
+    El valor absoluto de una suma es menor o igual a la suma de los valores absolutos:
+    \[ ||p^n(x, \cdot) - \pi|| \le \frac{1}{2} \sum_{y \in S} \sum_{k=2}^{|S|} |\lambda_k|^n |U_{xk} U^{-1}_{ky}| \]
+
+    \textbf{5. Extracción de $\lambda_2$:} \\
+    Por definición, $\lambda_2$ es el segundo eigenvalor más grande en valor absoluto. Esto significa que para cualquier $k \ge 2$, se cumple que $|\lambda_k| \le |\lambda_2|$. Por lo tanto, podemos sustituir todos los $|\lambda_k|^n$ por la cota superior $|\lambda_2|^n$ y factorizarlo fuera de la sumatoria:
+    \[ ||p^n(x, \cdot) - \pi|| \le |\lambda_2|^n \left( \frac{1}{2} \sum_{y \in S} \sum_{k=2}^{|S|} |U_{xk} U^{-1}_{ky}| \right) \]
+
+    \textbf{6. Conclusión:} \\
+    Todo el término encerrado en el paréntesis depende únicamente de los eigenvectores de la matriz y del estado inicial $x$, pero \textbf{no depende del tiempo $n$}. Lo podemos agrupar en una constante positiva $C$:
+    \[ C = \frac{1}{2} \sum_{y \in S} \sum_{k=2}^{|S|} |U_{xk} U^{-1}_{ky}| \]
+    
+    Sustituyendo esta constante, obtenemos el resultado final:
+    \[ \mathbf{||p^n(x, \cdot) - \pi|| \le C |\lambda_2|^n} \]
+    
+    \textit{Queda demostrado que la velocidad a la que la cadena converge a su distribución estacionaria está dominada exponencialmente por el segundo eigenvalor.}
+\end{proof}
+
+\newpage
+
+\vspace{5mm}
+
+\begin{ejercicio}{Desigualdad de Acoplamiento (Coupling)}{2.3b}
+    Enuncie y use la desigualdad de acoplamiento: si $\tau_c = \min\{n : X_n = X'_n\}$ para dos copias de la cadena, entonces $||p^n(x, \cdot) - \pi|| \le P(\tau_c > n)$.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{nota}{Construcción del Acoplamiento}
+    Definimos dos Cadenas de Markov $(X_n)$ y $(X'_n)$ que se mueven en el mismo espacio $S$ con la misma matriz de transición $P$:
+    \begin{itemize}
+        \item La cadena original arranca en el estado $x$: $X_0 = x$. Por tanto, su distribución en el tiempo $n$ es $P(X_n = y) = p^n(x,y)$.
+        \item La copia arranca ya en la distribución estacionaria: $X'_0 \sim \pi$. Por definición de invarianza, su distribución en cualquier tiempo $n$ sigue siendo $\pi$: $P(X'_n = y) = \pi(y)$.
+    \end{itemize}
+    Las cadenas se mueven hasta el tiempo de encuentro $\tau_c$. Una vez que se encuentran ($X_{\tau_c} = X'_{\tau_c}$), se acoplan y se mueven idénticamente juntas para todo $n \ge \tau_c$.
+\end{nota}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Demostración de la Desigualdad}]
+    Recordemos una definición equivalente y muy útil de la distancia en variación total usando conjuntos de estados (eventos $A \subset S$):
+    \[ ||p^n(x, \cdot) - \pi|| = \max_{A \subset S} |P(X_n \in A) - P(X'_n \in A)| \]
+    
+    Para cualquier evento $A$, podemos dividir la probabilidad usando la Ley de Probabilidad Total, condicionando a si las cadenas ya se acoplaron ($\tau_c \le n$) o no ($\tau_c > n$):
+    \begin{align*}
+        P(X_n \in A) &= P(X_n \in A, \tau_c \le n) + P(X_n \in A, \tau_c > n) \\
+        P(X'_n \in A) &= P(X'_n \in A, \tau_c \le n) + P(X'_n \in A, \tau_c > n)
+    \end{align*}
+    
+    Por la regla de construcción de nuestro acoplamiento, si $\tau_c \le n$, entonces las dos cadenas están pegadas y son idénticas en el tiempo $n$ ($X_n = X'_n$). Esto implica que las probabilidades conjuntas del primer término son exactamente iguales:
+    \[ P(X_n \in A, \tau_c \le n) = P(X'_n \in A, \tau_c \le n) \]
+    
+    Ahora, restamos las probabilidades para encontrar la distancia:
+    \[ P(X_n \in A) - P(X'_n \in A) = P(X_n \in A, \tau_c > n) - P(X'_n \in A, \tau_c > n) \]
+    
+    Tomamos el valor absoluto en ambos lados. Dado que ambos términos de la derecha son probabilidades (valores entre 0 y 1) y ambos están contenidos en el evento $\{\tau_c > n\}$, la diferencia máxima posible entre ellos no puede exceder el tamaño total de ese evento:
+    \[ |P(X_n \in A) - P(X'_n \in A)| \le P(\tau_c > n) \]
+    
+    Como esta desigualdad se cumple para cualquier evento $A$, también se cumple para el evento máximo que define la distancia en variación total:
+    \[ \max_{A \subset S} |P(X_n \in A) - P(X'_n \in A)| \le P(\tau_c > n) \]
+    
+    Sustituyendo la definición de variación total, llegamos a la demostración final:
+    \[ \mathbf{||p^n(x, \cdot) - \pi|| \le P(\tau_c > n)} \]
+    
+    \textit{Conclusión: El error respecto al equilibrio está acotado por la probabilidad de que las dos cadenas aún no se hayan cruzado.}
+\end{proof}
+
+\newpage
+
+\vspace{5mm}
+
+\begin{ejercicio}{Tiempo de mezcla en el Ciclo $\mathbb{Z}_N$}{2.3c}
+    Para el ciclo $\mathbb{Z}_N$, calcule los valores propios de $p$ y deduzca $t_{\text{mix}}(1/4) = \Theta(N^2)$.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{nota}{Brecha Espectral y Tiempo de Relajación}
+    El tiempo de relajación de una cadena se define como $t_{\text{rel}} = \frac{1}{1 - |\lambda_2|}$, donde $\lambda_2$ es el segundo eigenvalor más grande en magnitud. 
+    Existe un teorema fundamental que acota el tiempo de mezcla utilizando este valor:
+    \[ (t_{\text{rel}} - 1)\ln\left(\frac{1}{2\epsilon}\right) \le t_{\text{mix}}(\epsilon) \le t_{\text{rel}} \ln\left(\frac{1}{\epsilon \pi_{\min}}\right) \]
+\end{nota}
+
+\begin{proof}[\textbf{Cálculo para el Ciclo $\mathbb{Z}_N$}]
+    \textbf{1. Valores Propios:} \\
+    La matriz de transición $P$ para la caminata aleatoria simple en $\mathbb{Z}_N$ es una matriz circulante donde $P_{x, x+1} = 1/2$ y $P_{x, x-1} = 1/2$. 
+    Por teoría de matrices circulantes, sus valores propios conocidos son:
+    \[ \lambda_k = \cos\left(\frac{2\pi k}{N}\right) \quad \text{para } k = 0, 1, \dots, N-1 \]
+    
+    El valor propio principal es $\lambda_0 = \cos(0) = 1$. El segundo valor propio más grande corresponde a $k=1$:
+    \[ \lambda_2 = \cos\left(\frac{2\pi}{N}\right) \]
+    
+    \textbf{2. Expansión de Taylor y Brecha Espectral:} \\
+    Para $N$ grande, utilizamos la expansión de Taylor del coseno ($\cos(x) \approx 1 - x^2/2$):
+    \[ \lambda_2 \approx 1 - \frac{1}{2}\left(\frac{2\pi}{N}\right)^2 = 1 - \frac{2\pi^2}{N^2} \]
+    La brecha espectral es $\gamma = 1 - \lambda_2 \approx \frac{2\pi^2}{N^2}$. \\
+    Por lo tanto, el tiempo de relajación es inversamente proporcional:
+    \[ t_{\text{rel}} = \frac{1}{\gamma} \approx \frac{N^2}{2\pi^2} = \Theta(N^2) \]
+    
+    \textbf{3. Deducción del Tiempo de Mezcla:} \\
+    Utilizando la cota inferior del teorema del tiempo de mezcla con $\epsilon = 1/4$:
+    \[ t_{\text{mix}}(1/4) \ge (t_{\text{rel}} - 1)\ln(2) = \Omega(N^2) \]
+    Dado que la difusión en $\mathbb{Z}_N$ está gobernada por el comportamiento gaussiano (Teorema del Límite Central), se sabe que el límite superior empata asintóticamente con el inferior. Por lo tanto, el tiempo exacto de convergencia es proporcional a $N^2$:
+    \[ \mathbf{t_{\text{mix}}(1/4) = \Theta(N^2)} \]
+\end{proof}
+
+\vspace{5mm}
+
+\begin{ejercicio}{Tiempo de mezcla en la Gráfica Completa $K_N$}{2.3d}
+    Para la gráfica completa $K_N$, muestre que $t_{\text{mix}}(1/4) = O(\log N)$.
+\end{ejercicio}
+
+\begin{proof}[\textbf{Cálculo para la Gráfica Completa $K_N$}]
+    \textbf{1. Valores Propios de $K_N$:} \\
+    En la gráfica completa, la transición desde cualquier estado $x$ a cualquier otro estado $y \neq x$ es uniforme. La matriz de transición es $P = \frac{1}{N-1}(J - I)$, donde $J$ es la matriz de puros unos e $I$ es la matriz identidad.
+    
+    Sabemos que los eigenvalores de $J$ son $N$ (con multiplicidad $1$) y $0$ (con multiplicidad $N-1$).
+    Al aplicar la transformación lineal de la ecuación de $P$, los eigenvalores de $P$ son:
+    \begin{itemize}
+        \item Para $\lambda(J) = N \implies \lambda_1 = \frac{N - 1}{N - 1} = 1$ (El estado estacionario).
+        \item Para $\lambda(J) = 0 \implies \lambda_k = \frac{0 - 1}{N - 1} = -\frac{1}{N-1}$ (Para el resto de los $N-1$ eigenvectores).
+    \end{itemize}
+    
+    \textbf{2. Tiempo de Relajación:} \\
+    El segundo valor propio en valor absoluto es $|\lambda_2| = \frac{1}{N-1}$. 
+    El tiempo de relajación es:
+    \[ t_{\text{rel}} = \frac{1}{1 - |\lambda_2|} = \frac{1}{1 - \frac{1}{N-1}} = \frac{N-1}{N-2} \]
+    Para $N \ge 3$, el tiempo de relajación está acotado por una constante: $t_{\text{rel}} = O(1)$. La gráfica mezcla su información casi instantáneamente.
+    
+    \textbf{3. Cota Superior del Tiempo de Mezcla:} \\
+    Por la simetría de la gráfica completa, la distribución estacionaria es uniforme para todos los estados: $\pi_{\min} = \pi(x) = \frac{1}{N}$. \\
+    Aplicamos la cota superior universal del tiempo de mezcla con $\epsilon = 1/4$:
+    \[ t_{\text{mix}}(1/4) \le t_{\text{rel}} \ln\left(\frac{1}{\epsilon \pi_{\min}}\right) \]
+    Sustituyendo nuestros valores:
+    \[ t_{\text{mix}}(1/4) \le \left(\frac{N-1}{N-2}\right) \ln\left(\frac{1}{(1/4)(1/N)}\right) \]
+    \[ t_{\text{mix}}(1/4) \le \left(\frac{N-1}{N-2}\right) \ln(4N) \]
+    
+    Dado que el coeficiente fraccionario tiende a $1$ conforme $N$ crece, la función está dominada puramente por el logaritmo de $N$:
+    \[ \mathbf{t_{\text{mix}}(1/4) = O(\log N)} \]
+    \textit{Queda demostrado analíticamente.}
+\end{proof}
+
+\newpage
+\subsection{Caminata aleatoria en $Z^{d}$}
+
+\vspace{5mm}
+
+\begin{ejercicio}{Distancia Esperada en Caminatas Multidimensionales}{2.4a}
+    Sea $(X_n)$ la caminata aleatoria simple en $\mathbb{Z}^d$: $p(x, y) = 1/(2d)$ si $|x - y| = 1$. \\
+    (a) Calcule $E^0[||X_n||^2] = n$ para todo $n$ y todo $d$.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{nota}{Descomposición en Variables Independientes}
+    La posición de la partícula en el tiempo $n$, denotada como $X_n$, puede verse como la suma acumulada de $n$ saltos individuales. 
+    Definimos $Y_k$ como el vector de desplazamiento en el paso $k$. Así, $X_n = \sum_{k=1}^n Y_k$.
+    
+    Propiedades clave de los incrementos $Y_k$:
+    \begin{enumerate}
+        \item \textbf{Longitud unitaria:} Cada salto se mueve exactamente 1 unidad a lo largo de uno de los ejes coordenados. Por lo tanto, el producto punto de un salto consigo mismo es la magnitud al cuadrado: $\langle Y_k, Y_k \rangle = ||Y_k||^2 = 1$.
+        \item \textbf{Simetría (Media cero):} Dado que es igual de probable moverse en dirección positiva o negativa sobre cualquier eje, el vector esperado de cada salto es el vector nulo: $E[Y_k] = \mathbf{0}$.
+        \item \textbf{Independencia:} El vector $Y_i$ es estadísticamente independiente del vector $Y_j$ para todo $i \neq j$.
+    \end{enumerate}
+\end{nota}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Cálculo de la Esperanza de la Norma al Cuadrado}]
+    Queremos calcular el valor esperado de la norma euclidiana al cuadrado de la posición final $X_n$, asumiendo que arrancamos en el origen ($X_0 = \mathbf{0}$).
+    
+    \textbf{1. Expresar la norma al cuadrado como un producto punto:}
+    Por definición, la magnitud al cuadrado de un vector es el producto punto consigo mismo:
+    \[ ||X_n||^2 = \langle X_n, X_n \rangle \]
+    
+    \textbf{2. Sustituir la suma de incrementos:}
+    Sustituimos $X_n$ por la suma de sus saltos individuales $Y_k$:
+    \[ ||X_n||^2 = \left\langle \sum_{i=1}^n Y_i, \sum_{j=1}^n Y_j \right\rangle \]
+    
+    \textbf{3. Expandir el producto punto:}
+    Por la propiedad distributiva (bilinealidad) del producto punto, podemos expandir este producto de sumas en una doble sumatoria:
+    \[ ||X_n||^2 = \sum_{i=1}^n \sum_{j=1}^n \langle Y_i, Y_j \rangle \]
+    
+    Para facilitar el análisis, separamos esta doble suma en dos partes: los términos donde $i = j$ (la diagonal) y los términos donde $i \neq j$ (los cruzados):
+    \[ ||X_n||^2 = \sum_{i=1}^n \langle Y_i, Y_i \rangle + \sum_{i \neq j} \langle Y_i, Y_j \rangle \]
+    
+    \textbf{4. Aplicar la Esperanza Matemática:}
+    Tomamos el valor esperado en ambos lados de la ecuación. Por la linealidad de la esperanza, podemos meter el operador $E[\cdot]$ dentro de las sumatorias:
+    \[ E^0[||X_n||^2] = \sum_{i=1}^n E[\langle Y_i, Y_i \rangle] + \sum_{i \neq j} E[\langle Y_i, Y_j \rangle] \]
+    
+    \textbf{5. Evaluar cada término:}
+    \begin{itemize}
+        \item \textbf{Términos diagonales ($i = j$):} Sabemos que $\langle Y_i, Y_i \rangle = ||Y_i||^2 = 1$. Por lo tanto, el valor esperado de una constante es la constante misma: $E[1] = 1$.
+        Como hay exactamente $n$ de estos términos en la primera sumatoria:
+        \[ \sum_{i=1}^n 1 = n \]
+        
+        \item \textbf{Términos cruzados ($i \neq j$):} Como los saltos $Y_i$ y $Y_j$ son independientes, la esperanza de su producto es el producto de sus esperanzas:
+        \[ E[\langle Y_i, Y_j \rangle] = \langle E[Y_i], E[Y_j] \rangle \]
+        Dado que la caminata es simétrica, la esperanza de cualquier salto individual es el vector cero ($E[Y_i] = \mathbf{0}$). 
+        \[ \langle \mathbf{0}, \mathbf{0} \rangle = 0 \]
+        Por lo tanto, todos los términos cruzados se anulan y suman $0$.
+    \end{itemize}
+    
+    \textbf{6. Conclusión:}
+    Sumando ambas partes, llegamos al resultado final:
+    \[ \mathbf{E^0[||X_n||^2] = n + 0 = n} \]
+    
+    \textit{Queda demostrado que el valor esperado de la distancia al cuadrado desde el origen es exactamente el número de pasos, sin importar la dimensión $d$ del espacio en el que ocurra la caminata.}
+\end{proof}
+
+\newpage
+
+\begin{ejercicio}{Teorema de Pólya }{2.4b}
+    Muestre que $\sum_n p^n(0,0) = \infty$ para $d \le 2$ (recurrencia) y $\sum_n p^n(0,0) < \infty$ para $d \ge 3$ (transencia), usando la estimación $p^{2n}(0,0) \asymp n^{-d/2}$.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{nota}{El Criterio de la Serie-$p$}
+    Sabemos que la caminata aleatoria en $\mathbb{Z}^d$ es bipartita, lo que significa que solo podemos regresar al origen en un número par de pasos ($2n$). Por lo tanto, el número esperado de visitas al origen es la suma de las probabilidades en los pasos pares. 
+    Usaremos el criterio de convergencia de las \textit{series-p} del cálculo: la serie $\sum_{n=1}^\infty \frac{1}{n^p}$ converge si $p > 1$ y diverge si $p \le 1$.
+\end{nota}
+
+\begin{proof}[\textbf{Demostración Asintótica}]
+    El número esperado de retornos al origen está dado por la suma de las probabilidades de transición:
+    \[ G(0,0) = \sum_{n=0}^{\infty} p^n(0,0) = \sum_{n=0}^{\infty} p^{2n}(0,0) \]
+    
+    Usando la estimación asintótica proporcionada, sabemos que para $n$ grande, el comportamiento de la probabilidad es proporcional a $n^{-d/2}$:
+    \[ p^{2n}(0,0) \approx C \cdot \frac{1}{n^{d/2}} \]
+    
+    Analizamos la convergencia de la serie $\sum \frac{1}{n^{d/2}}$ dependiendo de la dimensión $d$:
+    \begin{itemize}
+        \item \textbf{Para $d = 1$:} La serie se comporta como $\sum \frac{1}{n^{1/2}}$. Como $1/2 \le 1$, la serie \textbf{diverge} a $\infty$.
+        \item \textbf{Para $d = 2$:} La serie se comporta como $\sum \frac{1}{n^1}$ (la serie armónica). Como $1 \le 1$, la serie \textbf{diverge} a $\infty$.
+        \item \textbf{Para $d \ge 3$:} La serie se comporta como $\sum \frac{1}{n^{d/2}}$. Como $d \ge 3$, el exponente $d/2 \ge 1.5 > 1$. Por el criterio de la serie-$p$, la serie \textbf{converge} a un valor finito.
+    \end{itemize}
+    
+    \textbf{Conclusión:} 
+    Si la suma de probabilidades diverge ($d \le 2$), la partícula regresa infinitas veces, por lo que es \textbf{recurrente}. Si la suma converge ($d \ge 3$), la partícula regresa un número finito de veces en promedio, por lo que existe riesgo de escape y es \textbf{transitoria}.
+\end{proof}
+
+\newpage
+
+\begin{ejercicio}{Representación Integral de Green}{2.4c}
+    Para $d \ge 3$, exprese $G(0,0) = \sum_n p^n(0,0)$ como la integral 
+    \[ G(0,0) = (2\pi)^{-d} \int_{[-\pi, \pi]^d} \frac{d\theta}{1 - \frac{1}{d} \sum_{j=1}^d \cos \theta_j} \]
+    y argumente que converge.
+\end{ejercicio}
+
+\begin{proof}[\textbf{Derivación mediante Análisis de Fourier}]
+    \textbf{1. Función Característica del Salto:} \\
+    La función característica (transformada de Fourier) de un solo paso de la caminata en $\mathbb{Z}^d$ es el promedio de los exponentes complejos de los posibles saltos. Como hay $2d$ direcciones (positivas y negativas para cada eje), agrupamos por pares de Euler ($e^{i\theta} + e^{-i\theta} = 2\cos\theta$):
+    \[ \phi(\theta) = \frac{1}{2d} \sum_{j=1}^d \left( e^{i\theta_j} + e^{-i\theta_j} \right) = \frac{1}{d} \sum_{j=1}^d \cos(\theta_j) \]
+    
+    \textbf{2. Transformada Inversa para $n$ pasos:} \\
+    Por las propiedades de la transformada de Fourier para sumas de variables independientes, la función característica de $n$ pasos es $\phi(\theta)^n$.
+    La probabilidad de estar en el origen en el paso $n$ se recupera evaluando la transformada inversa de Fourier en $x=0$:
+    \[ p^n(0,0) = \frac{1}{(2\pi)^d} \int_{[-\pi, \pi]^d} \phi(\theta)^n d\theta \]
+    
+    \textbf{3. Intercambio de Suma e Integral:} \\
+    Sustituimos esto en la definición de $G(0,0)$:
+    \[ G(0,0) = \sum_{n=0}^{\infty} \frac{1}{(2\pi)^d} \int_{[-\pi, \pi]^d} \phi(\theta)^n d\theta \]
+    Por el Teorema de Convergencia Monótona, intercambiamos la serie y la integral. Dentro de la integral nos queda una serie geométrica $\sum_{n=0}^{\infty} \phi(\theta)^n$.
+    Como $|\phi(\theta)| < 1$ en casi todas partes, la serie geométrica converge a $\frac{1}{1 - \phi(\theta)}$:
+    \[ G(0,0) = \frac{1}{(2\pi)^d} \int_{[-\pi, \pi]^d} \frac{1}{1 - \phi(\theta)} d\theta \]
+    Sustituyendo nuestra $\phi(\theta)$, obtenemos la expresión solicitada:
+    \[ \mathbf{G(0,0) = (2\pi)^{-d} \int_{[-\pi, \pi]^d} \frac{d\theta}{1 - \frac{1}{d} \sum_{j=1}^d \cos \theta_j}} \]
+
+    \textbf{4. Argumento de Convergencia local:} \\
+    El único punto donde el denominador se hace cero (singularidad) es en el origen $\theta = \mathbf{0}$. Cerca de $0$, la expansión de Taylor nos da $1 - \cos(\theta_j) \approx \theta_j^2/2$. 
+    Así, el integrando cerca de cero se comporta proporcionalmente a $1/||\theta||^2$. 
+    Pasando a coordenadas esféricas en $d$ dimensiones, el elemento de volumen aporta un término $r^{d-1}dr$. La integral local es proporcional a $\int \frac{r^{d-1}}{r^2} dr = \int r^{d-3} dr$. 
+    Esta integral en el origen converge sí y solo sí $d-3 > -1 \implies d > 2$. Por lo tanto, para \textbf{$d \ge 3$, la singularidad es integrable y la integral completa converge}.
+\end{proof}
+
+\newpage
+
+\begin{ejercicio}{Cálculo Numérico de la Probabilidad de Retorno en 3D}{2.4d}
+    Para $d = 3$, estime numéricamente $G(0,0) \approx 1.516$ y calcule la probabilidad de retorno al origen.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{nota}{Esperanza vs. Probabilidad }
+    Sea $f$ la probabilidad de regresar al origen al menos una vez. El número de retornos sigue una distribución geométrica. 
+    El número esperado de visitas al origen, contando la visita inicial en $t=0$, está dado por la fórmula clásica:
+    \[ G(0,0) = \sum_{k=0}^{\infty} f^k = \frac{1}{1 - f} \]
+    A partir de esta relación, si conocemos la esperanza (la integral de Green), podemos despejar la probabilidad exacta de retorno.
+\end{nota}
+
+\begin{proof}[\textbf{Cálculo de la Probabilidad de Retorno}]
+    Utilizando la fórmula de la nota anterior, despejamos la probabilidad de retorno al origen, denotada como $f$:
+    \[ G(0,0) = \frac{1}{1 - f} \]
+    \[ 1 - f = \frac{1}{G(0,0)} \]
+    \[ f = 1 - \frac{1}{G(0,0)} \]
+    
+    El problema nos proporciona la estimación numérica de la integral tridimensional de Watson
+    : $G(0,0) \approx 1.516$.
+    Sustituimos este valor en nuestra ecuación:
+    \[ f \approx 1 - \frac{1}{1.516} \]
+    \[ f \approx 1 - 0.6596 \]
+    \[ \mathbf{f \approx 0.3404} \]
+    
+    \textbf{Conclusión:} 
+    En una caminata aleatoria tridimensional, la probabilidad de que una partícula eventualmente regrese al punto de partida es de aproximadamente el \textbf{34.04\%}. 
+    Como la probabilidad es estrictamente menor a 1, la cadena es oficialmente transitoria. Existe un $\approx 65.96\%$ de probabilidad de que la partícula se pierda en el espacio para siempre sin volver a pisar el origen.
 \end{proof}
 
 \end{document}

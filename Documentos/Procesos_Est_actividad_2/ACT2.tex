@@ -9,9 +9,11 @@
 \usepackage{soul}
 \usepackage{listings}
 \usepackage[most]{tcolorbox}
+\tcbset{shield externalize}
 \usetikzlibrary{arrows.meta, positioning, automata}
 \usetikzlibrary{babel}
-
+\usetikzlibrary{external}
+\tikzexternalize[prefix=build-tikz/]
 
 %--------------------------------------------------------------------------------
 
@@ -492,48 +494,31 @@
 
 Para clasificar los estados, primero visualizamos las conexiones mediante un grafo dirigido donde los nodos representan los estados.
 
-\vspace{5mm}
-
 \begin{center}
 \begin{tikzpicture}[
-    shorten >=1pt, 
-    node distance=2.5cm, 
-    on grid, 
-    auto,
+    shorten >=1pt, node distance=2.5cm, on grid, auto,
     every state/.style={draw=blue!50!black, fill=blue!5, thick},
     >=Stealth
 ]
+    % Nodos
+    \node[state] (a1) {$1$};
+    \node[state] (a2) [above left=of a1] {$2$};
+    \node[state] (a3) [above right=of a1] {$3$};
+    \node[state] (a4) [below left=of a1] {$4$};
+    \node[state] (a5) [below right=of a1] {$5$};
 
-% Nodos (estructura corregida)
-\node[state] (a1) {$1$};
-\node[state] (a2) [above left=of a1] {$2$};
-\node[state] (a3) [above right=of a1] {$3$};
-\node[state] (a4) [below left=of a1] {$4$};
-\node[state] (a5) [below right=of a1] {$5$};
-
-% Aristas (Transiciones)
-\path[->, thick]
-
-% Desde 1
-(a1) edge [bend left=15] node[left] {$\tfrac{1}{2}$} (a2)
-     edge [bend right=15] node[right] {$\tfrac{1}{2}$} (a3)
-
-% Desde 2 y 3
-(a2) edge [bend right=15] node[left] {$1$} (a4)
-(a3) edge [bend left=15] node[right] {$1$} (a5)
-
-% Desde 4
-(a4) edge [bend left=10] node[below] {$\tfrac{1}{3}$} (a1)
-     edge [bend left=25] node[left] {$\tfrac{1}{3}$} (a2)
-     edge [bend left=45] node[above] {$\tfrac{1}{3}$} (a3)
-
-% Desde 5
-(a5) edge [bend right=15] node[below] {$1$} (a1);
-
+    % Aristas (Sin líneas en blanco intermedias para evitar errores de scan)
+    \path[->, thick]
+    (a1) edge [bend left=15] node[left] {$\tfrac{1}{2}$} (a2)
+         edge [bend right=15] node[right] {$\tfrac{1}{2}$} (a3)
+    (a2) edge [bend right=15] node[left] {$1$} (a4)
+    (a3) edge [bend left=15] node[right] {$1$} (a5)
+    (a4) edge [bend left=10] node[below] {$\tfrac{1}{3}$} (a1)
+         edge [bend left=25] node[left] {$\tfrac{1}{3}$} (a2)
+         edge [bend left=45] node[above] {$\tfrac{1}{3}$} (a3)
+    (a5) edge [bend right=15] node[below] {$1$} (a1); % <--- Punto y coma vital
 \end{tikzpicture}
 \end{center}
-
-
 
 \begin{proof}[\textit{ Sol. }]
     
@@ -1863,16 +1848,16 @@ a) Defina $h(x) = E^x[T]$ y escriba la ecuación en diferencias satisfecha por $
 \end{ejercicio}
 
 \begin{proof}[\textbf{Derivación mediante Análisis de Fourier}]
-    \textbf{1. Función Característica del Salto:} \\
+    \textbf{1. Función Característica del Salto:} 
     La función característica (transformada de Fourier) de un solo paso de la caminata en $\mathbb{Z}^d$ es el promedio de los exponentes complejos de los posibles saltos. Como hay $2d$ direcciones (positivas y negativas para cada eje), agrupamos por pares de Euler ($e^{i\theta} + e^{-i\theta} = 2\cos\theta$):
     \[ \phi(\theta) = \frac{1}{2d} \sum_{j=1}^d \left( e^{i\theta_j} + e^{-i\theta_j} \right) = \frac{1}{d} \sum_{j=1}^d \cos(\theta_j) \]
     
-    \textbf{2. Transformada Inversa para $n$ pasos:} \\
+    \textbf{2. Transformada Inversa para $n$ pasos:} 
     Por las propiedades de la transformada de Fourier para sumas de variables independientes, la función característica de $n$ pasos es $\phi(\theta)^n$.
     La probabilidad de estar en el origen en el paso $n$ se recupera evaluando la transformada inversa de Fourier en $x=0$:
     \[ p^n(0,0) = \frac{1}{(2\pi)^d} \int_{[-\pi, \pi]^d} \phi(\theta)^n d\theta \]
     
-    \textbf{3. Intercambio de Suma e Integral:} \\
+    \textbf{3. Intercambio de Suma e Integral:} 
     Sustituimos esto en la definición de $G(0,0)$:
     \[ G(0,0) = \sum_{n=0}^{\infty} \frac{1}{(2\pi)^d} \int_{[-\pi, \pi]^d} \phi(\theta)^n d\theta \]
     Por el Teorema de Convergencia Monótona, intercambiamos la serie y la integral. Dentro de la integral nos queda una serie geométrica $\sum_{n=0}^{\infty} \phi(\theta)^n$.
@@ -1881,7 +1866,7 @@ a) Defina $h(x) = E^x[T]$ y escriba la ecuación en diferencias satisfecha por $
     Sustituyendo nuestra $\phi(\theta)$, obtenemos la expresión solicitada:
     \[ \mathbf{G(0,0) = (2\pi)^{-d} \int_{[-\pi, \pi]^d} \frac{d\theta}{1 - \frac{1}{d} \sum_{j=1}^d \cos \theta_j}} \]
 
-    \textbf{4. Argumento de Convergencia local:} \\
+    \textbf{4.Convergencia local:}
     El único punto donde el denominador se hace cero (singularidad) es en el origen $\theta = \mathbf{0}$. Cerca de $0$, la expansión de Taylor nos da $1 - \cos(\theta_j) \approx \theta_j^2/2$. 
     Así, el integrando cerca de cero se comporta proporcionalmente a $1/||\theta||^2$. 
     Pasando a coordenadas esféricas en $d$ dimensiones, el elemento de volumen aporta un término $r^{d-1}dr$. La integral local es proporcional a $\int \frac{r^{d-1}}{r^2} dr = \int r^{d-3} dr$. 
@@ -1920,5 +1905,1833 @@ a) Defina $h(x) = E^x[T]$ y escriba la ecuación en diferencias satisfecha por $
     En una caminata aleatoria tridimensional, la probabilidad de que una partícula eventualmente regrese al punto de partida es de aproximadamente el \textbf{34.04\%}. 
     Como la probabilidad es estrictamente menor a 1, la cadena es oficialmente transitoria. Existe un $\approx 65.96\%$ de probabilidad de que la partícula se pierda en el espacio para siempre sin volver a pisar el origen.
 \end{proof}
+
+\newpage
+\subsection{Caminata aleatoria en grafos finitos.}
+\vspace{5mm}
+
+\begin{ejercicio}{Caminata Aleatoria en Gráficas $d$-Regulares}{2.5a}
+    Sea $G = (V,E_G)$ una gráfica $d$-regular conexa con $N$ vértices, y $(X_n)$ la caminata simple: $p(x,y) = 1/d$ si $\{x,y\} \in E_G$. \\
+    (a) Muestre que $\pi(x) = 1/N$ es la única probabilidad estacionaria y que la cadena es reversible.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{nota}{Intuición Geométrica}
+    Una gráfica $d$-regular es aquella donde todos los vértices tienen exactamente el mismo número de vecinos ($d$). Como el "paisaje local" es idéntico desde cualquier vértice y la gráfica está conectada, la caminata no es atraída hacia ninguna región en particular. Es natural que, en equilibrio, la probabilidad de visitar cualquier vértice sea perfectamente uniforme ($\pi(x) = 1/N$).
+\end{nota}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Demostración de Reversibilidad, Estacionariedad y Unicidad}]
+    \textbf{1. Demostración de Reversibilidad (Balance Detallado):} \\
+    Para que una cadena sea reversible respecto a una medida $\pi$, debe satisfacer la ecuación de balance detallado para todo par de estados $x, y \in V$:
+    \[ \pi(x)p(x,y) = \pi(y)p(y,x) \]
+    
+    Evaluamos esta condición proponiendo la distribución uniforme $\pi(x) = 1/N$:
+    \begin{itemize}
+        \item \textbf{Caso 1: $x$ e $y$ son vecinos ($\{x,y\} \in E_G$).} \\
+        Por definición de la caminata simple en la gráfica $d$-regular, la probabilidad de ir a un vecino específico es $p(x,y) = 1/d$ y el retorno es $p(y,x) = 1/d$.
+        Sustituyendo en la ecuación de balance detallado:
+        \[ \left(\frac{1}{N}\right)\left(\frac{1}{d}\right) = \left(\frac{1}{N}\right)\left(\frac{1}{d}\right) \implies \frac{1}{Nd} = \frac{1}{Nd} \]
+        La igualdad se cumple de forma trivial.
+        
+        \item \textbf{Caso 2: $x$ e $y$ no son vecinos ($\{x,y\} \notin E_G$).} \\
+        La probabilidad de saltar directamente entre ellos en un solo paso es nula: $p(x,y) = 0$ y $p(y,x) = 0$.
+        \[ \left(\frac{1}{N}\right)(0) = \left(\frac{1}{N}\right)(0) \implies 0 = 0 \]
+        La igualdad también se cumple.
+    \end{itemize}
+    \textit{Conclusión:} Como la cadena cumple el balance detallado para todo par de nodos, es \textbf{reversible} respecto a $\pi(x) = 1/N$.
+    
+    \vspace{3mm}
+    \textbf{2. Demostración de Estacionariedad:} \\
+    Es un resultado conocido (Teorema) que si una medida $\pi$ cumple el balance detallado, automáticamente cumple las ecuaciones de balance global ($\pi P = \pi$), por lo que es una medida estacionaria.
+    Para confirmar que es una \textit{probabilidad} estacionaria (y no solo una medida), verificamos que la suma sobre todo el espacio sea 1:
+    \[ \sum_{x \in V} \pi(x) = \sum_{x \in V} \frac{1}{N} = N \left( \frac{1}{N} \right) = 1 \]
+    
+    \vspace{3mm}
+    \textbf{3. Demostración de Unicidad:} \\
+    El enunciado establece que la gráfica es \textbf{conexa}. En la teoría de Cadenas de Markov, esto significa que existe un camino de probabilidad positiva entre cualquier par de estados; por lo tanto, la cadena es \textbf{irreducible}.
+    Dado que el espacio de estados es finito ($N$ vértices) y la cadena es irreducible, el Teorema Fundamental de Cadenas de Markov garantiza que su distribución estacionaria existe y es \textbf{única}.
+\end{proof}
+
+
+\newpage
+
+
+\begin{ejercicio}{Tiempo de Mezcla y Brecha Espectral Absoluta}{2.5b}
+    Exprese el tiempo de mezcla en términos de $\lambda_* = \max(|\lambda_2|, |\lambda_N|)$.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{nota}{El Eigenvalor $\lambda_N$ y la Periodicidad}
+    En cadenas reversibles, los valores propios son reales y están acotados en el intervalo $[-1, 1]$.
+    Sabemos que $\lambda_2$ controla el decaimiento de las diferencias a largo plazo (el "cuello de botella" geométrico). Pero, ¿por qué importa $\lambda_N$? 
+    Si la gráfica es bipartita o casi bipartita, la cadena tiende a oscilar alternando entre conjuntos de nodos, lo que se refleja en un eigenvalor $\lambda_N$ muy cercano a $-1$.
+    Por ello, la verdadera velocidad de convergencia al equilibrio depende de la \textbf{brecha espectral absoluta} $\gamma_* = 1 - \lambda_*$, donde $\lambda_*$ es el eigenvalor más grande en valor absoluto excluyendo al estado trivial $\lambda_1 = 1$.
+\end{nota}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Acotación del Tiempo de Mezcla}]
+    Sea $\lambda_* = \max(|\lambda_2|, |\lambda_N|)$ el segundo mayor valor propio en magnitud de la matriz de transición $P$.
+
+    \textbf{1. Tiempo de Relajación:} \\
+    El tiempo de relajación de la cadena, que mide el tiempo característico para que las desviaciones respecto al equilibrio decaigan en un factor de $e$, se define empleando la brecha espectral absoluta:
+    \[ t_{\text{rel}} = \frac{1}{1 - \lambda_*} \]
+
+    \textbf{2. Cota Superior General:} \\
+    Para cualquier cadena reversible con un espacio de estados finito, el tiempo de mezcla $t_{\text{mix}}(\epsilon)$ (el tiempo mínimo necesario para que la distancia en variación total al equilibrio sea menor a $\epsilon$) está acotado superiormente por el teorema de convergencia de autovalores:
+    \[ t_{\text{mix}}(\epsilon) \le t_{\text{rel}} \ln\left(\frac{1}{\epsilon \pi_{\min}}\right) \]
+
+    \textbf{3. Sustitución para la Gráfica $d$-regular:} \\
+    Del inciso (a) demostramos que la distribución estacionaria es perfectamente uniforme: $\pi(x) = \frac{1}{N}$ para todo $x \in V$.
+    Por lo tanto, el peso de probabilidad más pequeño es $\pi_{\min} = \frac{1}{N}$. Sustituyendo esto y la definición de $t_{\text{rel}}$ en nuestra desigualdad, obtenemos:
+    \[ t_{\text{mix}}(\epsilon) \le \left( \frac{1}{1 - \lambda_*} \right) \ln\left(\frac{N}{\epsilon}\right) \]
+
+    Evaluando para la convención estándar del tiempo de mezcla donde la distancia debe ser menor a $\epsilon = 1/4$:
+    \[ t_{\text{mix}}(1/4) \le \frac{\ln(4N)}{1 - \lambda_*} \]
+
+    \textbf{Conclusión:} \\
+    El tiempo de mezcla queda expresado asintóticamente en términos de $\lambda_*$ como:
+    \[ \mathbf{t_{\text{mix}}(\epsilon) = O\left( \frac{\log N}{1 - \lambda_*} \right)} \]
+    \textit{Queda explícito que para lograr una mezcla rápida (un "rapid mixing"), se requiere que $\lambda_*$ esté estrictamente alejado de $1$, es decir, que la matriz de transición no tenga eigenvalores cercanos a $1$ ni a $-1$.}
+\end{proof}
+
+\newpage
+
+\begin{ejercicio}{Espectro del Hipercubo y Tiempo de Mezcla}{2.5c}
+    Para el hipercubo $\{0,1\}^d$, calcule los valores propios $\lambda_k = 1 - 2k/d$ ($k=0,1,\dots,d$) con multiplicidades $\binom{d}{k}$ y obtenga $t_{\text{mix}}(1/4) = \Theta(d \log d)$.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{nota}{El Hipercubo y la Matriz de Transición}
+    Un hipercubo de dimensión $d$ tiene $N = 2^d$ vértices. Dos vértices están conectados si difieren en exactamente una coordenada. La caminata simple elige una de las $d$ coordenadas al azar (probabilidad $1/d$) y la voltea. 
+    Se puede analizar como el producto tensorial de $d$ caminatas independientes en el grafo de dos nodos $K_2$.
+\end{nota}
+
+\begin{proof}[\textbf{Cálculo de Eigenvalores y Tiempo de Mezcla}]
+    \textbf{1. Valores Propios del Hipercubo:} \\
+    Consideremos la caminata en una sola dimensión (un bit). Sus eigenvalores son $1$ (vector simétrico) y $-1$ (vector antisimétrico).
+    Al tener $d$ dimensiones independientes, cualquier vector propio del hipercubo se forma combinando los estados de estas dimensiones. Si elegimos $k$ dimensiones con el eigenvalor $-1$ y las $d-k$ restantes con el eigenvalor $1$, el efecto de la matriz de transición (que promedia sobre las $d$ dimensiones) será:
+    \[ \lambda_k = \frac{(d-k)(1) + k(-1)}{d} = \frac{d - 2k}{d} = 1 - \frac{2k}{d} \]
+    
+    Para formar este eigenvalor específico, necesitamos escoger exactamente $k$ coordenadas de las $d$ disponibles. La cantidad de formas de hacer esto es el coeficiente binomial:
+    \[ \text{Multiplicidad}(\lambda_k) = \binom{d}{k} \]
+    \textit{Notemos que la suma de todas las multiplicidades es $\sum \binom{d}{k} = 2^d = N$, completando el espectro.}
+
+    \textbf{2. Tiempo de Mezcla $\Theta(d \log d)$:} \\
+    Si usamos la cota espectral pura con $\lambda_2 = 1 - 2/d$ y $\pi_{\min} = 1/2^d$, obtendríamos un límite superior de $O(d^2)$. Sin embargo, el tiempo de mezcla real es más rápido.
+    Para hallar el tiempo exacto $\Theta(d \log d)$, recurrimos a un acoplamiento basado en el problema del \textbf{Coleccionista de Cupones} (Coupon Collector).
+    La cadena se mezcla perfectamente cuando hemos seleccionado (y aleatorizado) todas y cada una de las $d$ coordenadas al menos una vez. 
+    El tiempo esperado para coleccionar $d$ elementos distintos, eligiendo uno al azar en cada paso, es matemáticamente conocido como:
+    \[ E[T] \approx d \ln d + c d = \Theta(d \log d) \]
+    Por lo tanto, la caminata en el hipercubo requiere exactamente este tiempo para borrar la memoria de su estado inicial.
+\end{proof}
+
+\vspace{5mm}
+
+\begin{ejercicio}{Comparación de Brechas Espectrales}{2.5d}
+    Muestre que la \textit{brecha espectral} $1 - \lambda_*$ es proporcional a $1/N^2$ para el camino lineal y a $1/d$ para el hipercubo.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{proof}[\textbf{Análisis de Brechas Espectrales}]
+    La brecha espectral absoluta $\gamma_* = 1 - \lambda_*$ es el indicador principal de la velocidad de convergencia (entre más grande sea la brecha, más rápida es la relajación). Comparamos dos topologías extremas:
+
+    \textbf{1. El Camino Lineal (Path Graph de longitud $N$):} \\
+    Los eigenvalores de un camino con $N$ nodos reflejando en los bordes están dados por los cosenos de la matriz tridiagonal:
+    \[ \lambda_k = \cos\left( \frac{\pi k}{N} \right) \quad \text{para } k = 0, \dots, N-1 \]
+    El segundo valor propio más grande es $\lambda_1 = \cos(\pi/N)$. Usando la expansión de Taylor para valores grandes de $N$ ($\cos x \approx 1 - x^2/2$):
+    \[ \lambda_1 \approx 1 - \frac{1}{2}\left(\frac{\pi}{N}\right)^2 = 1 - \frac{\pi^2}{2N^2} \]
+    Calculando la brecha espectral:
+    \[ \gamma_{\text{lineal}} = 1 - \lambda_1 = 1 - \left(1 - \frac{\pi^2}{2N^2}\right) = \frac{\pi^2}{2N^2} \]
+    Por lo tanto, la brecha espectral decae cuadráticamente respecto al tamaño del grafo:
+    \[ \mathbf{\gamma_{\text{lineal}} \propto \frac{1}{N^2}} \]
+    \textit{(Esto justifica por qué el camino lineal es una de las gráficas más lentas para mezclar, requiriendo $\Theta(N^2)$ pasos).}
+
+    \vspace{3mm}
+    \textbf{2. El Hipercubo de dimensión $d$:} \\
+    Del inciso (c), calculamos explícitamente el espectro del hipercubo. El segundo eigenvalor más grande se da cuando $k=1$:
+    \[ \lambda_1 = 1 - \frac{2(1)}{d} = 1 - \frac{2}{d} \]
+    Calculando su brecha espectral:
+    \[ \gamma_{\text{hipercubo}} = 1 - \left( 1 - \frac{2}{d} \right) = \frac{2}{d} \]
+    Por lo tanto, la brecha es inversamente proporcional a la dimensión $d$:
+    \[ \mathbf{\gamma_{\text{hipercubo}} \propto \frac{1}{d}} \]
+    
+    \textbf{Conclusión:} \\
+    A pesar de que el hipercubo tiene una cantidad masiva de nodos ($N = 2^d$), su brecha espectral es $\propto 1/\log_2(N)$, comparado con el $1/N^2$ del camino lineal. Esto demuestra que la geometría altamente interconectada del hipercubo ("todo está cerca de todo") genera tiempos de convergencia exponencialmente más rápidos que las geometrías lineales.
+\end{proof}
+
+\newpage
+\section{Martingalas, potencial y función de Green}
+\subsection{Teorema de paro opcional}
+
+\begin{ejercicio}{Teorema de paro opcional}{3.1a}
+    Sea $(M_n)$ una martingala respecto de $(\mathcal{F}_n)$ y $\tau$ un tiempo de paro. \\
+    (a) Enuncie el teorema de paro opcional de Doob y dé condiciones suficientes para $E^x[M_\tau] = E^x[M_0]$.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{nota}{ }
+    Una martingala representa un juego estadísticamente justo. El Teorema de Paro Opcional establece que no existe ninguna estrategia de retiro (tiempo de paro $\tau$) que pueda convertir un juego justo en uno ventajoso, \textit{siempre y cuando} no se tengan recursos ni tiempo infinitos. Si se cumplen ciertas condiciones de regularidad, el valor esperado al momento de detener el proceso es exactamente el valor inicial.
+\end{nota}
+
+\vspace{5mm}
+
+\begin{mytheo}{Teorema de Paro Opcional de Doob}{}
+    Sea $(M_n)_{n \ge 0}$ una martingala con respecto a la filtración $(\mathcal{F}_n)_{n \ge 0}$, y sea $\tau$ un tiempo de paro respecto a la misma filtración. Entonces, la esperanza del proceso detenido en $\tau$ es igual a la esperanza inicial:
+    \[ E[M_\tau] = E[M_0] \]
+    \textbf{siempre y cuando} se cumpla al menos una de las siguientes tres condiciones suficientes:
+    
+    \begin{enumerate}
+        \item \textbf{Tiempo de paro acotado:} Existe una constante determinista $N \in \mathbb{N}$ tal que $P(\tau \le N) = 1$. (El juego forzosamente termina antes de un tiempo límite máximo).
+        
+        \item \textbf{Tiempo de paro integrable e incrementos acotados:} 
+        El tiempo esperado para detenerse es finito, es decir, $E[\tau] < \infty$, \textbf{y} los saltos de la martingala están uniformemente acotados, es decir, existe una constante $C < \infty$ tal que $|M_{n+1} - M_n| \le C$ casi seguramente para todo $n < \tau$.
+        
+        \item \textbf{Martingala acotada (o Uniformemente Integrable):} 
+        El tiempo de paro es finito casi seguramente ($P(\tau < \infty) = 1$) \textbf{y} el proceso detenido $(M_{n \wedge \tau})$ está acotado por una constante $K$, es decir, $|M_{n \wedge \tau}| \le K$ casi seguramente para todo $n$. (De manera más general, basta con que el proceso detenido sea uniformemente integrable).
+    \end{enumerate}
+\end{mytheo}
+
+\vspace{3mm}
+
+\begin{alerta}{Importancia de las Condiciones}
+    Si no se cumple ninguna de estas tres condiciones, la igualdad $E[M_\tau] = E[M_0]$ puede fallar trágicamente. El ejemplo clásico es la estrategia de doblar la apuesta tras cada pérdida en un volado simétrico: la martingala eventualmente alcanza un valor positivo, pero requiere tolerar pérdidas intermedias arbitrariamente grandes (violando la condición 3) y un tiempo de paro no acotado (violando la condición 1).
+\end{alerta}
+
+\newpage
+
+\vspace{5mm}
+
+\begin{ejercicio}{Caminata Simétrica: Probabilidad de Ruina y Tiempo Esperado}{3.1b}
+    Para la caminata simple en $\mathbb{Z}$ desde 0, use las martingalas $X_n$ y $X_n^2 - n$ para calcular $P^0(T_b < T_{-a})$ y $E^0[T_{-a,b}]$, con $a, b > 0$.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{nota}{martingalas}
+    En la caminata simple simétrica ($p=q=1/2$), la posición $X_n$ es una martingala porque el salto esperado es 0. 
+    Además, la varianza crece linealmente con el tiempo, lo que hace que $X_n^2 - n$ también sea una martingala. Aplicaremos el Teorema de Paro Opcional (OST) usando el tiempo de paro $T = \min(T_b, T_{-a})$, que está garantizado a ser finito casi seguramente.
+\end{nota}
+
+\begin{proof}[\textbf{Cálculo con $X_n$ (Probabilidad)}]
+    Sea $P_b = P^0(T_b < T_{-a})$ la probabilidad de tocar $b$ antes que $-a$. \\
+    Aplicando OST a la martingala $X_n$, sabemos que $E^0[X_T] = E^0[X_0] = 0$.
+    Al momento de parar $T$, la partícula solo puede estar en dos lugares: en $b$ (con probabilidad $P_b$) o en $-a$ (con probabilidad $1 - P_b$). Planteamos la esperanza:
+    \[ E^0[X_T] = b \cdot P_b + (-a) \cdot (1 - P_b) = 0 \]
+    \[ b P_b - a + a P_b = 0 \implies P_b(a+b) = a \]
+    \[ \mathbf{P^0(T_b < T_{-a}) = \frac{a}{a+b}} \]
+    \textit{(Justo como dicta el sentido común: la probabilidad de ganar es proporcional a qué tan lejos está tu ruina).}
+\end{proof}
+
+\begin{proof}[\textbf{Cálculo con $X_n^2 - n$ (Tiempo Esperado)}]
+    Aplicando OST a la martingala $X_n^2 - n$, tenemos $E^0[X_T^2 - T] = X_0^2 - 0 = 0$. \\
+    Por linealidad de la esperanza: $E^0[T] = E^0[X_T^2]$.
+    
+    Usando las probabilidades exactas que acabamos de calcular:
+    \[ E^0[X_T^2] = b^2 \cdot P_b + (-a)^2 \cdot (1 - P_b) \]
+    \[ E^0[X_T^2] = b^2 \left( \frac{a}{a+b} \right) + a^2 \left( \frac{b}{a+b} \right) \]
+    Factorizamos $ab$ en el numerador:
+    \[ E^0[T] = \frac{ab^2 + a^2b}{a+b} = \frac{ab(b + a)}{a+b} = \mathbf{ab} \]
+    \textit{(El tiempo esperado para que termine el juego es simplemente el producto de las distancias a las dos barreras).}
+\end{proof}
+
+\newpage
+
+\begin{ejercicio}{Caminata Asimétrica: Martingala Exponencial}{3.1c}
+    Para $p \neq q$, muestre que $M_n = (q/p)^{X_n}$ es martingala y úsela para calcular $P^0(T_b < T_{-a})$ directamente.
+\end{ejercicio}
+
+\begin{proof}[\textbf{Verificación y Cálculo}]
+    \textbf{1. Verificación de Martingala:} \\
+    Calculamos la esperanza condicional de un paso adelante:
+    \[ E[M_{n+1} \mid X_n] = p \cdot (q/p)^{X_n+1} + q \cdot (q/p)^{X_n-1} \]
+    Factorizamos $(q/p)^{X_n}$ que es constante dado $X_n$:
+    \[ = (q/p)^{X_n} \left[ p\left(\frac{q}{p}\right) + q\left(\frac{p}{q}\right) \right] = (q/p)^{X_n} [q + p] \]
+    Como $p+q=1$, nos queda exactamente $(q/p)^{X_n} = M_n$. Queda demostrado que es martingala.
+
+    \vspace{3mm}
+    \textbf{2. Cálculo de la Probabilidad:} \\
+    Aplicamos OST: $E^0[M_T] = M_0 = (q/p)^0 = 1$.
+    Al tiempo $T$, la cadena vale $(q/p)^b$ con probabilidad $P_b$, y $(q/p)^{-a}$ con probabilidad $1 - P_b$:
+    \[ P_b(q/p)^b + (1 - P_b)(q/p)^{-a} = 1 \]
+    Despejamos $P_b$:
+    \[ P_b\left( (q/p)^b - (q/p)^{-a} \right) = 1 - (q/p)^{-a} \]
+    \[ P_b = \frac{1 - (q/p)^{-a}}{(q/p)^b - (q/p)^{-a}} \]
+    Multiplicando numerador y denominador por $(q/p)^a$ para limpiar exponentes negativos:
+    \[ \mathbf{P^0(T_b < T_{-a}) = \frac{(q/p)^a - 1}{(q/p)^{a+b} - 1}} \]
+
+\end{proof}
+
+\newpage
+
+\begin{ejercicio}{Funciones Armónicas y OST}{3.1d}
+    Sea $h : S \to \mathbb{R}$ armónica y acotada en $D = S \setminus A$. Demuestre que $h(x) = E^x[h(X_{T_A})]$ para $x \in D$.
+\end{ejercicio}
+
+\begin{alerta}{Condición de Acotamiento}
+    El hecho de que $h$ sea acotada es vital. Nos permite usar el \textbf{Teorema de Convergencia Acotada} para justificar que el límite y la esperanza pueden intercambiarse cuando el tiempo de paro $T_A$ tiende a infinito.
+\end{alerta}
+
+\begin{proof}[\textbf{Demostración}]
+    Por definición, una función es armónica en $D$ si para todo $x \in D$:
+    \[ h(x) = \sum_{y \in S} p(x,y)h(y) = E^x[h(X_1)] \]
+    Esto significa que el proceso evaluado en la función $M_n = h(X_n)$ se comporta localmente como una martingala mientras la cadena permanezca en $D$.
+    
+    Para evitar que la cadena evalúe la función fuera del dominio donde es armónica, detenemos el proceso al tocar la frontera $A$. Definimos la martingala detenida $M_{n \wedge T_A} = h(X_{n \wedge T_A})$.
+    
+    Aplicando el Teorema de Paro Opcional para un tiempo determinista $n$:
+    \[ E^x[h(X_{n \wedge T_A})] = h(x) \]
+    
+    Tomamos el límite cuando $n \to \infty$. Asumiendo que la cadena eventualmente alcanza $A$ con probabilidad 1 ($P(T_A < \infty) = 1$), tenemos que $X_{n \wedge T_A} \to X_{T_A}$ casi seguramente. 
+    Dado que el problema especifica que $h$ está \textbf{acotada}, podemos aplicar el Teorema de Convergencia Acotada de Lebesgue para meter el límite dentro de la esperanza:
+    \[ \lim_{n \to \infty} E^x[h(X_{n \wedge T_A})] = E^x\left[ \lim_{n \to \infty} h(X_{n \wedge T_A}) \right] = E^x[h(X_{T_A})] \]
+    
+    Igualando este resultado con la esperanza inicial que era invariante respecto a $n$, concluimos:
+    \[ \mathbf{h(x) = E^x[h(X_{T_A})]} \]
+   
+\end{proof}
+
+
+\newpage
+
+\subsection{Problema de Dirichlet discreto}
+
+\begin{ejercicio}{Problema de Dirichlet Discreto}{3.2a}
+    Sea $(X_n)$ una cadena, $D \subset S$ finito y $f : \partial D \to \mathbb{R}$ dada en $\partial D = S \setminus D$. \\
+    (a) Demuestre que $h(x) = E^x[f(X_{T_{\partial D}})]$ es la única solución del \textit{problema de Dirichlet discreto}: 
+    \[ \sum_{y \in S} p(x,y) h(y) = h(x) \text{ en } D, \quad h = f \text{ en } \partial D. \]
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{nota}{Conexión Estocástica-Analítica}
+    Este resultado demuestra que las ecuaciones en diferencias con condiciones de frontera fijas pueden resolverse estocásticamente. El valor de la función en un punto interior es exactamente el valor esperado de la función de frontera, evaluado en el punto aleatorio donde la caminata choca por primera vez con dicha frontera.
+\end{nota}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Demostración (Existencia y Unicidad)}]
+    La demostración se divide en dos partes: primero verificar que $h(x)$ es una solución válida (existencia), y luego usar martingalas para probar que no existe otra (unicidad).
+    
+    \textbf{1. Existencia (Verificación de la Solución):} \\
+    Evaluamos la función $h(x) = E^x[f(X_{T_{\partial D}})]$ en los dos dominios posibles para $x$:
+    \begin{itemize}
+        \item \textbf{En la frontera ($x \in \partial D$):} Si la cadena arranca directamente en la frontera, el tiempo para alcanzarla es cero ($T_{\partial D} = 0$). El estado de paro es el mismo punto inicial $X_0 = x$. 
+        La esperanza se vuelve trivial: $h(x) = E^x[f(x)] = f(x)$. 
+        \textit{(Se cumple perfectamente la condición de frontera).}
+        
+        \item \textbf{En el interior ($x \in D$):} Si arrancamos en el interior, obligatoriamente daremos al menos un paso antes de tocar la frontera. Condicionamos sobre el primer salto $X_1 = y$ usando la Ley de Probabilidad Total:
+        \[ h(x) = E^x[f(X_{T_{\partial D}})] = \sum_{y \in S} E^x[f(X_{T_{\partial D}}) \mid X_1 = y] p(x,y) \]
+        Por la propiedad de Markov, una vez que la cadena está en $y$, su evolución futura es idéntica a una cadena que arrancó fresca en $y$:
+        \[ h(x) = \sum_{y \in S} E^y[f(X_{T_{\partial D}})] p(x,y) = \sum_{y \in S} p(x,y) h(y) \]
+        \textit{(Se cumple perfectamente la condición de función armónica en el interior).}
+    \end{itemize}
+
+    \textbf{2. Unicidad (Aplicación del Teorema de Paro Opcional):} \\
+    Supongamos que existe una función alternativa $g(x)$ que también es solución del problema de Dirichlet discreto. 
+    Como $g$ cumple $\sum_y p(x,y) g(y) = g(x)$ en el interior $D$, el proceso evaluado en esta función, $M_n = g(X_n)$, se comporta como una \textbf{martingala} mientras la cadena no escape de $D$.
+    
+    Para evitar salirnos del dominio de harmonicidad, detenemos la martingala exactamente al tocar la frontera $\partial D$. Al ser $S$ un conjunto finito (y asumiendo irreducibilidad hacia la frontera), el tiempo de paro es finito casi seguramente ($P(T_{\partial D} < \infty) = 1$). 
+    Aplicamos el Teorema de Paro Opcional de Doob a la martingala detenida:
+    \[ g(x) = E^x[M_0] = E^x[M_{T_{\partial D}}] \]
+    
+    Sustituimos la definición de nuestra martingala al tiempo de paro:
+    \[ g(x) = E^x[g(X_{T_{\partial D}})] \]
+    
+    Sabemos con total certeza que al tiempo $T_{\partial D}$, la posición de la cadena $X_{T_{\partial D}}$ pertenece a la frontera $\partial D$. En esa frontera, $g$ está obligada (por la condición del problema) a tomar los valores de la función límite $f$. Sustituimos $g$ por $f$ dentro del operador de esperanza:
+    \[ g(x) = E^x[f(X_{T_{\partial D}})] \]
+    
+    Notamos que el lado derecho de la ecuación es exactamente la definición de $h(x)$. 
+    Por lo tanto, $g(x) = h(x)$. 
+    
+\end{proof}
+
+\newpage
+
+\vspace{5mm}
+
+\begin{ejercicio}{Principio del Máximo Discreto}{3.2b}
+    Obtenga el \textit{principio del máximo discreto}: $\min_{\partial D} f \le h(x) \le \max_{\partial D} f$ para $x \in D$.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{nota}{Interpretación del Principio}
+    Si imaginamos a $h(x)$ como la temperatura en una placa $D$, el Principio del Máximo nos dice que el interior no puede estar ni más caliente que el punto más caliente de los bordes, ni más frío que el punto más frío. Las funciones armónicas promedian su entorno, por lo que nunca pueden crear un "pico" aislado en el interior.
+\end{nota}
+
+\begin{proof}[\textbf{Obtención a partir de la Solución Estocástica}]
+    Por el inciso (a), sabemos que la única solución a la ecuación es la esperanza estocástica:
+    \[ h(x) = E^x[f(X_{T_{\partial D}})] \]
+    
+    Para cualquier trayectoria aleatoria, la posición de parada $X_{T_{\partial D}}$ pertenece a la frontera $\partial D$. 
+    Por definición de máximo y mínimo, para cualquier punto de esa frontera, se cumple que:
+    \[ \min_{y \in \partial D} f(y) \le f(X_{T_{\partial D}}) \le \max_{y \in \partial D} f(y) \]
+    
+    Como esta desigualdad es válida para \textit{todas} las trayectorias (casi seguramente), podemos tomar la esperanza condicional $E^x[\cdot]$ a los tres términos. Sabiendo que el valor esperado de una constante es la constante misma y que la esperanza preserva desigualdades (monotonía), obtenemos:
+    \[ E^x \left[ \min_{y \in \partial D} f(y) \right] \le E^x \left[ f(X_{T_{\partial D}}) \right] \le E^x \left[ \max_{y \in \partial D} f(y) \right] \]
+    \[ \min_{\partial D} f \le h(x) \le \max_{\partial D} f \]
+    \textit{Queda demostrado el Principio del Máximo Discreto.}
+\end{proof}
+
+\newpage
+
+\begin{ejercicio}{Aplicación a la Ruina del Jugador}{3.2c}
+    Aplique a la caminata simple en $\{0, 1, \dots, N\}$ con $f(0) = 0$, $f(N) = 1$ para recuperar $u(x)$.
+\end{ejercicio}
+
+\begin{proof}[\textbf{Recuperación de la Probabilidad de Ruina}]
+    Definimos el dominio interior como $D = \{1, 2, \dots, N-1\}$ y la frontera como $\partial D = \{0, N\}$.
+    La función de frontera $f$ está dada como $f(0) = 0$ y $f(N) = 1$.
+    
+    Por la representación estocástica del Problema de Dirichlet (inciso a), la solución es:
+    \[ h(x) = E^x[f(X_{T_{\partial D}})] \]
+    
+    Dado que $f$ solo toma valores en $0$ y $1$, desarrollamos la esperanza utilizando probabilidades discretas:
+    \[ h(x) = f(0) \cdot P^x(X_{T_{\partial D}} = 0) + f(N) \cdot P^x(X_{T_{\partial D}} = N) \]
+    
+    Sustituyendo los valores de $f$:
+    \[ h(x) = 0 \cdot P^x(T_0 < T_N) + 1 \cdot P^x(T_N < T_0) \]
+    \[ h(x) = P^x(T_N < T_0) \]
+    
+    Para una caminata simple ($p=q=1/2$), sabemos que la función armónica $h(x)$ en el interior debe ser lineal: $h(x) = Ax + B$.
+    Aplicando las condiciones de frontera:
+    \begin{itemize}
+        \item $h(0) = B = 0$
+        \item $h(N) = AN = 1 \implies A = 1/N$
+    \end{itemize}
+    Por lo tanto, la función es $h(x) = x/N$.
+    Igualando nuestro resultado analítico con la interpretación probabilística, recuperamos la fórmula clásica de la ruina en juegos simétricos (que demostramos en el capítulo 1):
+    \[ \mathbf{u(x) = P^x(T_N < T_0) = \frac{x}{N}} \]
+\end{proof}
+
+\newpage
+
+\begin{ejercicio}{Ecuación de Poisson para Tiempos Esperados}{3.2d}
+    Calcule $E^x[T_{\partial D}]$ mediante la solución de $(P - I)g = -1$ en $D$, $g = 0$ en $\partial D$.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{nota}{Diferencia entre Dirichlet y Poisson}
+    Mientras que Dirichlet calcula \textit{a dónde} vamos a parar (usando la ecuación de Laplace $(P-I)h = 0$), el problema de Poisson calcula \textit{cuánto tiempo} nos va a tomar (usando una fuente constante $(P-I)g = -1$, indicando que en cada paso perdemos una unidad de tiempo).
+\end{nota}
+
+\begin{proof}[\textbf{Relación entre Tiempos de Paro y Ecuaciones Lineales}]
+    Sea $g(x) = E^x[T_{\partial D}]$ el tiempo esperado para salir de $D$ comenzando en $x$.
+    
+    \textbf{1. Condición de Frontera:} \\
+    Si $x \in \partial D$, la partícula ya está en la frontera y el tiempo de viaje es cero.
+    Por tanto, $g(x) = 0$ para todo $x \in \partial D$. \textit{(Se cumple la condición).}
+
+    \textbf{2. Ecuación en el Interior:} \\
+    Si $x \in D$, obligatoriamente la cadena da al menos 1 paso. Condicionamos sobre el primer salto $X_1 = y$:
+    \[ g(x) = E^x[T_{\partial D}] = 1 + \sum_{y \in S} p(x,y) E^y[T_{\partial D}] \]
+    Sustituyendo nuestra definición $g(y) = E^y[T_{\partial D}]$:
+    \[ g(x) = 1 + \sum_{y \in S} p(x,y) g(y) \]
+    
+    \textbf{3. Forma Matricial (Poisson):} \\
+    Reescribimos la suma utilizando notación matricial (o de operador):
+    \[ g(x) = 1 + (Pg)(x) \]
+    Pasamos $g(x)$ restando al lado derecho:
+    \[ 0 = 1 + (Pg)(x) - g(x) = 1 + (P - I)g(x) \]
+    Despejando, llegamos a la ecuación lineal solicitada:
+    \[ \mathbf{(P - I)g(x) = -1 \quad \text{para } x \in D} \]
+    
+    \textit{Conclusión:} Al igual que en Dirichlet, resolver este sistema lineal nos entrega directamente el tiempo de paro esperado sin tener que lidiar con sumatorias infinitas.
+\end{proof}
+
+\newpage
+\subsection{Función de Green y ecuación de Poisson}
+
+
+\begin{ejercicio}{Función de Green y ecuación de Poisson}{3.3a}
+    Sea $(X_n)$ transiente en $S$; defina $G(x,y) = \sum_{n=0}^\infty p^n(x,y)$. \\
+    (a) Demuestre que $G(x,y) < \infty$ para todo $x,y$ si y solo si la cadena es transiente.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{nota}{Interpretación de la Función de Green}
+    La función $G(x,y)$ representa el \textbf{número esperado de visitas} al estado $y$ dado que la cadena inició en el estado $x$. 
+    Para ver esto, note que la variable indicadora $\mathbf{1}_{\{X_n = y\}}$ vale 1 si la cadena está en $y$ al tiempo $n$, y 0 en caso contrario. 
+    El número total de visitas es $N(y) = \sum_{n=0}^\infty \mathbf{1}_{\{X_n = y\}}$. 
+    Tomando la esperanza condicional:
+    $$ E^x[N(y)] = E^x\left[ \sum_{n=0}^\infty \mathbf{1}_{\{X_n = y\}} \right] = \sum_{n=0}^\infty P^x(X_n = y) = \sum_{n=0}^\infty p^n(x,y) = G(x,y) $$
+\end{nota}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Demostración (Equivalencia Transiente)}]
+    Por definición, un estado $y \in S$ es transiente si la probabilidad de regresar a él alguna vez, denotada como $f_{yy}$, es estrictamente menor a 1 ($f_{yy} < 1$). Una cadena es transiente si todos sus estados lo son.
+    
+    Recordemos la relación fundamental para una Cadena de Markov entre el número esperado de visitas y la probabilidad de retorno:
+    $$ G(y,y) = \sum_{n=0}^\infty p^n(y,y) = \frac{1}{1 - f_{yy}} $$
+    
+    \textbf{1. Ida ($\implies$):} \\
+    Supongamos que $G(x,y) < \infty$ para todo par $x,y \in S$.
+    En particular, si evaluamos el caso donde empezamos y terminamos en el mismo estado ($x=y$), tenemos que $G(y,y) < \infty$.
+    Sustituyendo esto en nuestra relación fundamental:
+    $$ \frac{1}{1 - f_{yy}} < \infty \implies 1 - f_{yy} > 0 \implies f_{yy} < 1 $$
+    Como la probabilidad de retorno al origen es estrictamente menor a 1 para todo estado $y$, concluimos por definición que \textbf{la cadena es transiente}.
+    
+    \vspace{3mm}
+    \textbf{2. Regreso ($\impliedby$):} \\
+    Supongamos ahora que la cadena es transiente. Esto significa que para todo estado $y$, se cumple que $f_{yy} < 1$.
+    Por nuestra relación fundamental, el denominador $1 - f_{yy}$ es mayor a cero, lo que implica inmediatamente que $G(y,y) < \infty$.
+    
+    Ahora, necesitamos probar que esto también acota los viajes cruzados desde cualquier otro estado $x \neq y$. 
+    El número esperado de visitas a $y$ empezando desde $x$ se puede descomponer usando la propiedad fuerte de Markov en dos etapas: 
+    Primero, la cadena debe lograr llegar a $y$ por primera vez (lo cual ocurre con probabilidad $f_{xy}$); y una vez que pisa $y$, el proceso se "reinicia" y el número esperado de visitas a partir de ahí es exactamente $G(y,y)$.
+    Escrito algebraicamente:
+    $$ G(x,y) = f_{xy} \cdot G(y,y) $$
+    
+    Dado que $f_{xy}$ es una probabilidad ($f_{xy} \le 1$) y ya demostramos en el paso anterior que $G(y,y)$ es finito ($G(y,y) < \infty$), el producto de ambos obligatoriamente tiene que estar acotado:
+    $$ \mathbf{G(x,y) < \infty} \quad \text{para todo } x,y \in S $$
+    
+    \textit{Queda demostrada la equivalencia bidireccional.}
+\end{proof}
+
+\newpage
+
+
+\begin{ejercicio}{Ecuación de Poisson y la Delta de Dirac}{3.3b}
+    Muestre que $G(\cdot, y)$ resuelve la ecuación de Poisson $(P - I)f = -\delta_y$.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{nota}{El Operador Laplaciano Discreto}
+    El operador $P - I$ (o $\Delta = P - I$) actúa sobre una función $f$ evaluando la diferencia entre el valor promedio de la función en los vecinos de $x$ y el valor en $x$. La función delta de Dirac $\delta_y(x)$ vale $1$ si $x=y$, y $0$ en cualquier otro caso.
+\end{nota}
+
+\begin{proof}[\textbf{Demostración Analítica}]
+    Sea $f(x) = G(x,y) = \sum_{n=0}^\infty p^n(x,y)$.
+    Aplicamos el operador matricial $P$ a la función $f$:
+    \[ (Pf)(x) = \sum_{z \in S} p(x,z) f(z) = \sum_{z \in S} p(x,z) \sum_{n=0}^\infty p^n(z,y) \]
+    
+    Por el Teorema de Fubini/Tonelli (dado que todos los términos son positivos), podemos intercambiar las sumas:
+    \[ (Pf)(x) = \sum_{n=0}^\infty \sum_{z \in S} p(x,z) p^n(z,y) \]
+    
+    Por la ecuación de Chapman-Kolmogorov, la suma interna representa exactamente la probabilidad de transición en $n+1$ pasos:
+    \[ (Pf)(x) = \sum_{n=0}^\infty p^{n+1}(x,y) \]
+    
+    Haciendo un cambio de índice ($k = n+1$), la suma va desde $k=1$ hasta $\infty$:
+    \[ (Pf)(x) = \sum_{k=1}^\infty p^k(x,y) \]
+    
+    Para recuperar la función original $f(x) = G(x,y)$ (que empieza en $n=0$), sumamos y restamos el término inicial $p^0(x,y)$:
+    \[ (Pf)(x) = \sum_{k=0}^\infty p^k(x,y) - p^0(x,y) = G(x,y) - p^0(x,y) \]
+    
+    Sabiendo que $p^0(x,y)$ es la probabilidad de ir de $x$ a $y$ en cero pasos, esto es exactamente la delta de Dirac $\delta_y(x)$. Sustituyendo:
+    \[ (Pf)(x) = f(x) - \delta_y(x) \]
+    
+    Agrupamos los términos de $f$:
+    \[ (Pf)(x) - f(x) = -\delta_y(x) \implies \mathbf{(P - I)f(x) = -\delta_y(x)} \]
+    \textit{Queda demostrado que la Función de Green es la solución fundamental.}
+\end{proof}
+
+\newpage
+
+\begin{ejercicio}{Decaimiento Asintótico de la Función de Green}{3.3c}
+    Para $d \ge 3$, muestre que $G(x,y) \to 0$ cuando $|x - y| \to \infty$ y que $G(x,y) \asymp |x - y|^{2-d}$.
+\end{ejercicio}
+
+\begin{proof}[\textbf{Esbozo de la Demostración}]
+    Por simetría e invarianza de traslación, $G(x,y) = G(0, y-x)$. Denotemos $r = |x-y|$ como la distancia euclidiana entre los puntos.
+    
+    Para que la partícula viaje una distancia $r$, requiere al menos $O(r)$ pasos, pero la difusión aleatoria típicamente toma $n \approx r^2$ pasos para alcanzar un radio $r$.
+    La probabilidad de transición a tiempo $n$ en $d$ dimensiones escala según el Teorema del Límite Central Local como $p^n(0, r) \approx n^{-d/2} \exp(-r^2/2n)$.
+    
+    Aproximando la suma de la Función de Green mediante una integral:
+    \[ G(0, r) = \sum_{n=0}^\infty p^n(0, r) \approx \int_0^\infty n^{-d/2} e^{-r^2/2n} dn \]
+    
+    Realizamos el cambio de variable $u = r^2 / n \implies dn = -r^2 / u^2 du$:
+    \[ G(0, r) \approx \int_\infty^0 \left(\frac{u}{r^2}\right)^{d/2} e^{-u/2} \left(-\frac{r^2}{u^2}\right) du = r^{2-d} \int_0^\infty u^{d/2 - 2} e^{-u/2} du \]
+    
+    La integral resultante es una función Gamma constante que solo depende de $d$ (específicamente $\Gamma(d/2 - 1) 2^{d/2-1}$). 
+    Por lo tanto, la dependencia respecto a la distancia queda aislada en el factor inicial:
+    \[ \mathbf{G(x,y) \asymp |x - y|^{2-d}} \]
+    
+    \textit{Conclusión:} Como $d \ge 3$, el exponente $2-d$ es estrictamente negativo. Cuando $|x-y| \to \infty$, el término $|x-y|^{2-d} \to 0$. Esto demuestra matemáticamente que la influencia entre dos puntos en dimensiones altas desaparece a largas distancias.
+\end{proof}
+
+\newpage
+
+\begin{ejercicio}{Solución del Problema de Poisson General}{3.3d}
+    Sea $D$ finito y $g : D \to \mathbb{R}$. Demuestre que $f(x) = E^x\left[\sum_{n=0}^{T_{S \setminus D} - 1} g(X_n)\right]$ es la solución de $(P - I)f = -g$ en $D$ con $f = 0$ fuera de $D$.
+\end{ejercicio}
+
+\begin{proof}[\textbf{Verificación de la Solución Estocástica}]
+    Esta ecuación representa el "costo total" o "recompensa total" acumulada antes de salir del dominio $D$, donde en cada paso en el estado $z$ cobramos $g(z)$. Denotemos la frontera como $\partial D = S \setminus D$.
+
+    \textbf{1. Condición de Frontera:} \\
+    Si la cadena inicia en un punto fuera de $D$ ($x \in \partial D$), el tiempo de salida es instantáneo ($T_{\partial D} = 0$). 
+    La sumatoria va desde $n=0$ hasta $-1$, lo cual se define convencionalmente como el conjunto vacío o suma cero. 
+    \[ f(x) = E^x[0] = 0 \quad \text{para } x \notin D \]
+    \textit{(La condición de frontera se satisface de forma trivial).}
+
+    \textbf{2. Ecuación en el Interior (Propiedad de Markov):} \\
+    Si $x \in D$, obligatoriamente damos al menos un paso antes de salir. Podemos separar el primer término de la sumatoria (el costo inmediato en $n=0$) del resto de los pasos futuros:
+    \[ f(x) = E^x \left[ g(X_0) + \sum_{n=1}^{T_{\partial D} - 1} g(X_n) \right] \]
+    Como empezamos en $x$, $g(X_0) = g(x)$, y al ser determinista, sale de la esperanza:
+    \[ f(x) = g(x) + E^x \left[ \sum_{n=1}^{T_{\partial D} - 1} g(X_n) \right] \]
+    
+    Aplicamos la Ley de Probabilidad Total para condicionar sobre el primer salto hacia el estado $y$:
+    \[ f(x) = g(x) + \sum_{y \in S} p(x,y) E^x \left[ \sum_{n=1}^{T_{\partial D} - 1} g(X_n) \mathrel{\Big|} X_1 = y \right] \]
+    
+    Por la propiedad de Markov, el futuro a partir de $n=1$ (habiendo llegado a $y$) tiene la misma distribución que empezar de cero desde $y$:
+    \[ f(x) = g(x) + \sum_{y \in S} p(x,y) E^y \left[ \sum_{m=0}^{T_{\partial D} - 1} g(X_m) \right] \]
+    
+    Notemos que la esperanza en el lado derecho es exactamente la definición de $f(y)$. Sustituyendo:
+    \[ f(x) = g(x) + \sum_{y \in S} p(x,y) f(y) \]
+    
+    Reescribimos la suma usando el operador $P$:
+    \[ f(x) = g(x) + (Pf)(x) \]
+    Pasamos $f(x)$ al lado derecho y factorizamos:
+    \[ -g(x) = (Pf)(x) - f(x) = (P - I)f(x) \]
+    
+    \textit{Conclusión:} \[ \mathbf{(P - I)f = -g \text{ en } D} \]
+    Queda demostrado que el costo estocástico acumulado es la solución única de la ecuación de Poisson general con condiciones de frontera cero.
+\end{proof}
+
+\newpage
+
+\subsection{Tiempo de cubrimiento de una gráfica}
+
+
+\begin{ejercicio}{Tiempo de cubrimiento en el camino lineal}{3.4a}
+    Para una gráfica finita conexa $G = (V, E_G)$, el \textit{tiempo de cubrimiento} es $C_x = \max_{y \in V} T_{\{y\}}$, el primer tiempo en que la caminata simple ha visitado todos los vértices. \\
+    (a) Para el camino lineal $\{0,1,\dots,N\}$, calcule $E^0[C_0]$ usando los tiempos de llegada $E^x[T_{\{y\}}]$ del Ejercicio 1.4. Muestre que $E^0[C_0] = \Theta(N^2)$.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{nota}{Reducción Topológica del Problema}
+    En una gráfica arbitraria, calcular el tiempo de cubrimiento es complejo porque la partícula puede re-visitar nodos de forma caótica. Sin embargo, en un camino lineal unidimensional arrancando desde un extremo ($x=0$), para poder visitar el otro extremo ($N$), la partícula forzosamente tuvo que haber pisado todos los nodos intermedios ($1, 2, \dots, N-1$). 
+    Por lo tanto, el evento "visitar todos los vértices" ocurre exactamente en el mismo instante en que se visita el vértice $N$ por primera vez.
+    \[ C_0 = T_N \implies E^0[C_0] = E^0[T_N] \]
+\end{nota}
+
+\begin{proof}[\textbf{Cálculo del Tiempo Esperado}]
+    Para encontrar el tiempo total $E^0[T_N]$, lo descomponemos como la suma de los tiempos esperados para avanzar de un nodo $k$ al siguiente nodo $k+1$:
+    \[ E^0[T_N] = \sum_{k=0}^{N-1} E^k[T_{k+1}] \]
+    
+    Analizamos el tiempo esperado de transición de $k$ a $k+1$, asumiendo reflexión en el origen ($p(0,1) = 1$) y saltos simétricos ($p=q=1/2$) en el interior:
+    \begin{itemize}
+        \item \textbf{Frontera ($k=0$):} El único salto posible es hacia el $1$. El tiempo es determinista:
+        \[ E^0[T_1] = 1 \]
+        
+        \item \textbf{Interior ($k \ge 1$):} Condicionamos sobre el primer salto. Podemos avanzar a $k+1$ (éxito en 1 paso) o retroceder a $k-1$ (tardando 1 paso más el tiempo en recuperar el terreno desde $k-1$ hasta $k+1$):
+        \[ E^k[T_{k+1}] = \frac{1}{2}(1) + \frac{1}{2}(1 + E^{k-1}[T_{k+1}]) \]
+        Descomponiendo el viaje desde $k-1$ hasta $k+1$ como la suma de ir de $k-1 \to k$ y luego de $k \to k+1$:
+        \[ E^k[T_{k+1}] = \frac{1}{2} + \frac{1}{2}\left(1 + E^{k-1}[T_k] + E^k[T_{k+1}]\right) \]
+        Multiplicamos todo por 2:
+        \[ 2 E^k[T_{k+1}] = 1 + 1 + E^{k-1}[T_k] + E^k[T_{k+1}] \]
+        Restamos $E^k[T_{k+1}]$ de ambos lados:
+        \[ E^k[T_{k+1}] = E^{k-1}[T_k] + 2 \]
+    \end{itemize}
+    
+    Esta es una progresión aritmética clásica. Si $E^0[T_1] = 1$ y cada subsecuente aumenta en $2$, el término general es de los números impares:
+    \[ E^k[T_{k+1}] = 2k + 1 \]
+    
+    Sustituimos esto en nuestra suma original telescópica:
+    \[ E^0[T_N] = \sum_{k=0}^{N-1} (2k + 1) \]
+    
+    Separamos la sumatoria:
+    \[ = 2 \sum_{k=0}^{N-1} k + \sum_{k=0}^{N-1} 1 \]
+    Aplicamos la fórmula de la suma de Gauss para los primeros $N-1$ enteros:
+    \[ = 2 \left[ \frac{(N-1)N}{2} \right] + N \]
+    \[ = N(N-1) + N = N^2 - N + N = N^2 \]
+    
+    \textbf{Conclusión:}
+    Hemos obtenido que $E^0[C_0] = N^2$. Dado que esta es una función polinomial exacta de grado 2, acota tanto superior como inferiormente asintóticamente a la función, por lo que:
+    \[ \mathbf{E^0[C_0] = \Theta(N^2)} \]
+    \textit{Queda demostrado que el tiempo para cubrir un camino lineal escala cuadráticamente respecto a su longitud.}
+\end{proof}
+
+\newpage
+
+
+\begin{ejercicio}{Tiempo de cubrimiento en el Ciclo $\mathbb{Z}_N$}{3.4b}
+    Para el ciclo $\mathbb{Z}_N$, calcule $E^0[C_0]$ y muestre que es también $\Theta(N^2)$.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{nota}{Expansión del Arco Visitado}
+    En un ciclo, el conjunto de vértices visitados siempre forma un arco continuo. Si hemos visitado $k$ vértices distintos, la partícula forzosamente se encuentra en uno de los dos extremos de este arco. Para visitar un nuevo vértice (y hacer que el arco crezca a $k+1$), la caminata debe dar un paso "hacia afuera" del arco.
+\end{nota}
+
+\begin{proof}[\textbf{Cálculo del Tiempo en el Ciclo}]
+    Supongamos que el arco de vértices visitados tiene tamaño $k$ (con $1 \le k < N$) y la partícula está en uno de sus extremos.
+    Para visitar un vértice nuevo, la partícula debe moverse al nodo adyacente no visitado. Si se mueve hacia "adentro" del arco, tendrá que recorrer toda la longitud de los $k$ vértices ya visitados para intentar salir por el otro extremo.
+    
+    Este escenario es idéntico al problema de la ruina del jugador en un segmento de longitud $k$. La partícula está a distancia $1$ de un nuevo vértice (éxito) y a distancia $k$ del otro nuevo vértice al extremo opuesto.
+    Por las fórmulas de tiempo esperado de la caminata simple (Ejercicio 3.1b), el tiempo esperado para tocar cualquiera de las dos barreras (distancia $1$ y distancia $k$) es el producto de las distancias:
+    \[ E[\text{Tiempo para pasar de tamaño } k \text{ a } k+1] = 1 \cdot k = k \]
+    
+    El tiempo total de cubrimiento es la suma del tiempo que toma expandir el arco desde tamaño $1$ (el vértice inicial) hasta tamaño $N$ (todos visitados):
+    \[ E^0[C_0] = \sum_{k=1}^{N-1} k \]
+    
+    Aplicando la fórmula de la suma de Gauss:
+    \[ E^0[C_0] = \frac{N(N-1)}{2} = \frac{1}{2}N^2 - \frac{1}{2}N \]
+    
+    \textbf{Conclusión:} Al ser un polinomio de segundo grado, la cota asintótica es idéntica a la del camino lineal:
+    \[ \mathbf{E^0[C_0] = \Theta(N^2)} \]
+\end{proof}
+
+\newpage
+
+\begin{ejercicio}{Tiempo de cubrimiento en la Gráfica Completa $K_N$}{3.4c}
+    Para la gráfica completa $K_N$, use el modelo de \textit{coleccionista de cupones}: la $k$-ésima visita a un estado nuevo requiere en promedio $N/(N-k+1)$ pasos. Deduzca $E^x[C_x] \sim N \log N$.
+\end{ejercicio}
+
+\begin{proof}[\textbf{Deducción Asintótica (Coleccionista de Cupones)}]
+    En la gráfica completa $K_N$, desde cualquier vértice, la caminata salta a cualquiera de los otros $N-1$ vértices con probabilidad uniforme. 
+    Aproximando esto al modelo clásico de extraer elementos con reemplazo de una urna de $N$ elementos, la probabilidad de visitar un estado nuevo cuando ya hemos visitado $k-1$ estados es la proporción de estados no visitados:
+    \[ p_k \approx \frac{N - (k-1)}{N} = \frac{N - k + 1}{N} \]
+    
+    El número de pasos para lograr este éxito sigue una distribución geométrica, cuya esperanza es el inverso de la probabilidad:
+    \[ E[\text{Pasos para la } k\text{-ésima visita}] = \frac{1}{p_k} = \frac{N}{N - k + 1} \]
+    
+    El tiempo total de cubrimiento es la suma de los tiempos esperados para coleccionar los $N$ vértices (comenzando a contar desde el segundo, pues el primero ya está visitado en $t=0$):
+    \[ E^x[C_x] = \sum_{k=2}^N \frac{N}{N - k + 1} \]
+    
+    Hacemos un cambio de índice definiendo $j = N - k + 1$. Cuando $k=2 \implies j=N-1$, y cuando $k=N \implies j=1$:
+    \[ E^x[C_x] = N \sum_{j=1}^{N-1} \frac{1}{j} \]
+    
+    Reconocemos la sumatoria como el $(N-1)$-ésimo número armónico, $H_{N-1}$. Se sabe por cálculo elemental que la suma armónica crece asintóticamente como el logaritmo natural:
+    \[ \sum_{j=1}^{N-1} \frac{1}{j} \sim \ln(N) \]
+    
+    Sustituyendo esta aproximación:
+    \[ \mathbf{E^x[C_x] \sim N \log N} \]
+    \textit{Esto demuestra la increíble eficiencia de expansión de las redes altamente conexas.}
+\end{proof}
+
+\newpage
+
+\begin{ejercicio}{Potencial de Green y Tiempos de Llegada}{3.4d}
+    Enuncie cómo la función de Green $G(x,y)$ puede usarse para estimar $E^x[T_{\{y\}}]$ en términos del \textit{potencial de Green}.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{nota}{El Operador Potencial}
+    Para cadenas recurrentes (donde la matriz $G$ estándar diverge a infinito), se define la matriz de \textbf{Potencial de Green} $R$ (o matriz fundamental) que mide la desviación acumulada respecto a la distribución estacionaria $\pi$:
+    \[ R(x,y) = \sum_{n=0}^\infty (p^n(x,y) - \pi(y)) \]
+\end{nota}
+
+\begin{proof}[\textbf{Relación entre Potencial y Tiempo de Llegada}]
+    El tiempo esperado para alcanzar un estado $y$ arrancando desde $x$, denotado como $E^x[T_{\{y\}}]$, puede calcularse exactamente sin necesidad de simular toda la caminata, utilizando únicamente las entradas de la matriz de potencial $R$ y la distribución estacionaria $\pi$.
+    
+    La identidad fundamental establece que la diferencia de potenciales entre el estado objetivo $y$ y el punto de inicio $x$ escala proporcionalmente al tiempo de llegada:
+    \[ \mathbf{E^x[T_{\{y\}}] = \frac{R(y,y) - R(x,y)}{\pi(y)}} \]
+    
+    \textbf{Interpretación:}
+    \begin{itemize}
+        \item $\pi(y)$ actúa como un factor de escala (estados más probables asintóticamente son más rápidos de alcanzar).
+        \item $R(y,y)$ es el "auto-potencial" o resistencia local del nodo destino.
+        \item $R(x,y)$ representa el flujo o conductancia cruzada entre el origen y el destino.
+    \end{itemize}
+    \textit{Si el grafo es transitivo (muy simétrico), la fórmula colapsa a identidades directas, lo que convierte a la teoría del potencial en la herramienta algebraica más poderosa para estudiar caminatas aleatorias.}
+\end{proof}
+
+\newpage
+\subsection{Capacidad y probabilidad de absorción}
+
+\begin{ejercicio}{Capacidad y Probabilidad de Absorción}{3.5a}
+    Sea $(X_n)$ la caminata simple en $\mathbb{Z}^d$ con $d \ge 3$. Para $A \subset \mathbb{Z}^d$ finito, la \textit{capacidad} de $A$ es
+    \[ \text{Cap}(A) = \sum_{x \in A} \pi(x) P^x(T_A^+ = \infty), \]
+    donde $\pi$ es la medida de Green normalizada. \\
+    (a) Demuestre que $P^x(T_A < \infty) = G(x, A) / G(A, A)$ en términos adecuados de la función de Green, donde $G(x, A) = \sum_{y \in A} G(x, y)$.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{nota}{Intuición Electroestática}
+    En la teoría del potencial clásica, el potencial $V(x)$ generado por un conductor $A$ en el espacio tridimensional decae con la distancia. En probabilidad discreta, este potencial es exactamente la probabilidad de golpear el conjunto: $V(x) = P^x(T_A < \infty)$. 
+    Este inciso nos dice que dicha probabilidad es proporcional a la "influencia total" $G(x,A)$, normalizada por la influencia interna del conjunto $G(A,A)$.
+\end{nota}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Demostración por la Propiedad Fuerte de Markov}]
+    \textbf{1. Descomposición del Número Esperado de Visitas:} \\
+    Por definición, $G(x, A)$ es el número esperado de visitas totales a cualquier punto del conjunto $A$, arrancando desde $x$. 
+    Podemos expresar este número separando las trayectorias en dos eventos mutuamente excluyentes: aquellas que \textit{nunca} visitan $A$, y aquellas que \textit{sí} lo visitan al menos una vez.
+    
+    Sea $T_A = \min \{n \ge 0 : X_n \in A\}$ el tiempo de primera llegada al conjunto $A$. 
+    \begin{itemize}
+        \item Si $T_A = \infty$, la cadena nunca visita $A$, por lo que el número de visitas es $0$.
+        \item Si $T_A < \infty$, la cadena llega a $A$ en algún punto de entrada $X_{T_A} = z \in A$.
+    \end{itemize}
+
+    \textbf{2. Aplicación de la Propiedad Fuerte de Markov:} \\
+    Condicionamos la esperanza del número de visitas al hecho de haber llegado a $A$:
+    \[ G(x, A) = E^x \left[ \text{Visitas a } A \mid T_A < \infty \right] P^x(T_A < \infty) + (0) P^x(T_A = \infty) \]
+    
+    Por la Propiedad Fuerte de Markov, en el instante exacto $T_A$ en que la cadena toca el conjunto $A$ por primera vez en el estado $z$, el proceso "pierde la memoria". El número de visitas esperadas a $A$ a partir de ese momento es exactamente igual a haber iniciado la cadena fresca desde $z$:
+    \[ E^x \left[ \text{Visitas a } A \mid T_A < \infty, X_{T_A} = z \right] = G(z, A) \]
+    
+    \textbf{3. El Término "Adecuado" $G(A,A)$:} \\
+    Sustituyendo esto en la ecuación anterior mediante la Ley de Probabilidad Total (promediando sobre todos los posibles puntos de entrada $z$):
+    \[ G(x, A) = P^x(T_A < \infty) \sum_{z \in A} P^x(X_{T_A} = z \mid T_A < \infty) G(z, A) \]
+    
+    La sumatoria representa el valor esperado de la función de Green evaluada en el punto de entrada aleatorio. El problema nos pide definir "términos adecuados". Por lo tanto, definimos $G(A,A)$ como la \textit{influencia interna efectiva}, es decir, el valor esperado de visitas a $A$ dado que ya logramos entrar a $A$:
+    \[ G(A, A) := E^x \left[ G(X_{T_A}, A) \mid T_A < \infty \right] = \sum_{z \in A} P^x(X_{T_A} = z \mid T_A < \infty) G(z, A) \]
+    \textit{(Nota: Si $A=\{y\}$ es un solo punto, la entrada es forzosamente $y$, por lo que $G(A,A)$ colapsa a la constante $G(y,y)$).}
+    
+    \textbf{4. Despeje Final:} \\
+    Sustituyendo esta definición en nuestra ecuación principal, obtenemos:
+    \[ G(x, A) = P^x(T_A < \infty) G(A, A) \]
+    
+    Despejando la probabilidad de absorción:
+    \[ \mathbf{P^x(T_A < \infty) = \frac{G(x, A)}{G(A, A)}} \]
+    
+    
+\end{proof}
+
+\newpage
+
+\vspace{5mm}
+
+\begin{ejercicio}{Comportamiento asintótico en $\mathbb{Z}^3$}{3.5b}
+    Para $A = \{0\}$ en $\mathbb{Z}^3$, calcule $P^x(T_{\{0\}} < \infty) = G(x,0)/G(0,0)$ y dé el comportamiento asintótico cuando $|x| \to \infty$.
+\end{ejercicio}
+
+\begin{proof}[\textbf{Cálculo Asintótico}]
+    Usando la fórmula demostrada en el inciso (a), la probabilidad de que una caminata que inicia en $x$ golpee el origen en algún momento es:
+    $$P^x(T_{\{0\}} < \infty) = \frac{G(x, 0)}{G(0, 0)}$$
+    
+    Del Ejercicio 3.3(c), sabemos que para $d=3$, la función de Green decae proporcionalmente al inverso de la distancia euclidiana. Es decir, cuando $|x| \to \infty$, la relación asintótica es $G(x,0) \asymp |x|^{2-3} = |x|^{-1}$.
+    
+    Dado que $G(0,0)$ es una constante estrictamente finita (el número esperado de retornos al origen es finito porque en $\mathbb{Z}^3$ la caminata es transiente), el comportamiento asintótico de la probabilidad de absorción está dominado únicamente por el numerador $G(x,0)$:
+    $$P^x(T_{\{0\}} < \infty) \asymp \frac{1}{G(0,0)} |x|^{-1}$$
+    
+    \textit{Conclusión:} La probabilidad de golpear el origen decae a un ritmo de $1/r$, donde $r = |x|$ es la distancia inicial al origen. Físicamente, esto es idéntico a cómo decae el potencial electrostático de una carga puntual en un espacio tridimensional vacío.
+\end{proof}
+
+\newpage
+
+\begin{ejercicio}{Capacidad y la Partícula desde el Infinito}{3.5c}
+    Interprete la capacidad como la probabilidad de que una partícula lanzada desde el infinito de golpee $A$.
+\end{ejercicio}
+
+\begin{nota}{Interpretación Física de la Capacidad}
+    La medida $e_A(x) = P^x(T_A^+ = \infty)$ se conoce como la "medida de equilibrio" y representa la carga eléctrica que debe distribuirse en la superficie del conjunto $A$ para mantenerlo a un potencial constante. La capacidad, por definición, es la suma de toda esta carga local.
+    
+    Si imaginamos el espacio infinito como un reservorio inmenso que inyecta partículas aleatorias al sistema, la capacidad de $A$ funciona como su "sección transversal efectiva" o tamaño aparente. Entre mayor sea la $\text{Cap}(A)$, mayor será la tasa a la que captura las partículas que vienen vagando desde posiciones asintóticamente lejanas. En términos simples, la capacidad mide qué tan "visible" es el conjunto $A$ para un caminante aleatorio que inició su viaje en el infinito.
+\end{nota}
+
+\newpage
+
+\begin{ejercicio}{Capacidad, Conductancia y el Principio de Dirichlet}{3.5d}
+    ¿Cuál es la relación entre capacidad, conductancia y el principio variacional de Dirichlet?
+\end{ejercicio}
+
+\begin{proof}[\textbf{Correspondencia con Redes Eléctricas}]
+    Existe un isomorfismo profundo entre las Cadenas de Markov reversibles y los circuitos eléctricos clásicos:
+    
+    \textbf{1. Conductancia Efectiva:} Si tratamos a las aristas del grafo como resistencias eléctricas con conductancia $C(x,y) = \pi(x)p(x,y)$, la capacidad de un conjunto $A$ respecto al infinito es matemáticamente idéntica a la \textbf{conductancia efectiva} (el inverso de la resistencia equivalente) medida entre el conjunto $A$ y el infinito.
+    $$\text{Cap}(A) = C_{\text{eff}}(A, \infty)$$
+    
+    \textbf{2. Energía de Dirichlet:} La energía disipada en forma de calor por la red eléctrica bajo un campo de voltajes $f$ está dada por la Forma (o Energía) de Dirichlet:
+    $$\mathcal{E}(f, f) = \frac{1}{2} \sum_{x,y} C(x,y) (f(x) - f(y))^2$$
+    
+    \textbf{3. Principio Variacional de Dirichlet:} Este principio fundamental establece que la naturaleza siempre busca el estado que minimiza la energía disipada. En nuestro contexto, el potencial eléctrico real $h(x)$ (que equivale a la probabilidad estocástica $P^x(T_A < \infty)$) es la función única que minimiza la energía de Dirichlet sujeta a las restricciones de frontera ($f=1$ en $A$, y $f \to 0$ en el infinito).
+    
+    \textbf{Síntesis Matemática:} Si evaluamos la energía total disipada utilizando esta función minimizadora $h$, obtenemos exactamente la capacidad:
+    $$\text{Cap}(A) = \mathcal{E}(h, h) = \min_{f|_A=1, f|_\infty=0} \mathcal{E}(f, f)$$
+    \textit{Conclusión: La capacidad de un conjunto mide la mínima energía que la red debe disipar para poder mantener un potencial de $1$ en $A$ y $0$ en el infinito.}
+\end{proof}
+
+\newpage
+\subsection{Movimiento browniano como límite de la caminata}
+
+
+\begin{ejercicio}{Movimiento browniano como límite de la caminata}{3.6a}
+    Sea $(S^{(N)}_t)_{t \ge 0}$ la caminata aleatoria simple en $\mathbb{Z}$ reescalada: $S^{(N)}_t = \frac{X_{\lfloor Nt \rfloor}}{\sqrt{N}}$. \\
+    (a) Enuncie el principio de invariancia de Donsker: $S^{(N)} \to B$ en distribución (como procesos en $C[0,1]$), donde $B$ es el movimiento browniano estándar.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{nota}{El Teorema Central del Límite Funcional}
+    Así como el Teorema Central del Límite (TCL) clásico nos dice que la suma de variables aleatorias converge a una distribución Normal en un \textit{instante} de tiempo fijo, el \textbf{Teorema de Donsker} (o TCL Funcional) generaliza esto a \textit{trayectorias completas}. Nos asegura que, al encoger los saltos espaciales por $\sqrt{N}$ y acelerar el tiempo por $N$, la trayectoria dentada de la caminata aleatoria converge a una trayectoria continua universal: el Movimiento Browniano.
+\end{nota}
+
+\vspace{5mm}
+
+\begin{mytheo}{Principio de Invariancia de Donsker}{}
+    Sea $X_1, X_2, \dots$ una sucesión de variables aleatorias independientes e idénticamente distribuidas (i.i.d.) con media $E[X_i] = 0$ y varianza $\text{Var}(X_i) = 1$.
+    Definimos la suma parcial $S_n = \sum_{i=1}^n X_i$ con $S_0 = 0$.
+
+    Construimos el proceso estocástico continuo interpolado y reescalado para el intervalo temporal $t \in [0,1]$ como:
+    \[ W^{(N)}(t) = \frac{S_{\lfloor Nt \rfloor}}{\sqrt{N}} + \frac{Nt - \lfloor Nt \rfloor}{\sqrt{N}} X_{\lfloor Nt \rfloor + 1} \]
+    \textit{(La interpolación lineal del segundo término se añade teóricamente para asegurar que las trayectorias sean estrictamente continuas y pertenezcan al espacio de funciones $C[0,1]$. Para fines asintóticos, la versión escalonada del enunciado es equivalente).}
+
+    Entonces, conforme $N \to \infty$, la medida de probabilidad inducida por los procesos $W^{(N)}$ converge débilmente a la Medida de Wiener. Es decir, el proceso converge en distribución al Movimiento Browniano Estándar $B$:
+    \[ W^{(N)} \xrightarrow{d} B \quad \text{en } C[0,1] \]
+
+    \vspace{2mm}
+    \textbf{Propiedades del Proceso Límite (Movimiento Browniano Estándar $B_t$):}
+    \begin{enumerate}
+        \item \textbf{Origen:} $B_0 = 0$ casi seguramente.
+        \item \textbf{Incrementos Independientes:} Para $0 \le t_1 < t_2 \dots < t_k$, los incrementos $B_{t_2}-B_{t_1}, \dots, B_{t_k}-B_{t_{k-1}}$ son independientes.
+        \item \textbf{Incrementos Gaussianos Estacionarios:} Para cualquier $0 \le s < t$, el incremento se distribuye normal con varianza igual al lapso de tiempo: $B_t - B_s \sim \mathcal{N}(0, t-s)$.
+        \item \textbf{Continuidad:} Sus trayectorias son continuas en casi todo punto $t$ (pero analíticamente se demuestra que no son diferenciables en ninguna parte).
+    \end{enumerate}
+\end{mytheo}
+
+\newpage
+
+\begin{ejercicio}{Convergencia Asintótica y Teorema Central del Límite}{3.6b}
+    Para $p = q = \frac{1}{2}$, calcule $E^0[S_n^2] = n$ y demuestre que $S_n/\sqrt{n} \to \mathcal{N}(0,1)$ usando el Teorema Central del Límite.
+\end{ejercicio}
+
+\begin{proof}[\textbf{Cálculo y Límite}]
+    \textbf{1. Cálculo de la Esperanza al Cuadrado:} \\
+    Sea $S_n = \sum_{i=1}^n X_i$, donde $X_i$ son los pasos de la caminata. Como es simétrica, cada paso toma valores en $\{-1, 1\}$ con probabilidad $1/2$.
+    Calculamos la media y el segundo momento de un solo paso:
+    \[ E[X_i] = (1)\left(\frac{1}{2}\right) + (-1)\left(\frac{1}{2}\right) = 0 \]
+    \[ E[X_i^2] = (1)^2\left(\frac{1}{2}\right) + (-1)^2\left(\frac{1}{2}\right) = 1 \]
+    La varianza de la suma de variables independientes es la suma de las varianzas. Al tener media cero, $E[S_n^2] = \text{Var}(S_n)$:
+    \[ E^0[S_n^2] = \text{Var}\left( \sum_{i=1}^n X_i \right) = \sum_{i=1}^n \text{Var}(X_i) = \sum_{i=1}^n (E[X_i^2] - E[X_i]^2) = \sum_{i=1}^n 1 = \mathbf{n} \]
+
+    \textbf{2. Teorema Central del Límite (TCL):} \\
+    El TCL clásico establece que para variables i.i.d. con media $\mu$ y varianza $\sigma^2$ finitas, la suma estandarizada converge en distribución a una Normal estándar:
+    \[ \frac{S_n - n\mu}{\sigma \sqrt{n}} \xrightarrow{d} \mathcal{N}(0,1) \]
+    Sustituyendo nuestros parámetros teóricos $\mu = 0$ y $\sigma = 1$:
+    \[ \mathbf{\frac{S_n}{\sqrt{n}} \xrightarrow{d} \mathcal{N}(0,1)} \]
+    \textit{Esto demuestra que, en un instante fijo $n$ suficientemente grande, la distribución espacial de la caminata es una campana de Gauss, coincidiendo exactamente con la distribución marginal del Movimiento Browniano.}
+\end{proof}
+
+\newpage
+
+\begin{ejercicio}{Convergencia del Tiempo de Salida}{3.6c}
+    Deduzca que $E^0[\tau_{-a,b}]/N \to a b$ cuando $N \to \infty$ (convergencia del tiempo de salida al tiempo de salida del browniano).
+\end{ejercicio}
+
+\begin{proof}[\textbf{Deducción del Límite Espacio-Temporal}]
+    En el Ejercicio 3.1b, demostramos que para una caminata discreta simple en $\mathbb{Z}$, el tiempo esperado para salir del intervalo $[-A, B]$ es $E[\text{pasos}] = A \cdot B$.
+
+    Para aplicar el límite difusivo hacia el Movimiento Browniano, reescalamos el espacio por un factor de $\sqrt{N}$. Esto significa que las barreras continuas $-a$ y $b$ corresponden físicamente a las barreras discretas equivalentes $A = a\sqrt{N}$ y $B = b\sqrt{N}$.
+    
+    El número esperado de pasos discretos para alcanzar estas fronteras reescaladas es:
+    \[ E^0[\text{pasos}] = A \cdot B = (a\sqrt{N})(b\sqrt{N}) = N a b \]
+
+    En la escala del Movimiento Browniano, el tiempo continuo $t$ se define comprimiendo el número de pasos por un factor de $N$ (es decir, el tiempo continuo es $t = \text{pasos} / N$). 
+    Dividimos la esperanza discreta entre $N$ para obtener el límite continuo $\tau_{-a,b}$:
+    \[ E^0[\tau_{-a,b}] = \lim_{N \to \infty} \frac{E^0[\text{pasos}]}{N} = \lim_{N \to \infty} \frac{N a b}{N} = \mathbf{a b} \]
+    
+    \textit{Este límite coincide magistralmente con el resultado del Movimiento Browniano Estándar $B_t$, donde usando la martingala $B_t^2 - t$ y el Teorema de Paro Opcional, se concluye directamente que $E^0[\tau_{-a,b}] = ab$.}
+\end{proof}
+
+\newpage
+
+\begin{ejercicio}{Límite continuo de la probabilidad de ruina}{3.6d}
+    ¿Cómo se aproxima la probabilidad de ruina $u(x) = P^x(T_{\{N\}} < T_{\{0\}})$ en el límite continuo?
+\end{ejercicio}
+
+\begin{proof}[\textbf{Aproximación Continua}]
+    Para la caminata discreta simétrica en el intervalo $[0, N]$, demostramos en el capítulo 1 que la probabilidad de ruina (ganar el juego) es estrictamente lineal:
+    \[ u(x) = \frac{x}{N} \]
+
+    Para llevar esto al límite continuo (Movimiento Browniano en un intervalo espacial $[0, L]$), definimos la posición espacial continua como $y = x \Delta y$ y la frontera superior del intervalo como $L = N \Delta y$, donde $\Delta y \to 0$. 
+    
+    Multiplicando el numerador y el denominador de nuestra probabilidad discreta por el diferencial espacial $\Delta y$:
+    \[ u(x) = \frac{x \Delta y}{N \Delta y} = \frac{y}{L} \]
+
+    En el límite continuo completo, el proceso estocástico converge al Movimiento Browniano $B_t$. Si iniciamos el proceso en $B_0 = y \in [0, L]$, la probabilidad de alcanzar la barrera superior $L$ antes de tocar la barrera inferior $0$ es idéntica a la fórmula límite:
+    \[ \mathbf{P^y(T_L < T_0) = \frac{y}{L}} \]
+    
+    \textit{Justificación teórica: En el espacio continuo, la probabilidad de salida ya no se rige por ecuaciones en diferencias, sino por la Ecuación de Laplace diferencial unidimensional $\Delta u = \frac{d^2u}{dy^2} = 0$. Sus únicas soluciones son rectas de la forma $u(y) = Ay+B$. Evaluando las condiciones de frontera $u(0)=0$ (ruina inferior) y $u(L)=1$ (victoria superior), se recupera inevitablemente la misma proporción lineal $u(y) = y/L$.}
+\end{proof}
+
+\newpage
+
+\section{Cadenas de Markov a tiempo continuo}
+\subsection{Generador y semigruppo}
+
+\begin{ejercicio}{Generador y semigrupo}{4.1}
+    Sea $(Y_t)_{t \ge 0}$ un proceso de Markov a tiempo continuo en $S$ con generador $\mathcal{A}$.
+    
+    (a) Demuestre que $P_t f(x) = E^x[f(Y_t)]$ satisface la ecuación de Kolmogorov hacia atrás: $\partial_t P_t f = \mathcal{A}P_t f$.
+    
+    (b) Escriba las ecuaciones de Kolmogorov hacia adelante para $p_t(x,y) = P^x(Y_t = y)$: $\partial_t p_t(\cdot, y) = p_t(\cdot, y)\mathcal{A}$.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{nota}{El Generador Infinitesimal}
+    En tiempo continuo, el sistema cambia en cada instante. El generador $\mathcal{A}$ describe la tasa de cambio instantánea en el tiempo $t=0$, definido como $\mathcal{A}f = \lim_{h \downarrow 0} \frac{P_h f - f}{h}$.
+    Las ecuaciones de Kolmogorov extienden este concepto para encontrar la tasa de cambio en cualquier tiempo $t>0$. El truco central para ambas demostraciones es la propiedad de semigrupo (Chapman-Kolmogorov): avanzar un tiempo $t+h$ es equivalente a avanzar primero $t$ y luego $h$, o viceversa ($P_{t+h} = P_h P_t = P_t P_h$).
+\end{nota}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Demostración (a): Ecuación de Kolmogorov Hacia Atrás}]
+    Iniciamos aplicando la definición formal de la derivada temporal al operador de transición $P_t$:
+    \[ \partial_t P_t f = \lim_{h \downarrow 0} \frac{P_{t+h} f - P_t f}{h} \]
+
+    Aplicamos la propiedad de semigrupo separando el tiempo como un pequeño salto inicial $h$ seguido del viaje principal $t$. Por tanto, $P_{t+h} = P_h P_t$. Sustituyendo esto en nuestro límite:
+    \[ \partial_t P_t f = \lim_{h \downarrow 0} \frac{P_h (P_t f) - P_t f}{h} \]
+
+    Observemos la estructura del límite. Si definimos momentáneamente a la función interior como $g = P_t f$, la expresión se convierte en $\lim_{h \downarrow 0} \frac{P_h g - g}{h}$.
+    Esta es exactamente la definición de la acción del generador $\mathcal{A}$ sobre la función $g$.
+    
+    Evaluando el límite, obtenemos $\mathcal{A}g$. Regresando a nuestra notación original ($g = P_t f$), llegamos directamente al resultado:
+    \[ \mathbf{\partial_t P_t f = \mathcal{A} (P_t f)} \]
+    \textit{Físicamente, condicionamos sobre el primer salto infinitesimal (por eso "hacia atrás", miramos al inicio del proceso) y la tasa está regida por $\mathcal{A}$ aplicado sobre el estado futuro.}
+\end{proof}
+
+\newpage
+
+\begin{proof}[\textbf{Demostración (b): Ecuación de Kolmogorov Hacia Adelante}]
+    Iniciamos nuevamente con el límite de la derivada temporal, pero esta vez aplicamos la propiedad de semigrupo invirtiendo el orden: el proceso viaja el tiempo largo $t$ primero, y condicionamos sobre el último salto infinitesimal $h$. Es decir, $P_{t+h} = P_t P_h$.
+    
+    \[ \partial_t P_t f = \lim_{h \downarrow 0} \frac{P_{t+h} f - P_t f}{h} = \lim_{h \downarrow 0} \frac{P_t (P_h f) - P_t f}{h} \]
+
+    Dado que $P_t$ es un operador lineal (es una esperanza matemática o una multiplicación matricial), podemos sacarlo fuera del límite (asumiendo las condiciones de regularidad necesarias para intercambiar límite e integral/suma):
+    \[ \partial_t P_t f = P_t \left( \lim_{h \downarrow 0} \frac{P_h f - f}{h} \right) \]
+    
+    Reconocemos el límite interior como el generador $\mathcal{A}$ aplicado a la función $f$:
+    \[ \partial_t P_t f = P_t (\mathcal{A} f) \]
+
+    Para traducir esta ecuación de operadores a la notación de probabilidades puntuales $p_t(x,y)$, analizamos los elementos individuales como si fueran matrices. La ecuación matricial es $\partial_t P_t = P_t \mathcal{A}$. 
+    Evaluando la derivada para la entrada específica que va del estado inicial (implícito como un vector fila puntual) al estado final $y$, aplicamos el producto de la fila $p_t$ por la matriz $\mathcal{A}$:
+    \[ \partial_t p_t(\cdot,y) = \sum_{z \in S} p_t(\cdot, z) \mathcal{A}(z,y) \]
+    
+    En forma vectorial, el vector de probabilidad evoluciona multiplicándose por la derecha con el generador:
+    \[ \mathbf{\partial_t p_t(\cdot, y) = p_t(\cdot, y)\mathcal{A}} \]
+\end{proof}
+
+\newpage
+
+\begin{ejercicio}{Exponencial de Matrices y Semigrupos}{4.1c}
+    Demuestre que $P_t = e^{t\mathcal{A}}$ y que las matrices $P_t$ forman un semigrupo estocástico.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{nota}{La Exponencial Matricial}
+    La exponencial de una matriz se define de la misma manera que en el cálculo escalar, utilizando su serie de Taylor: $e^{t\mathcal{A}} = \sum_{k=0}^\infty \frac{t^k \mathcal{A}^k}{k!}$. Esta serie converge absolutamente para cualquier matriz con norma finita.
+\end{nota}
+
+\begin{proof}[\textbf{Demostración (Solución y Semigrupo)}]
+    \textbf{1. Solución de la Ecuación de Kolmogorov:} \\
+    Del inciso anterior sabemos que la matriz de transición satisface la ecuación diferencial matricial con la condición inicial de que en $t=0$ no hay transición:
+    \[ \frac{d}{dt} P_t = \mathcal{A} P_t, \quad P_0 = I \]
+    Proponemos como solución la exponencial de la matriz $P_t = e^{t\mathcal{A}}$. Derivando término a término la serie de Taylor respecto a $t$:
+    \[ \frac{d}{dt} e^{t\mathcal{A}} = \frac{d}{dt} \sum_{k=0}^\infty \frac{t^k \mathcal{A}^k}{k!} = \sum_{k=1}^\infty \frac{k t^{k-1} \mathcal{A}^k}{k!} = \mathcal{A} \sum_{k=1}^\infty \frac{t^{k-1} \mathcal{A}^{k-1}}{(k-1)!} = \mathcal{A} e^{t\mathcal{A}} \]
+    Como cumple la ecuación diferencial y la condición inicial ($e^{0\mathcal{A}} = I$), por el teorema de existencia y unicidad, concluimos que $\mathbf{P_t = e^{t\mathcal{A}}}$.
+
+    \vspace{3mm}
+    \textbf{2. Propiedad de Semigrupo:} \\
+    Un semigrupo de operadores matemáticos debe cumplir la identidad $P_0 = I$ y la propiedad de composición $P_{t+s} = P_t P_s$. Usando nuestra representación exponencial y las leyes de los exponentes (las cuales son válidas porque toda matriz conmuta consigo misma, $\mathcal{A}\mathcal{A} = \mathcal{A}\mathcal{A}$):
+    \[ P_{t+s} = e^{(t+s)\mathcal{A}} = e^{t\mathcal{A} + s\mathcal{A}} = e^{t\mathcal{A}} e^{s\mathcal{A}} = \mathbf{P_t P_s} \]
+
+    \vspace{3mm}
+    \textbf{3. Propiedad Estocástica:} \\
+    Para que las matrices de transición sean estocásticas, la suma de las probabilidades en cualquier fila debe ser 1 ($P_t \mathbf{1} = \mathbf{1}$, donde $\mathbf{1}$ es el vector columna de puros unos). 
+    Por propiedades del generador infinitesimal, sabemos que las filas de $\mathcal{A}$ suman cero ($\mathcal{A} \mathbf{1} = \mathbf{0}$). Evaluando la serie de la exponencial multiplicada por $\mathbf{1}$:
+    \[ P_t \mathbf{1} = \left( I + t\mathcal{A} + \frac{t^2}{2}\mathcal{A}^2 + \dots \right) \mathbf{1} = I\mathbf{1} + t(\mathcal{A}\mathbf{1}) + \frac{t^2}{2}\mathcal{A}(\mathcal{A}\mathbf{1}) + \dots \]
+    Sustituyendo el vector nulo:
+    \[ P_t \mathbf{1} = \mathbf{1} + \mathbf{0} + \mathbf{0} + \dots = \mathbf{1} \]
+    Junto con la no-negatividad de sus entradas, queda demostrado que la familia de matrices $(P_t)_{t \ge 0}$ forma un \textbf{semigrupo estocástico}.
+\end{proof}
+
+\newpage
+
+\begin{ejercicio}{Invarianza en la Medida Estacionaria}{4.1d}
+    Muestre que si $\pi$ es estacionaria, entonces $E^\pi[f(Y_t)] = E^\pi[f(Y_0)]$ para todo $t \ge 0$.
+\end{ejercicio}
+
+\begin{proof}[\textbf{Demostración de Invarianza del Valor Esperado}]
+    Por definición, si $\pi$ es la distribución estacionaria de una cadena a tiempo continuo, se cumple la ecuación de balance global $\pi \mathcal{A} = \mathbf{0}$.
+    Multiplicando la exponencial matricial $P_t = e^{t\mathcal{A}}$ por la izquierda por el vector fila $\pi$:
+    \[ \pi P_t = \pi \left( I + t\mathcal{A} + \frac{t^2}{2}\mathcal{A}^2 + \dots \right) = \pi + t(\pi\mathcal{A}) + \frac{t^2}{2}(\pi\mathcal{A})\mathcal{A} + \dots \]
+    Como $\pi\mathcal{A} = \mathbf{0}$, todos los términos de la serie a partir del segundo se anulan por completo, resultando en:
+    \[ \pi P_t = \pi \]
+    Esto significa que la distribución no cambia en el tiempo. Si iniciamos el proceso muestreando desde la distribución $\pi$, la probabilidad marginal de encontrarlo en cualquier estado $x$ a tiempo $t$ sigue siendo $\pi(x)$.
+
+    Calculamos la esperanza del proceso a un tiempo $t$ asumiendo que la distribución inicial de $Y_0$ es $\pi$:
+    \[ E^\pi[f(Y_t)] = \sum_{x \in S} \pi(x) E^x[f(Y_t)] \]
+    Por definición del operador de transición, $E^x[f(Y_t)] = (P_t f)(x)$:
+    \[ E^\pi[f(Y_t)] = \sum_{x \in S} \pi(x) (P_t f)(x) = \pi P_t f \]
+    Usando la propiedad de estacionariedad $\pi P_t = \pi$ que acabamos de derivar:
+    \[ \pi P_t f = \pi f = \sum_{x \in S} \pi(x) f(x) \]
+    
+    Por otro lado, evaluando la esperanza en el tiempo $t=0$, sabemos directamente que $Y_0 \sim \pi$:
+    \[ E^\pi[f(Y_0)] = \sum_{x \in S} \pi(x) f(x) \]
+    
+    Igualando ambas expresiones, llegamos a nuestra conclusión:
+    \[ \mathbf{E^\pi[f(Y_t)] = E^\pi[f(Y_0)]} \]
+    \textit{Físicamente, esto garantiza que cuando el sistema termodinámico o estocástico ha alcanzado su estado de equilibrio, el valor esperado de cualquier función observable $f$ permanece constante para toda la eternidad.}
+\end{proof}
+
+\newpage
+
+\subsection{Proceso de Poisson}
+
+\vspace{5mm}
+
+\begin{ejercicio}{Proceso de Poisson}{4.2}
+    Sea $(N_t)_{t \ge 0}$ un proceso de Poisson de tasa $\lambda > 0$.
+    
+    (a) Escriba el generador $\mathcal{A}f(n) = \lambda[f(n+1)-f(n)]$ y verifique que $M_t = N_t - \lambda t$ es martingala.
+    
+    (b) Demuestre que $M_t^2 - \lambda t$ también es martingala y use el teorema de paro para calcular $E^0[T_n]$ y $\text{Var}^0(T_n)$, donde $T_n = \min\{t: N_t = n\}$.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{proof}[\textbf{Demostración (a): Generador y Martingala Compensada}]
+    \textbf{1. Generador Infinitesimal:} \\
+    Por definición, para un pequeño incremento de tiempo $h$, la probabilidad de que el proceso de Poisson dé exactamente un salto es $\lambda h + o(h)$, la de que no dé ninguno es $1 - \lambda h + o(h)$, y la de múltiples saltos es $o(h)$. Evaluamos la definición del generador:
+    $$ \mathcal{A}f(n) = \lim_{h \downarrow 0} \frac{E^n[f(N_h)] - f(n)}{h} $$
+    Condicionando a los posibles saltos en el intervalo $h$:
+    $$ \mathcal{A}f(n) = \lim_{h \downarrow 0} \frac{(1 - \lambda h)f(n) + (\lambda h)f(n+1) - f(n)}{h} $$
+    $$ \mathcal{A}f(n) = \lim_{h \downarrow 0} \frac{-\lambda h f(n) + \lambda h f(n+1)}{h} = \mathbf{\lambda [f(n+1) - f(n)]} $$
+    
+    \vspace{3mm}
+    \textbf{2. Martingala Compensada ($M_t$):} \\
+    Para verificar que $M_t = N_t - \lambda t$ es martingala, calculamos su esperanza condicional hacia el futuro $t+s$:
+    $$ E[M_{t+s} \mid \mathcal{F}_t] = E[N_{t+s} - \lambda(t+s) \mid \mathcal{F}_t] $$
+    Reescribimos $N_{t+s}$ como $N_t + (N_{t+s} - N_t)$ usando la propiedad de incrementos independientes:
+    $$ = E[N_t + (N_{t+s} - N_t) - \lambda t - \lambda s \mid \mathcal{F}_t] $$
+    Como $N_t$ es medible respecto a $\mathcal{F}_t$, sale de la esperanza. El incremento $N_{t+s} - N_t$ es independiente del pasado y distribuye Poisson con media $\lambda s$:
+    $$ = N_t - \lambda t - \lambda s + E[N_{t+s} - N_t] = M_t - \lambda s + \lambda s = \mathbf{M_t} $$
+    \textit{Se comprueba que $M_t$ es martingala.}
+\end{proof}
+
+\newpage
+
+\begin{proof}[\textbf{Demostración (b): Varianza y Teorema de Paro}]
+    \textbf{1. Verificación de la segunda martingala:} \\
+    Calculamos la esperanza condicional de $M_{t+s}^2 - \lambda(t+s)$:
+    $$ E[M_{t+s}^2 - \lambda(t+s) \mid \mathcal{F}_t] = E[(M_t + (M_{t+s} - M_t))^2 \mid \mathcal{F}_t] - \lambda(t+s) $$
+    Desarrollamos el binomio al cuadrado:
+    $$ = E[M_t^2 + 2M_t(M_{t+s} - M_t) + (M_{t+s} - M_t)^2 \mid \mathcal{F}_t] - \lambda t - \lambda s $$
+    Por linealidad, analizamos cada término. El término cruzado se anula porque $E[M_{t+s} - M_t] = 0$. El último término es la varianza del incremento del proceso de Poisson, que sabemos es igual a su media $\lambda s$:
+    $$ E[(M_{t+s} - M_t)^2] = \text{Var}(N_{t+s} - N_t - \lambda s) = \text{Var}(N_{t+s} - N_t) = \lambda s $$
+    Sustituyendo todo de regreso:
+    $$ = M_t^2 + 0 + \lambda s - \lambda t - \lambda s = \mathbf{M_t^2 - \lambda t} $$
+    \textit{Se comprueba que también es martingala.}
+
+    \vspace{3mm}
+    \textbf{2. Tiempo Esperado $E^0[T_n]$:} \\
+    Aplicamos el Teorema de Paro Opcional a la primera martingala $M_t$ con el tiempo de paro $T_n$ (tiempo de llegada al estado $n$). Sabemos que exactamente en ese instante, el proceso vale $N_{T_n} = n$:
+    $$ E^0[M_{T_n}] = M_0 = 0 \implies E^0[N_{T_n} - \lambda T_n] = 0 $$
+    $$ E^0[n - \lambda T_n] = 0 \implies n - \lambda E^0[T_n] = 0 $$
+    $$ \mathbf{E^0[T_n] = \frac{n}{\lambda}} $$
+    \textit{(Lógico: si llega a 1 cliente cada $1/\lambda$ minutos, para $n$ clientes toma $n/\lambda$ minutos).}
+
+    \vspace{3mm}
+    \textbf{3. Varianza del Tiempo $\text{Var}^0(T_n)$:} \\
+    Aplicamos el Teorema de Paro Opcional a la segunda martingala:
+    $$ E^0[M_{T_n}^2 - \lambda T_n] = 0 \implies E^0[(N_{T_n} - \lambda T_n)^2] = \lambda E^0[T_n] $$
+    Sustituimos $N_{T_n} = n$ en el lado izquierdo, y $E^0[T_n] = n/\lambda$ en el lado derecho:
+    $$ E^0[(n - \lambda T_n)^2] = \lambda \left(\frac{n}{\lambda}\right) = n $$
+    Factorizamos $\lambda^2$ dentro de la esperanza del lado izquierdo:
+    $$ \lambda^2 E^0\left[\left(\frac{n}{\lambda} - T_n\right)^2\right] = n $$
+    Reconocemos que el término dentro de la esperanza es exactamente la definición de la varianza $\text{Var}(T_n) = E[(E[T_n] - T_n)^2]$:
+    $$ \lambda^2 \text{Var}^0(T_n) = n $$
+    $$ \mathbf{\text{Var}^0(T_n) = \frac{n}{\lambda^2}} $$
+    \textit{(Esto confirma que el tiempo de espera $T_n$ se comporta como una suma de $n$ exponenciales independientes, es decir, una distribución Gamma).}
+\end{proof}
+
+\newpage
+
+\begin{ejercicio}{Suma de Procesos y Distribución Condicional}{4.2c}
+    Sean $N_t^{(1)}, N_t^{(2)}$ procesos de Poisson independientes de tasas $\lambda_1, \lambda_2$. Demuestre que su suma es Poisson de tasa $\lambda_1 + \lambda_2$ y calcule la distribución de $N_t^{(1)}$ dado $\{N_t^{(1)} + N_t^{(2)} = n\}$.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{proof}[\textbf{Demostración y Cálculo}]
+    \textbf{1. Suma de Procesos de Poisson:} \\
+    Sean $N_t^{(1)} \sim \text{Poisson}(\lambda_1 t)$ y $N_t^{(2)} \sim \text{Poisson}(\lambda_2 t)$ variables independientes. Usaremos la Función Generadora de Momentos (FGM) para encontrar la distribución de su suma $N_t = N_t^{(1)} + N_t^{(2)}$.
+    La FGM de una variable Poisson de parámetro $\mu$ es $M(s) = \exp(\mu(e^s - 1))$.
+    Por la independencia de los procesos, la FGM de la suma es el producto de sus respectivas FGM:
+    \[ M_{N_t}(s) = E[e^{s(N_t^{(1)} + N_t^{(2)})}] = E[e^{sN_t^{(1)}}] E[e^{sN_t^{(2)}}] \]
+    \[ M_{N_t}(s) = \exp(\lambda_1 t (e^s - 1)) \cdot \exp(\lambda_2 t (e^s - 1)) = \exp((\lambda_1 + \lambda_2)t(e^s - 1)) \]
+    Esta es exactamente la FGM de una variable aleatoria Poisson con parámetro $(\lambda_1 + \lambda_2)t$. Por el teorema de unicidad de la FGM, concluimos que la suma es un proceso de Poisson de tasa $\lambda_1 + \lambda_2$.
+
+    \vspace{3mm}
+    \textbf{2. Distribución Condicional (Filtrado Espacial):} \\
+    Queremos calcular $P(N_t^{(1)} = k \mid N_t^{(1)} + N_t^{(2)} = n)$ para $0 \le k \le n$.
+    Aplicando la definición de probabilidad condicional:
+    \[ P(N_t^{(1)} = k \mid N_t = n) = \frac{P(N_t^{(1)} = k \text{ y } N_t^{(2)} = n-k)}{P(N_t = n)} \]
+    Por independencia en el numerador, factorizamos las probabilidades y sustituimos las fórmulas clásicas de Poisson:
+    \[ = \frac{ \left( e^{-\lambda_1 t} \frac{(\lambda_1 t)^k}{k!} \right) \left( e^{-\lambda_2 t} \frac{(\lambda_2 t)^{n-k}}{(n-k)!} \right) }{ e^{-(\lambda_1+\lambda_2)t} \frac{((\lambda_1+\lambda_2)t)^n}{n!} } \]
+    Observamos que los términos exponenciales se cancelan perfectamente en el numerador y denominador ($e^{-\lambda_1 t}e^{-\lambda_2 t} = e^{-(\lambda_1+\lambda_2)t}$). Agrupamos los factoriales y las potencias de $t$ (que también desaparecen al tener $t^k t^{n-k} / t^n = 1$):
+    \[ = \frac{n!}{k!(n-k)!} \frac{\lambda_1^k \lambda_2^{n-k}}{(\lambda_1+\lambda_2)^n} \]
+    Reconocemos el coeficiente binomial $\binom{n}{k}$ y separamos la fracción de las tasas para los términos a la potencia $k$ y $n-k$:
+    \[ = \binom{n}{k} \left(\frac{\lambda_1}{\lambda_1+\lambda_2}\right)^k \left(\frac{\lambda_2}{\lambda_1+\lambda_2}\right)^{n-k} \]
+    \textit{Conclusión:} La distribución condicional es exactamente una \textbf{Binomial} $\mathcal{B}(n, p)$ donde el número de "ensayos" es $n$ (el total de eventos ocurridos) y la probabilidad de éxito de que un evento provenga del primer proceso es directamente proporcional a su tasa: $\mathbf{p = \frac{\lambda_1}{\lambda_1+\lambda_2}}$.
+\end{proof}
+
+\newpage
+
+\begin{ejercicio}{Densidad Conjunta de Tiempos de Llegada}{4.2d}
+    Calcule la densidad conjunta de los primeros dos tiempos de llegada $(T_1, T_2)$.
+\end{ejercicio}
+
+\begin{proof}[\textbf{Cálculo mediante Tiempos de Inter-llegada}]
+    Sea $T_1$ el tiempo de la primera llegada y $S_2 = T_2 - T_1$ el tiempo que transcurre entre la primera y la segunda llegada. 
+    Por las propiedades fundamentales del proceso de Poisson, sabemos que los tiempos de inter-llegada son variables aleatorias continuas, independientes y ambas siguen una distribución Exponencial de parámetro $\lambda$.
+    
+    La densidad marginal de $T_1$ es $f_{T_1}(t_1) = \lambda e^{-\lambda t_1}$ para $t_1 > 0$. \\
+    La densidad marginal de $S_2$ es $f_{S_2}(s_2) = \lambda e^{-\lambda s_2}$ para $s_2 > 0$.
+    
+    Dado que los incrementos son independientes, su densidad conjunta es simplemente el producto de sus densidades marginales:
+    \[ f_{T_1, S_2}(t_1, s_2) = f_{T_1}(t_1) f_{S_2}(s_2) = (\lambda e^{-\lambda t_1}) (\lambda e^{-\lambda s_2}) = \lambda^2 e^{-\lambda (t_1 + s_2)} \]
+    
+    Queremos encontrar la densidad conjunta directa de $(T_1, T_2)$. Para ello, realizamos un cambio de variable multivariable. 
+    El mapeo es $T_1 = t_1$ y $T_2 = t_1 + s_2$. 
+    Despejando obtenemos la inversa: $t_1 = T_1$ y $s_2 = T_2 - T_1$.
+    El determinante de la matriz Jacobiana de esta transformación lineal es exactamente $1$, por lo que la función de densidad se preserva al sustituir directamente las variables.
+    
+    Sustituimos la equivalencia $s_2 = t_2 - t_1$ en nuestra función conjunta original:
+    \[ f_{T_1, T_2}(t_1, t_2) = \lambda^2 e^{-\lambda (t_1 + (t_2 - t_1))} \]
+    Al simplificar el exponente, el término $t_1$ desaparece misteriosamente de la ecuación:
+    \[ \mathbf{f_{T_1, T_2}(t_1, t_2) = \lambda^2 e^{-\lambda t_2}} \]
+    
+    \textit{Dominio de validez:} Es crucial notar que esta densidad solo existe en la región triangular donde los eventos ocurren en orden cronológico estricto, es decir, para $\mathbf{0 < t_1 < t_2 < \infty}$. Fuera de esta región, la densidad es cero.
+\end{proof}
+
+\newpage
+
+\subsection{Proceso de nacimiento–muerte con absorción}
+
+\begin{ejercicio}{Proceso de nacimiento-muerte con absorción}{4.3}
+    Sea $(Y_t)$ en $\{0, \dots, M\}$ con $q(x, x+1) = \lambda$, $q(x, x-1) = \mu$ para $1 \le x \le M-1$, $q(0, 1) = \lambda$, y $M$ absorbente.
+    
+    (a) Derive $\mathcal{A}v = -1$ para $v(x) = E^x[T_M]$ y escriba las condiciones de frontera.
+    
+    (b) Resuelva para $\lambda \neq \mu$:
+    \[ v(x) = \frac{M-x}{\lambda-\mu} + \frac{\mu}{(\lambda-\mu)^2} \left[ \left(\frac{\mu}{\lambda}\right)^M - \left(\frac{\mu}{\lambda}\right)^x \right] \]
+    Verifique $v(0) - v(1) = 1/\lambda$.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{nota}{Ecuación de Poisson en Tiempo Continuo}
+    En tiempo discreto, el tiempo de paro esperado satisface $v(x) = 1 + \sum_y p(x,y)v(y)$, que es equivalente a $(P-I)v = -1$. En tiempo continuo, el equivalente del operador $(P-I)$ es el generador infinitesimal $\mathcal{A}$. Por lo tanto, esperamos que la ecuación diferencial equivalente sea $\mathcal{A}v = -1$.
+\end{nota}
+
+\begin{proof}[\textbf{Demostración (a): Derivación de la ecuación de Poisson}]
+    \textbf{1. Condicionamiento sobre el primer salto:} \\
+    Si el proceso está en el estado $x$ (con $1 \le x \le M-1$), el tiempo que transcurre antes de dar el próximo salto sigue una distribución Exponencial con tasa total $q_x = \lambda + \mu$. La esperanza de este tiempo de espera es $1/(\lambda+\mu)$. 
+    Al saltar, el proceso va al estado $x+1$ con probabilidad $\lambda/(\lambda+\mu)$ o al estado $x-1$ con probabilidad $\mu/(\lambda+\mu)$.
+    
+    Por la propiedad de Markov, el tiempo total esperado para llegar a $M$ es el tiempo de espera inicial más el tiempo esperado desde el nuevo estado:
+    \[ v(x) = \frac{1}{\lambda+\mu} + \left( \frac{\lambda}{\lambda+\mu} \right) v(x+1) + \left( \frac{\mu}{\lambda+\mu} \right) v(x-1) \]
+    
+    \textbf{2. Transformación al Generador Infinitesimal:} \\
+    Multiplicamos toda la ecuación por la tasa de salida $(\lambda+\mu)$:
+    \[ (\lambda+\mu) v(x) = 1 + \lambda v(x+1) + \mu v(x-1) \]
+    Reagrupando los términos para formar diferencias:
+    \[ \lambda v(x+1) - \lambda v(x) + \mu v(x-1) - \mu v(x) = -1 \]
+    \[ \lambda [v(x+1) - v(x)] + \mu [v(x-1) - v(x)] = -1 \]
+    
+    Por definición, la acción del generador $\mathcal{A}$ sobre una función $v$ se calcula como $\mathcal{A}v(x) = \sum_{y \neq x} q(x,y)[v(y) - v(x)]$. Aplicando esto a nuestras tasas:
+    \[ \mathcal{A}v(x) = q(x,x+1)[v(x+1) - v(x)] + q(x,x-1)[v(x-1) - v(x)] \]
+    \[ \mathcal{A}v(x) = \lambda[v(x+1) - v(x)] + \mu[v(x-1) - v(x)] \]
+    Igualando con nuestro resultado algebraico anterior, concluimos que para $1 \le x \le M-1$:
+    \[ \mathbf{\mathcal{A}v(x) = -1} \]
+    
+    \textbf{3. Condiciones de frontera:}
+    \begin{itemize}
+        \item En el borde absorbente $x=M$, el proceso ya llegó, por lo que el tiempo es cero: $\mathbf{v(M) = 0}$.
+        \item En el borde reflejante $x=0$, el único salto posible es hacia $1$ con tasa $\lambda$. Repitiendo el análisis: $v(0) = \frac{1}{\lambda} + 1 \cdot v(1)$. Multiplicando por $\lambda$ y reordenando: $\lambda[v(1) - v(0)] = -1 \implies \mathbf{\mathcal{A}v(0) = -1}$.
+    \end{itemize}
+\end{proof}
+
+\newpage
+
+\begin{proof}[\textbf{Demostración (b): Verificación Algebraica}]
+    Se nos proporciona la fórmula general del tiempo esperado para un sistema asimétrico ($\lambda \neq \mu$):
+    \[ v(x) = \frac{M-x}{\lambda-\mu} + \frac{\mu}{(\lambda-\mu)^2} \left[ \left(\frac{\mu}{\lambda}\right)^M - \left(\frac{\mu}{\lambda}\right)^x \right] \]
+    
+    Se nos pide verificar que la condición de frontera en $x=0$ se cumple, es decir, que $v(0) - v(1) = 1/\lambda$. Evaluamos la función en estos dos puntos.
+    
+    Para $x=0$:
+    \[ v(0) = \frac{M}{\lambda-\mu} + \frac{\mu}{(\lambda-\mu)^2} \left[ \left(\frac{\mu}{\lambda}\right)^M - 1 \right] \]
+    
+    Para $x=1$:
+    \[ v(1) = \frac{M-1}{\lambda-\mu} + \frac{\mu}{(\lambda-\mu)^2} \left[ \left(\frac{\mu}{\lambda}\right)^M - \frac{\mu}{\lambda} \right] \]
+    
+    Calculamos la diferencia $v(0) - v(1)$ restando término a término:
+    \[ v(0) - v(1) = \left( \frac{M}{\lambda-\mu} - \frac{M-1}{\lambda-\mu} \right) + \frac{\mu}{(\lambda-\mu)^2} \left[ \left( \left(\frac{\mu}{\lambda}\right)^M - 1 \right) - \left( \left(\frac{\mu}{\lambda}\right)^M - \frac{\mu}{\lambda} \right) \right] \]
+    
+    En el primer bloque, $M$ se cancela y nos queda $1/(\lambda-\mu)$. En el segundo bloque (los corchetes), el término de la potencia $M$ se cancela:
+    \[ v(0) - v(1) = \frac{1}{\lambda-\mu} + \frac{\mu}{(\lambda-\mu)^2} \left[ \frac{\mu}{\lambda} - 1 \right] \]
+    
+    Simplificamos la expresión dentro de los corchetes buscando un denominador común:
+    \[ \frac{\mu}{\lambda} - 1 = \frac{\mu - \lambda}{\lambda} \]
+    
+    Sustituimos esto de regreso en nuestra ecuación:
+    \[ v(0) - v(1) = \frac{1}{\lambda-\mu} + \frac{\mu}{(\lambda-\mu)^2} \left[ \frac{\mu - \lambda}{\lambda} \right] \]
+    
+    Reconocemos que $(\mu - \lambda) = -(\lambda - \mu)$. Esto nos permite cancelar uno de los factores del denominador al cuadrado:
+    \[ v(0) - v(1) = \frac{1}{\lambda-\mu} - \frac{\mu}{\lambda(\lambda-\mu)} \]
+    
+    Factorizamos $1/(\lambda-\mu)$ de ambos términos:
+    \[ v(0) - v(1) = \frac{1}{\lambda-\mu} \left[ 1 - \frac{\mu}{\lambda} \right] \]
+    
+    Volvemos a buscar un denominador común dentro de los corchetes:
+    \[ 1 - \frac{\mu}{\lambda} = \frac{\lambda - \mu}{\lambda} \]
+    
+    Multiplicamos ambas fracciones:
+    \[ v(0) - v(1) = \left( \frac{1}{\lambda-\mu} \right) \left( \frac{\lambda-\mu}{\lambda} \right) \]
+    
+    Los términos $(\lambda-\mu)$ se cancelan perfectamente en el numerador y denominador, resultando en:
+    \[ \mathbf{v(0) - v(1) = \frac{1}{\lambda}} \]
+    
+    \textit{Queda analíticamente verificado que la solución propuesta satisface la condición de frontera en el origen, la cual surge naturalmente de la ecuación del generador $\mathcal{A}v(0) = -1$.}
+\end{proof}
+
+\newpage
+
+
+\begin{ejercicio}{Caso Simétrico (Equilibrio de Tasas)}{4.3c}
+    Resuelva para $\lambda = \mu$: $v(x) = (M(M + 1) - x(x + 1))/(2\lambda)$.
+\end{ejercicio}
+
+\begin{proof}[\textbf{Resolución de la Ecuación en Diferencias}]
+    Si $\lambda = \mu$, la ecuación de Poisson del inciso (a), $\lambda[v(x+1) - v(x)] + \mu[v(x-1) - v(x)] = -1$, se simplifica dividiendo y factorizando $\lambda$:
+    \[ \lambda [v(x+1) - 2v(x) + v(x-1)] = -1 \]
+    \[ v(x+1) - 2v(x) + v(x-1) = -\frac{1}{\lambda} \]
+    
+    Esta es una ecuación en diferencias lineal no homogénea de segundo orden. 
+    \begin{itemize}
+        \item \textbf{Solución Homogénea:} Las raíces de la ecuación característica para coeficientes $(1, -2, 1)$ son una raíz doble en $r=1$. Por lo tanto, la solución homogénea es una línea recta: $v_h(x) = Ax + B$.
+        \item \textbf{Solución Particular:} Como el lado derecho es una constante y la solución homogénea ya contiene a las constantes y a $x$, proponemos una solución particular de la forma $v_p(x) = Cx^2$. 
+        Sustituyendo en la ecuación:
+        \[ C(x+1)^2 - 2Cx^2 + C(x-1)^2 = C(x^2+2x+1 - 2x^2 + x^2-2x+1) = 2C \]
+        Igualando con el lado derecho: $2C = -1/\lambda \implies C = -1/(2\lambda)$.
+    \end{itemize}
+    
+    La solución general es la suma de ambas:
+    \[ v(x) = Ax + B - \frac{x^2}{2\lambda} \]
+    
+    Aplicamos nuestras condiciones de frontera del inciso (a):
+    1. Para $x=0$, la condición de reflexión $\mathcal{A}v(0) = -1$ dictaba que $v(1) - v(0) = -1/\lambda$. 
+    Evaluamos nuestra función: $v(0) = B$ y $v(1) = A + B - 1/(2\lambda)$.
+    Sustituimos en la condición:
+    \[ (A + B - \frac{1}{2\lambda}) - B = -\frac{1}{\lambda} \implies A = -\frac{1}{\lambda} + \frac{1}{2\lambda} = -\frac{1}{2\lambda} \]
+    Actualizamos la solución general:
+    \[ v(x) = B - \frac{x}{2\lambda} - \frac{x^2}{2\lambda} = B - \frac{x(x+1)}{2\lambda} \]
+    
+    2. Para $x=M$, el borde absorbente dicta que $v(M) = 0$.
+    \[ 0 = B - \frac{M(M+1)}{2\lambda} \implies B = \frac{M(M+1)}{2\lambda} \]
+    
+    Sustituyendo nuestra constante $B$ final, llegamos exactamente a la fórmula solicitada:
+    \[ \mathbf{v(x) = \frac{M(M+1) - x(x+1)}{2\lambda}} \]
+\end{proof}
+
+\newpage
+
+\begin{ejercicio}{Límite Asintótico y Velocidad de Deriva}{4.3d}
+    Calcule $\lim_{M \to \infty} v(0)/M$ para $\lambda > \mu$ e interprete en términos de la velocidad del proceso.
+\end{ejercicio}
+
+\begin{proof}[\textbf{Cálculo del Límite e Interpretación Física}]
+    Utilizamos la solución general para el caso asimétrico deducida en el inciso (b), evaluada en el origen $x=0$:
+    \[ v(0) = \frac{M}{\lambda-\mu} + \frac{\mu}{(\lambda-\mu)^2} \left[ \left(\frac{\mu}{\lambda}\right)^M - 1 \right] \]
+    
+    Dividimos toda la expresión entre $M$ para analizar la proporción asintótica:
+    \[ \frac{v(0)}{M} = \frac{1}{\lambda-\mu} + \frac{\mu}{M(\lambda-\mu)^2} \left[ \left(\frac{\mu}{\lambda}\right)^M - 1 \right] \]
+    
+    Dado que $\lambda > \mu$ (nacimientos superan a las muertes), la fracción base es menor a uno: $\frac{\mu}{\lambda} < 1$.
+    Por lo tanto, al tomar el límite cuando $M \to \infty$:
+    \begin{itemize}
+        \item La potencia geométrica decae a cero: $\left(\frac{\mu}{\lambda}\right)^M \to 0$.
+        \item El segundo gran término contiene a $M$ en el denominador y una constante entre los corchetes $(0 - 1 = -1)$, por lo que todo ese bloque tiende a cero: $\frac{\text{constante}}{M} \to 0$.
+    \end{itemize}
+    
+    Nos quedamos únicamente con el primer término, el cual es independiente de $M$:
+    \[ \mathbf{\lim_{M \to \infty} \frac{v(0)}{M} = \frac{1}{\lambda-\mu}} \]
+    
+    \textbf{Interpretación en términos de velocidad (Drift):} \\
+    Recordemos la fórmula básica de cinemática: $\text{Tiempo} = \frac{\text{Distancia}}{\text{Velocidad}}$.
+    Aquí, $v(0)$ es el Tiempo esperado total, y $M$ es la Distancia a recorrer desde el origen. Por lo tanto, el cociente $v(0)/M$ tiene unidades de \textit{inverso de velocidad}.
+    Si invertimos nuestro límite, obtenemos la velocidad neta del proceso estocástico a nivel macroscópico:
+    \[ \text{Velocidad Efectiva} \approx \frac{M}{v(0)} = \lambda - \mu \]
+    \textit{Físicamente, esto significa que cuando la meta está infinitamente lejos, las fluctuaciones aleatorias locales ("ruido") se promedian y dejan de importar. El proceso se comporta como un fluido determinista que avanza hacia la derecha con una velocidad constante exactamente igual a la diferencia entre la tasa de avance ($\lambda$) y la tasa de retroceso ($\mu$).}
+\end{proof}
+
+\newpage
+\subsection{Ecuaciones de Kolmogorov hacia adelante}
+
+\vspace{5mm}
+
+\begin{ejercicio}{Ecuaciones de Kolmogorov hacia adelante}{4.4}
+    Para el proceso del Ejercicio 4.3, sea $p_t(y) = P^0(Y_t = y)$.
+    
+    (a) Escriba el sistema completo de ecuaciones hacia adelante para $p_t(y), y \in \{0, \dots, M\}$.
+    
+    (b) Escriba explícitamente $p'_t(0), p'_t(1)$ y $p'_t(M)$.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{nota}{Balance de Probabilidad (Ecuación Maestra)}
+    La ecuación de Kolmogorov hacia adelante, en su forma de sumatoria, se expresa como:
+    \[ \frac{d}{dt} p_t(y) = \sum_{x \neq y} p_t(x)q(x, y) - p_t(y) \sum_{x \neq y} q(y, x) \]
+    Conceptualmente, la tasa de cambio de la probabilidad en el estado $y$ es igual al flujo de probabilidad que \textbf{entra} desde los estados vecinos $x$, menos el flujo de probabilidad que \textbf{sale} de $y$ hacia otros estados.
+\end{nota}
+
+\begin{proof}[\textbf{Solución (a): Sistema general hacia adelante}]
+    Para un estado interior $y \in \{1, 2, \dots, M-1\}$, el proceso solo puede recibir probabilidad de sus vecinos inmediatos $y-1$ (mediante un nacimiento con tasa $\lambda$) y $y+1$ (mediante una muerte con tasa $\mu$). 
+    De igual manera, la probabilidad solo puede escapar de $y$ hacia $y+1$ (tasa $\lambda$) o hacia $y-1$ (tasa $\mu$).
+    
+    Aplicando la ecuación de balance:
+    \begin{itemize}
+        \item \textbf{Flujo entrante (Inflow):} $p_t(y-1)\lambda + p_t(y+1)\mu$
+        \item \textbf{Flujo saliente (Outflow):} $p_t(y)(\lambda + \mu)$
+    \end{itemize}
+    
+    Agrupando esto, el sistema completo de ecuaciones diferenciales para los estados interiores es:
+    \[ \mathbf{p'_t(y) = \lambda p_t(y-1) + \mu p_t(y+1) - (\lambda + \mu) p_t(y) \quad \text{para } 1 \le y \le M-1} \]
+\end{proof}
+
+\newpage
+
+\begin{proof}[\textbf{Solución (b): Casos de Frontera}]
+    Evaluamos los tres casos específicos que se nos piden, teniendo especial cuidado con las condiciones de frontera definidas en el Ejercicio 4.3.
+    
+    \textbf{1. Para la frontera reflectante $y = 0$:} \\
+    El estado 0 solo puede recibir probabilidad desde el estado 1 (muerte con tasa $\mu$). 
+    Solo puede perder probabilidad hacia el estado 1 (nacimiento con tasa $\lambda$). No hay transiciones desde o hacia $-1$.
+    \[ \mathbf{p'_t(0) = \mu p_t(1) - \lambda p_t(0)} \]
+    
+    \textbf{2. Para el estado $y = 1$:} \\
+    Este es un estado interior regular, por lo que aplicamos directamente la fórmula general que dedujimos en el inciso (a), sustituyendo $y=1$:
+    \[ \mathbf{p'_t(1) = \lambda p_t(0) + \mu p_t(2) - (\lambda + \mu) p_t(1)} \]
+    
+    \textbf{3. Para la frontera absorbente $y = M$:} \\
+    Al ser un estado absorbente, una vez que la cadena llega a $M$, se queda ahí para siempre. La tasa de salida es estrictamente cero ($\sum q(M, x) = 0$).
+    Solo recibe probabilidad del estado anterior $M-1$ (nacimiento con tasa $\lambda$). Por lo tanto, su derivada es puramente positiva (la probabilidad de absorción crece monótonamente):
+    \[ \mathbf{p'_t(M) = \lambda p_t(M-1)} \]
+\end{proof}
+
+\newpage
+
+\vspace{5mm}
+
+\begin{ejercicio}{Formulación Matricial y Absorción}{4.4c}
+    Reformule como $\mathbf{p}'(t) = \mathbf{p}(t)Q$ e identifique la matriz $Q$. Argumente que $p_t(M) \to 1$ cuando $t \to \infty$.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{proof}[\textbf{Formulación Matricial y Límite}]
+    \textbf{1. Identificación de la matriz $Q$:} \\
+    Si definimos el vector de probabilidades como un vector fila $\mathbf{p}(t) = [p_t(0), p_t(1), \dots, p_t(M)]$, el sistema de ecuaciones diferenciales deducido en los incisos (a) y (b) se puede escribir compactamente como la multiplicación de este vector por la matriz generadora $Q$.
+    
+    La matriz $Q$ de tamaño $(M+1) \times (M+1)$ contiene las tasas de transición, donde el elemento $q_{ij}$ es la tasa para ir de $i$ a $j$, y los elementos de la diagonal son estrictamente $q_{ii} = -\sum_{j \neq i} q_{ij}$. Evaluando nuestras tasas de nacimiento y muerte, la matriz resulta ser tridiagonal:
+    \[
+    Q = \begin{pmatrix}
+    -\lambda & \lambda & 0 & 0 & \dots & 0 & 0 \\
+    \mu & -(\lambda+\mu) & \lambda & 0 & \dots & 0 & 0 \\
+    0 & \mu & -(\lambda+\mu) & \lambda & \dots & 0 & 0 \\
+    \vdots & \vdots & \ddots & \ddots & \ddots & \vdots & \vdots \\
+    0 & 0 & \dots & \mu & -(\lambda+\mu) & \lambda & 0 \\
+    0 & 0 & \dots & 0 & \mu & -(\lambda+\mu) & \lambda \\
+    0 & 0 & \dots & 0 & 0 & 0 & 0
+    \end{pmatrix}
+    \]
+    \textit{(Notemos la importancia de la última fila: son puros ceros porque una vez en $M$, no hay transiciones de salida. Es una trampa perfecta).}
+
+    \vspace{3mm}
+    \textbf{2. Argumento de Absorción asintótica:} \\
+    Dado que $\lambda > 0$, existe un camino de probabilidad estrictamente positiva para llegar desde cualquier estado $x < M$ hasta $M$ (basta con una racha ininterrumpida de $M-x$ nacimientos). 
+    En teoría de Cadenas de Markov, esto significa que todos los estados en $\{0, \dots, M-1\}$ son \textbf{transitorios}, y el estado $M$ es el único estado \textbf{recurrente}.
+    Por conservación de la masa, la probabilidad fluye continuamente hacia $M$ y, al ser una trampa con tasa de salida nula, nunca regresa. Conforme el tiempo se extiende al infinito, toda la probabilidad del sistema se acumulará obligatoriamente en ese sumidero:
+    \[ \mathbf{\lim_{t \to \infty} p_t(M) = 1} \]
+\end{proof}
+
+\newpage
+\begin{ejercicio}{Espectro de la Matriz y Velocidad de Absorción}{4.4d}
+    Explique por qué el espectro de la submatriz de $Q$ en $\{0, \dots, M-1\}$ determina la velocidad de absorción.
+\end{ejercicio}
+
+\begin{proof}[\textbf{Explicación Espectral}]
+    Sea $Q_0$ la submatriz principal de tamaño $M \times M$ que resulta de eliminar la fila y columna correspondientes al estado absorbente $M$. Esta matriz "sub-estocástica" rige exclusivamente la evolución de la probabilidad en los estados transitorios:
+    \[ \mathbf{p}_{tr}'(t) = \mathbf{p}_{tr}(t)Q_0 \]
+    
+    La solución analítica estricta a este sistema es la exponencial matricial:
+    \[ \mathbf{p}_{tr}(t) = \mathbf{p}_{tr}(0) e^{t Q_0} \]
+    
+    La "velocidad de absorción" no es otra cosa que el ritmo al cual la masa de probabilidad abandona los estados transitorios para caer en $M$. La probabilidad de no haber sido absorbido al tiempo $t$ depende directamente del decaimiento de la matriz $e^{t Q_0}$.
+    
+    Al aplicar la descomposición espectral, sabemos que el comportamiento asintótico de la exponencial matricial está dictado por las exponenciales de sus eigenvalores (espectro). Dado que $Q_0$ rige un conjunto de estados puramente transitorios hacia una absorción segura, por el Teorema de Perron-Frobenius, todos los eigenvalores de $Q_0$ tienen una \textbf{parte real estrictamente negativa}.
+    
+    Sea $\gamma_1$ el eigenvalor dominante de $Q_0$ (aquel con la parte real negativa más cercana a cero). La suma exponencial estará dominada por este término de decaimiento más lento. Por lo tanto, la probabilidad en los estados transitorios decae asintóticamente proporcional a:
+    \[ e^{\text{Re}(\gamma_1) t} \]
+    
+    \textbf{Conclusión:}
+    El proceso decae hacia cero a un ritmo exponencial determinado precisamente por este eigenvalor principal de la submatriz transitoria $Q_0$. Por lo tanto, el \textbf{espectro de $Q_0$ dicta el exponente de decaimiento}, determinando algebraicamente la \textbf{velocidad de absorción} de todo el sistema físico.
+\end{proof}
+
+\newpage
+\subsection{Cola M/M/1}
+
+
+\begin{ejercicio}{Cola M/M/1}{4.5}
+    Cola M/M/1 en $\mathbb{N}_0$: $q(x, x+1) = \lambda$, $q(x, x-1) = \mu$ para $x \ge 1$, $q(0, 1) = \lambda$.
+    
+    (a) Demuestre que $\pi(x) = (1-\rho)\rho^x$ ($\rho = \lambda/\mu < 1$) satisface el balance detallado y es la probabilidad estacionaria.
+    
+    (b) Calcule $E^\pi[Y_t] = \rho/(1-\rho)$.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{nota}{Condición de Estabilidad}
+    El parámetro $\rho = \lambda/\mu$ se conoce como la \textit{intensidad de tráfico}. La condición $\rho < 1$ garantiza que el servidor procesa trabajos más rápido de lo que llegan ($\mu > \lambda$). Si esta condición no se cumple, la fila crecería indefinidamente y no existiría una distribución estacionaria.
+\end{nota}
+
+\begin{proof}[\textbf{Demostración (a): Balance Detallado y Estacionariedad}]
+    \textbf{1. Verificación del Balance Detallado:} \\
+    La condición de balance detallado en tiempo continuo establece que el flujo de probabilidad entre cualquier par de estados adyacentes debe ser idéntico en ambas direcciones:
+    \[ \pi(x)q(x, x+1) = \pi(x+1)q(x+1, x) \quad \text{para todo } x \ge 0 \]
+    
+    Sustituimos la propuesta $\pi(x) = (1-\rho)\rho^x$ y las tasas del problema ($q(x,x+1)=\lambda$ y $q(x+1,x)=\mu$):
+    \begin{itemize}
+        \item \textbf{Lado izquierdo (flujo hacia arriba):} 
+        \[ \pi(x)\lambda = (1-\rho)\rho^x \lambda \]
+        \item \textbf{Lado derecho (flujo hacia abajo):} 
+        \[ \pi(x+1)\mu = (1-\rho)\rho^{x+1} \mu \]
+    \end{itemize}
+    
+    Recordando que $\rho = \lambda/\mu$, podemos reescribir $\mu = \lambda/\rho$. Sustituyendo esto en el lado derecho:
+    \[ (1-\rho)\rho^{x+1} \left( \frac{\lambda}{\rho} \right) = (1-\rho)\rho^x \rho \left( \frac{\lambda}{\rho} \right) = (1-\rho)\rho^x \lambda \]
+    
+    Ambos lados son matemáticamente idénticos. Por lo tanto, \textbf{satisface el balance detallado}.
+    
+    \vspace{3mm}
+    \textbf{2. Verificación de Probabilidad Estacionaria:} \\
+    Es un teorema fundamental que si una medida satisface el balance detallado, entonces automáticamente satisface las ecuaciones de balance global (es invariante/estacionaria). 
+    Solo falta demostrar que $\pi(x)$ es una verdadera distribución de probabilidad (es decir, que suma 1):
+    \[ \sum_{x=0}^\infty \pi(x) = \sum_{x=0}^\infty (1-\rho)\rho^x = (1-\rho) \sum_{x=0}^\infty \rho^x \]
+    Dado que $\rho < 1$, aplicamos la convergencia de la serie geométrica $\sum_{x=0}^\infty \rho^x = \frac{1}{1-\rho}$:
+    \[ \sum_{x=0}^\infty \pi(x) = (1-\rho) \left( \frac{1}{1-\rho} \right) = \mathbf{1} \]
+    \textit{Queda demostrado que es la única distribución de probabilidad estacionaria del sistema.}
+\end{proof}
+
+\newpage
+
+\begin{proof}[\textbf{Demostración (b): Número Esperado de Clientes en el Sistema}]
+    Queremos calcular la esperanza matemática de la variable aleatoria $Y_t$ 
+    bajo su distribución estacionaria geométrica $\pi$:
+    \[ E^\pi[Y_t] = \sum_{x=0}^\infty x \pi(x) = \sum_{x=0}^\infty x (1-\rho)\rho^x \]
+    
+    Dado que el primer término (cuando $x=0$) es cero, la suma realmente empieza en $x=1$. Factorizamos $(1-\rho)$ y una $\rho$:
+    \[ E^\pi[Y_t] = (1-\rho)\rho \sum_{x=1}^\infty x \rho^{x-1} \]
+    
+    Para resolver esta sumatoria, utilizamos un truco analítico estándar. Sabemos que la serie geométrica es:
+    \[ \sum_{x=0}^\infty \rho^x = \frac{1}{1-\rho} \]
+    
+    Derivamos ambos lados de la ecuación con respecto a $\rho$:
+    \[ \frac{d}{d\rho} \sum_{x=0}^\infty \rho^x = \frac{d}{d\rho} (1-\rho)^{-1} \]
+    \[ \sum_{x=1}^\infty x \rho^{x-1} = (-1)(1-\rho)^{-2}(-1) = \frac{1}{(1-\rho)^2} \]
+    
+    Sustituimos este resultado exacto de vuelta en nuestra ecuación de la esperanza:
+    \[ E^\pi[Y_t] = (1-\rho)\rho \left[ \frac{1}{(1-\rho)^2} \right] \]
+    
+    Cancelamos un factor de $(1-\rho)$ en el numerador y el denominador:
+    \[ \mathbf{E^\pi[Y_t] = \frac{\rho}{1-\rho}} \]
+    
+    \textit{Este es uno de los resultados más famosos de la investigación de operaciones. Nos indica que conforme el tráfico $\rho$ se acerca a 1 (el sistema se satura), el tamaño esperado de la fila crece de forma asintótica hacia el infinito.}
+\end{proof}
+
+\newpage
+
+\vspace{5mm}
+
+\begin{ejercicio}{Ley de Little e Inestabilidad}{4.5c}
+    (c) Use la Ley de Little ($L = \lambda W$) para calcular el tiempo medio de espera de un cliente en el sistema. \\
+    (d) Muestre que si $\rho \ge 1$, el proceso es transiente y $Y_t \to \infty$ en probabilidad.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{nota}{Componentes de la Ley de Little}
+    La Ley de Little es un resultado universal que no depende de las distribuciones de llegada o servicio. Se define como:
+    \begin{itemize}
+        \item $L$: Número medio de clientes en el sistema (lo que llamamos $E^\pi[Y_t]$).
+        \item $\lambda$: Tasa media de llegada de clientes.
+        \item $W$: Tiempo medio que un cliente pasa en el sistema (espera + servicio).
+    \end{itemize}
+\end{nota}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Demostración (c): Cálculo del tiempo de espera $W$}]
+    Del inciso (b), ya conocemos el número esperado de clientes en equilibrio:
+    \[ L = E^\pi[Y_t] = \frac{\rho}{1-\rho} \]
+    
+    Aplicamos la Ley de Little despejando el tiempo medio $W$:
+    \[ W = \frac{L}{\lambda} = \frac{1}{\lambda} \left( \frac{\rho}{1-\rho} \right) \]
+    
+    Sustituimos la definición de la intensidad de tráfico $\rho = \lambda/\mu$:
+    \[ W = \frac{1}{\lambda} \left( \frac{\lambda/\mu}{1 - \lambda/\mu} \right) \]
+    
+    Multiplicamos el numerador y denominador de la fracción interna por $\mu$ para simplificar:
+    \[ W = \frac{1}{\lambda} \left( \frac{\lambda}{\mu - \lambda} \right) \]
+    
+    Cancelamos la tasa de llegada $\lambda$:
+    \[ \mathbf{W = \frac{1}{\mu - \lambda}} \]
+    
+    \textit{Interpretación:} El tiempo que pasas en el banco o esperando a que tu servidor responda es inversamente proporcional a la "capacidad sobrante" del sistema ($\mu - \lambda$). Si la capacidad es muy ajustada, el tiempo de espera explota.
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Demostración (d): Inestabilidad y Transencia}]
+    Analizamos el comportamiento del sistema cuando la tasa de llegada iguala o supera a la de servicio ($\lambda \ge \mu$).
+    
+    \textbf{1. Transencia:} \\
+    Recordemos que la cola M/M/1 es esencialmente una caminata aleatoria en $\mathbb{N}_0$. La probabilidad de retorno al origen (el estado vacío) en una caminata con deriva (drift) depende de la dirección del movimiento neto:
+    \begin{itemize}
+        \item Si $\rho > 1$ ($\lambda > \mu$): El drift es positivo. La partícula tiene una tendencia determinista a alejarse del origen. Por lo tanto, existe una probabilidad positiva de nunca regresar a cero, lo que hace que el proceso sea \textbf{transiente}.
+        \item Si $\rho = 1$ ($\lambda = \mu$): La caminata es simétrica (como la caminata simple en $\mathbb{Z}$). Aunque es recurrente nula (regresa a cero), el tiempo esperado de retorno es infinito. En tiempo continuo, esto se traduce en que no existe una medida de probabilidad que sume 1 (la serie geométrica $\sum 1^x$ diverge).
+    \end{itemize}
+    
+    \textbf{2. Divergencia en Probabilidad:} \\
+    Consideremos la evolución temporal de la esperanza de $Y_t$. La tasa de cambio instantánea es $\frac{d}{dt} E[Y_t] = \lambda - \mu$ (mientras $Y_t > 0$).
+    Integrando respecto al tiempo:
+    \[ E[Y_t] \approx (\lambda - \mu)t + Y_0 \]
+    
+    Si $\lambda > \mu$, entonces $(\lambda - \mu) > 0$. Al tomar el límite cuando $t \to \infty$:
+    \[ \lim_{t \to \infty} E[Y_t] = \infty \]
+    
+    Por la desigualdad de Markov o analizando la caminata con deriva, para cualquier valor $K > 0$, la probabilidad de que la fila sea menor a $K$ tiende a cero:
+    \[ \mathbf{P(Y_t > K) \to 1 \quad \text{cuando } t \to \infty} \]
+    Esto significa que \textbf{$Y_t \to \infty$ en probabilidad}. El sistema colapsa porque la fila crece más rápido de lo que puede ser atendida.
+\end{proof}
+
+\newpage
+\subsection{Reversibilidad en tiempo continuo}
+
+\begin{ejercicio}{Reversibilidad en tiempo continuo}{4.6}
+    Sea $(Y_t)$ irreducible en $S$ con generador $q(x,y)$ y medida estacionaria $\pi$.
+    
+    (a) Demuestre que $(Y_t)$ es reversible en el tiempo si y solo si satisface el balance detallado: $\pi(x)q(x,y) = \pi(y)q(y,x)$ para todo $x \neq y$.
+    
+    (b) Demuestre que todo proceso de nacimiento-muerte con medida estacionaria es reversible.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{nota}{Simetría Probabilística}
+    La reversibilidad implica que la probabilidad de observar una trayectoria de estados es igual a la probabilidad de observar la trayectoria inversa. Esta propiedad simplifica enormemente el cálculo de medidas estacionarias, ya que el balance detallado es una condición mucho más fuerte (y fácil de verificar) que el balance global.
+\end{nota}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Demostración (a): Equivalencia del Balance Detallado}]
+    Un proceso es reversible si para cualquier par de estados $x, y$ y cualquier tiempo $t$, se cumple:
+    \[ P(Y_0 = x, Y_t = y) = P(Y_0 = y, Y_t = x) \]
+    
+    Usando la definición de probabilidad condicional y el semigrupo de transición $P_t$:
+    \[ \pi(x) P_t(x, y) = \pi(y) P_t(y, x) \]
+    
+    \textbf{1. Ida ($\implies$):} \\
+    Si el proceso es reversible, derivamos la identidad anterior con respecto a $t$ y evaluamos en $t=0$:
+    \[ \frac{d}{dt} \Big|_{t=0} [\pi(x) P_t(x, y)] = \frac{d}{dt} \Big|_{t=0} [\pi(y) P_t(y, x)] \]
+    Dado que $\frac{d}{dt} P_t \big|_{t=0} = \mathcal{A}$ (el generador), y para $x \neq y$ la entrada del generador es la tasa $q(x, y)$, obtenemos:
+    \[ \mathbf{\pi(x) q(x, y) = \pi(y) q(y, x)} \]
+    \textit{Se cumple el balance detallado.}
+
+    \vspace{3mm}
+    \textbf{2. Regreso ($\impliedby$):} \\
+    Supongamos que se cumple el balance detallado $\pi q = q^T \pi$. En forma matricial, esto es $\text{diag}(\pi) \mathcal{A} = \mathcal{A}^T \text{diag}(\pi)$. 
+    Como $P_t = e^{t\mathcal{A}}$, podemos expandir en serie de Taylor:
+    \[ \text{diag}(\pi) P_t = \text{diag}(\pi) \sum \frac{t^k \mathcal{A}^k}{k!} = \sum \frac{t^k}{k!} (\text{diag}(\pi) \mathcal{A}^k) \]
+    Por inducción, si $\text{diag}(\pi) \mathcal{A} = \mathcal{A}^T \text{diag}(\pi)$, entonces $\text{diag}(\pi) \mathcal{A}^k = (\mathcal{A}^T)^k \text{diag}(\pi)$.
+    Por lo tanto:
+    \[ \text{diag}(\pi) P_t = P_t^T \text{diag}(\pi) \implies \mathbf{\pi(x) P_t(x, y) = \pi(y) P_t(y, x)} \]
+    \textit{El proceso es reversible.}
+\end{proof}
+
+\newpage
+
+\begin{proof}[\textbf{Demostración (b): Reversibilidad en Nacimiento-Muerte}]
+    En un proceso de nacimiento-muerte, las transiciones solo ocurren entre estados vecinos ($x \leftrightarrow x+1$). 
+    
+    Para cualquier par de estados que \textbf{no} sean vecinos, $q(x, y) = 0$ y $q(y, x) = 0$, por lo que la ecuación $0 = 0$ se cumple trivialmente.
+    
+    Para estados vecinos $x$ y $x+1$, la medida estacionaria se construye precisamente resolviendo las ecuaciones de balance local:
+    \[ \pi(x) \lambda_x = \pi(x+1) \mu_{x+1} \]
+    Donde $\lambda_x = q(x, x+1)$ es la tasa de nacimiento y $\mu_{x+1} = q(x+1, x)$ es la tasa de muerte.
+    Sustituyendo las tasas:
+    \[ \mathbf{\pi(x) q(x, x+1) = \pi(x+1) q(x+1, x)} \]
+    
+    Como el balance detallado se cumple para todos los pares de estados posibles en la estructura de la gráfica (que es un camino lineal), por el inciso (a) concluimos que \textbf{todo proceso de nacimiento-muerte es reversible}.
+\end{proof}
+
+\newpage
+
+
+\begin{ejercicio}{Verificación de Reversibilidad y Contraejemplo}{4.6c}
+    (c) Verifique que la cola M/M/1 con $\rho < 1$ es reversible. Deduzca su medida estacionaria directamente del balance detallado. \\
+    (d) Construya un proceso irreducible en $\{1, 2, 3\}$ que no sea reversible. Verifique que el balance detallado falla para algún par.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{proof}[\textbf{Demostración (c): Reversibilidad en M/M/1}]
+    La cola M/M/1 es, por definición, un proceso de nacimiento-muerte sobre el espacio de estados $\mathbb{N}_0$, con tasas de nacimiento $\lambda$ y muerte $\mu$. 
+    Como demostramos en el inciso (b), \textbf{todo proceso de nacimiento-muerte con medida estacionaria es reversible}.
+    
+    Para deducir la medida $\pi$, planteamos la ecuación de balance detallado para estados vecinos:
+    \[ \pi(n)\lambda = \pi(n+1)\mu \implies \pi(n+1) = \left(\frac{\lambda}{\mu}\right)\pi(n) = \rho \pi(n) \]
+    
+    Esta es una relación de recurrencia que define una progresión geométrica:
+    \[ \pi(n) = \rho^n \pi(0) \]
+    
+    Usando la condición de normalización $\sum_{n=0}^\infty \pi(n) = 1$:
+    \[ \pi(0) \sum_{n=0}^\infty \rho^n = 1 \implies \pi(0) \left(\frac{1}{1-\rho}\right) = 1 \implies \pi(0) = 1-\rho \]
+    
+    Sustituyendo $\pi(0)$, recuperamos la medida estacionaria del Ejercicio 4.5:
+    \[ \mathbf{\pi(n) = (1-\rho)\rho^n} \]
+    \textit{La simplicidad de este cálculo comparado con resolver el balance global (ecuaciones algebraicas simultáneas) demuestra el poder de la propiedad de reversibilidad.}
+\end{proof}
+
+\newpage
+
+\begin{proof}[\textbf{Construcción (d): El Ciclo no Reversible}]
+    Para que un proceso no sea reversible, debemos romper la simetría de los flujos. La forma más sencilla es crear un \textbf{ciclo orientado} de probabilidad.
+    
+    Consideremos un proceso irreducible en $\{1, 2, 3\}$ con el siguiente generador $\mathcal{A}$ (matriz de tasas):
+    \[
+    \mathcal{A} = \begin{pmatrix}
+    -1 & 1 & 0 \\
+    0 & -1 & 1 \\
+    1 & 0 & -1
+    \end{pmatrix}
+    \]
+    En este proceso, el flujo solo va en una dirección: $1 \to 2 \to 3 \to 1$.
+    Por simetría de la matriz (es una matriz circulante), la medida estacionaria es uniforme: $\mathbf{\pi = [1/3, 1/3, 1/3]}$.
+    
+    \textbf{Verificación de la falla del Balance Detallado:} \\
+    Evaluamos el par $(1, 2)$:
+    \begin{itemize}
+        \item Flujo $1 \to 2$: $\pi(1)q(1, 2) = (1/3)(1) = 1/3$
+        \item Flujo $2 \to 1$: $\pi(2)q(2, 1) = (1/3)(0) = 0$
+    \end{itemize}
+    Como $1/3 \neq 0$, \textbf{el balance detallado falla}. 
+    
+    \textit{Interpretación:} Si grabamos este proceso, veríamos a la partícula rotar siempre en el sentido de las manecillas del reloj. Si proyectamos el video en reversa, la veríamos rotar en sentido contrario. Como el video original y el de reversa son distinguibles, el proceso \textbf{no es reversible}.
+\end{proof}
+
+\newpage
+\subsection{Cadena encajada y construcción}
+
+\vspace{5mm}
+
+\begin{ejercicio}{Cadena encajada y construcción}{4.7}
+    Sea $(Y_t)$ con generador $q(x,y)$ y tasa total $q(x) = \sum_{y \neq x} q(x,y) < \infty$.
+    
+    (a) Demuestre la construcción por saltos: $(Y_t)$ se obtiene de la cadena encajada $(Z_n)$ con $\tilde{p}(x,y) = q(x,y)/q(x)$ y tiempos de permanencia $\Delta_n \sim \text{Exp}(q(Z_{n-1}))$.
+    
+    (b) Justifique el algoritmo de Gillespie: (a) generar $\Delta t \sim \text{Exp}(q(x))$; (b) elegir $y$ con probabilidad $\tilde{p}(x,y)$.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{nota}{Construcción Dinámica}
+    Físicamente, el sistema en el estado $x$ está "compitiendo" por saltar a diferentes estados vecinos $y$. Cada posible transición tiene un reloj exponencial independiente con tasa $q(x,y)$. El primer reloj en sonar determina a dónde va el sistema y cuánto tiempo esperó.
+\end{nota}
+
+\begin{proof}[\textbf{Demostración (a): Construcción por Saltos}]
+    Sea el proceso en el estado $x$. Para cada $y \in S \setminus \{x\}$, definimos una variable $T_{xy} \sim \text{Exp}(q(x,y))$ que representa el tiempo que tardaría el proceso en saltar específicamente a $y$.
+    
+    \textbf{1. Tiempo de permanencia ($\Delta$):} \\
+    El tiempo que el proceso permanece en $x$ es el mínimo de todos los relojes posibles:
+    \[ \Delta = \min_{y \neq x} \{ T_{xy} \} \]
+    Por propiedades de la distribución exponencial, el mínimo de exponenciales independientes es también una exponencial cuya tasa es la suma de las tasas individuales:
+    \[ \Delta \sim \text{Exp}\left( \sum_{y \neq x} q(x,y) \right) = \mathbf{\text{Exp}(q(x))} \]
+    
+    \textbf{2. Probabilidad de transición ($\tilde{p}$):} \\
+    La probabilidad de que el proceso salte al estado $j$ es la probabilidad de que el reloj $T_{xj}$ sea el primero en sonar:
+    \[ \tilde{p}(x,j) = P(T_{xj} = \min_{y \neq x} T_{xy}) \]
+    Nuevamente, por propiedades de la exponencial, esta probabilidad es proporcional a la tasa del evento ganador sobre la tasa total:
+    \[ \mathbf{\tilde{p}(x,j) = \frac{q(x,j)}{\sum_{y \neq x} q(x,y)} = \frac{q(x,j)}{q(x)}} \]
+\end{proof}
+
+\newpage
+
+\begin{proof}[\textbf{Justificación (b): Algoritmo de Gillespie}]
+    El algoritmo de Gillespie (o Método de Monte Carlo Cinético) se justifica directamente por los resultados del inciso (a). Para simular la trayectoria de un sistema complejo:
+    
+    \begin{enumerate}
+        \item \textbf{Paso de Tiempo:} En lugar de avanzar en pasos de tiempo fijos $\Delta t$ (que pueden ser imprecisos), el algoritmo calcula el tiempo exacto al que ocurrirá el \textit{próximo} evento basándose en la tasa total de salida del estado actual $q(x)$. Esto garantiza que no se pierdan eventos rápidos y que no se pierda tiempo computacional en estados lentos.
+        \item \textbf{Selección de Evento:} Una vez determinado \textit{cuándo} ocurre algo, se decide \textit{qué} ocurre tirando un dado pesado con las probabilidades de la cadena encajada $\tilde{p}(x,y)$.
+    \end{enumerate}
+    
+    \textit{Conclusión:} Esta construcción es exacta y no una aproximación, porque respeta la propiedad de Markov (falta de memoria) y la naturaleza estocástica de las tasas infinitesimales del generador.
+\end{proof}
+\newpage
+
+\begin{ejercicio}{Explosión y Medida Estacionaria}{4.7cd}
+    (c) ¿Bajo qué condición sobre $q(x)$ puede ocurrir explosión en tiempo finito? Dé un ejemplo explícito en $S = \mathbb{N}_0$. \\
+    (d) Relacione la medida estacionaria de $(Y_t)$ con la de la cadena encajada $(Z_n)$.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{nota}{El concepto de Explosión}
+    Un proceso estocástico \textit{explota} si realiza una cantidad infinita de saltos en un intervalo de tiempo finito. Esto ocurre cuando los tiempos de permanencia en los estados se vuelven cada vez más cortos tan rápido que su suma total converge a un valor finito $\zeta < \infty$ (el tiempo de explosión).
+\end{nota}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Demostración (c): Condición de Explosión}]
+    Sea $\Delta_n \sim \text{Exp}(q(Z_{n-1}))$ el tiempo que el proceso pasa en el $n$-ésimo estado visitado. El tiempo total para realizar $n$ saltos es $T_n = \sum_{i=1}^n \Delta_i$. 
+    Decimos que hay explosión si el límite de estos tiempos es finito: $P(\lim_{n \to \infty} T_n < \infty) > 0$.
+    
+    \textbf{1. Condición necesaria y suficiente:} \\
+    Para que ocurra explosión, la suma de los valores esperados de los tiempos de permanencia debe converger:
+    \[ \mathbf{\sum_{n=1}^\infty \frac{1}{q(Z_n)} < \infty} \]
+    Si las tasas de salida $q(x)$ crecen lo suficientemente rápido conforme el proceso se aleja, el tiempo "se acaba" antes de que el proceso deje de saltar.
+
+    \textbf{2. Ejemplo explícito en $S = \mathbb{N}_0$:} \\
+    Consideremos un proceso de puro nacimiento donde la tasa de salto desde el estado $n$ es $q(n) = 2^n$ (o cualquier potencia $n^p$ con $p > 1$). 
+    El tiempo esperado de explosión desde el origen sería:
+    \[ E[T_\infty] = \sum_{n=0}^\infty \frac{1}{2^n} = \frac{1}{1 - 1/2} = 2 \text{ unidades de tiempo} \]
+    \textit{Interpretación:} En solo 2 segundos, el proceso habrá visitado una cantidad infinita de estados y se habrá "escapado" del espacio de estados numerable.
+\end{proof}
+
+\newpage
+
+\begin{proof}[\textbf{Demostración (d): Relación de Medidas Estacionarias}]
+    Sea $\pi$ la medida estacionaria del proceso en tiempo continuo $(Y_t)$ y $\nu$ la medida estacionaria de su cadena encajada $(Z_n)$.
+    
+    La cadena encajada solo cuenta los \textit{saltos}, ignorando cuánto tiempo se queda el proceso en cada lugar. Sin embargo, en el tiempo continuo, un estado es "más importante" (tiene más peso en $\pi$) si la cadena lo visita seguido \textbf{y} si se queda mucho tiempo en él.
+    
+    Como el tiempo medio de estancia en $x$ es $1/q(x)$, la relación es:
+    \[ \mathbf{\pi(x) \propto \frac{\nu(x)}{q(x)}} \]
+    
+    Para que $\pi$ sea una probabilidad normalizada, dividimos por la suma total:
+    \[ \mathbf{\pi(x) = \frac{\nu(x)/q(x)}{\sum_{y \in S} \nu(y)/q(y)}} \]
+    
+\end{proof}
+
+\newpage 
+\section{Lim}
+
 
 \end{document}

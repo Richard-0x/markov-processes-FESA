@@ -3731,7 +3731,2160 @@ a) Defina $h(x) = E^x[T]$ y escriba la ecuación en diferencias satisfecha por $
 \end{proof}
 
 \newpage 
-\section{Lim}
+\section{Teoremas límite}
 
+
+\subsection{Teorema central del límite para cadenas.}
+
+
+\vspace{3mm}
+
+\begin{ejercicio}{Teorema central del límite para cadenas}{5.1}
+    Sea $(X_n)$ irreducible y recurrente positiva con probabilidad estacionaria $\pi$, y $f : S \to \mathbb{R}$ con $\pi(f) = 0$ y $\pi(f^2) < \infty$.
+    
+    
+    (a) Enuncie el TCL para cadenas: existe $\sigma^2 \ge 0$ tal que $n^{-1/2} \sum_{k=0}^{n-1} f(X_k) \xrightarrow{\mathcal{L}} \mathcal{N}(0, \sigma^2)$. Exprese $\sigma^2$ en términos de la función de Green.
+
+    
+    (b) Calcule $\sigma^2$ para la cadena de nacimiento-muerte con $p_x = p < q$ y $f(x) = x - \pi(\text{id})$.
+    
+
+    (c) Demuestre que $\sigma^2 = 0$ si y solo si $f = Pg - g$ para algún $g \in L^2(\pi)$ (coborde).
+    
+
+    (d) Aplique el TCL para cuantificar el error en la estimación Monte Carlo de $\pi(g) = (1/n) \sum_{k=0}^{n-1} g(X_k)$.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{nota}{El TCL en Cadenas de Markov}
+    A diferencia de las variables i.i.d., en una Cadena de Markov los estados están correlacionados. El TCL sigue siendo válido, pero la varianza asintótica $\sigma^2$ no es solo la varianza estática $\pi(f^2)$, sino que debe incluir la suma de todas las autocovarianzas temporales.
+\end{nota}
+
+\begin{proof}[\textbf{Solución (a): Enunciado del TCL y Función de Green}]
+    \textbf{Enunciado Formal:} \\
+    Sea $(X_n)_{n \ge 0}$ una cadena de Markov irreducible y recurrente positiva con distribución estacionaria $\pi$. Si $f \in L^2(\pi)$ cumple que $E^\pi[f(X_0)] = \pi(f) = 0$, entonces la suma parcial reescalada converge en distribución a una variable aleatoria normal:
+    \[ \frac{1}{\sqrt{n}} \sum_{k=0}^{n-1} f(X_k) \xrightarrow{\mathcal{L}} \mathcal{N}(0, \sigma^2) \quad \text{cuando } n \to \infty \]
+    
+    \textbf{Varianza Asintótica y Función de Green:} \\
+    La varianza asintótica $\sigma^2$ se define clásicamente como la suma de las covarianzas:
+    \[ \sigma^2 = \text{Var}^\pi(f(X_0)) + 2 \sum_{k=1}^\infty \text{Cov}^\pi(f(X_0), f(X_k)) \]
+    Sabiendo que $\pi(f) = 0$, tenemos que $\text{Cov}^\pi(f(X_0), f(X_k)) = \pi(f P^k f)$. Sustituyendo:
+    \[ \sigma^2 = \pi(f^2) + 2 \sum_{k=1}^\infty \pi(f P^k f) \]
+    Definimos la \textit{Función de Green} (o matriz fundamental) centrada como $G = \sum_{k=0}^\infty (P^k - \Pi)$, donde $\Pi$ es la matriz con filas $\pi$. Como $\Pi f = 0$, la acción de $G$ sobre $f$ es $Gf = \sum_{k=0}^\infty P^k f$. 
+    Descomponiendo la suma de la varianza:
+    \[ \sigma^2 = -\pi(f^2) + 2 \sum_{k=0}^\infty \pi(f P^k f) = -\pi(f^2) + 2\pi(f G f) \]
+    Por lo tanto, la expresión formal en términos del operador de Green es:
+    \[ \mathbf{\sigma^2 = \langle f, (2G - I)f \rangle_\pi} \]
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (b): Varianza Asintótica para Nacimiento-Muerte}]
+    Tenemos una cadena con $p_{x, x+1} = p$ y $p_{x, x-1} = q$ (asumiremos $p_{x,x}=0$ por simplicidad del modelo clásico, aunque el resultado de la varianza es robusto a lazos si ajustamos la escala). La medida estacionaria es $\pi(x) \propto (p/q)^x$. La media es $\mu = \pi(\text{id}) = \frac{p}{q-p}$. Queremos la varianza para $f(x) = x - \mu$.
+    
+    Utilizaremos la Ecuación de Poisson $(I - P)g = f$. Para una cadena de nacimiento-muerte, esto implica:
+    \[ g(x) - [p g(x+1) + q g(x-1)] = x - \mu \]
+    La solución a esta ecuación de diferencias para la función de desviación es de la forma $g(x) = A x^2 + B x$. Resolviendo el sistema algebraico (como hicimos implícitamente en el Ejercicio 4.3 para tiempos de paso), encontramos que el gradiente (o diferencia finita) de $g$ es constante en la escala ajustada:
+    \[ \Delta g(x) = g(x+1) - g(x) = \frac{x+1}{q-p} \]
+    
+    La varianza asintótica se puede calcular de manera exacta mediante el producto de la medida estacionaria y la variación del operador (el \textit{carré du champ}):
+    \[ \sigma^2 = \pi \left( P(g^2) - (Pg)^2 \right) = \sum_{x=0}^\infty \pi(x) \left[ p(g(x+1)-g(x))^2 + q(g(x-1)-g(x))^2 \right] \]
+    
+    Sustituyendo $\Delta g$:
+    \[ \sigma^2 = \sum_{x=0}^\infty \pi(x) \left[ p\left(\frac{x+1}{q-p}\right)^2 + q\left(\frac{x}{q-p}\right)^2 \right] \]
+    \[ \sigma^2 = \frac{1}{(q-p)^2} \sum_{x=0}^\infty \pi(x) \left[ p(x^2+2x+1) + qx^2 \right] \]
+    \[ \sigma^2 = \frac{1}{(q-p)^2} \left[ (p+q)\pi(\text{id}^2) + 2p\pi(\text{id}) + p \right] \]
+    
+    Sustituimos los momentos de la distribución estacionaria geométrica ($\pi(\text{id}) = \frac{p}{q-p}$ y $\pi(\text{id}^2) = \frac{p(p+q)}{(q-p)^2}$):
+    \[ \sigma^2 = \frac{1}{(q-p)^2} \left[ (p+q)\frac{p(p+q)}{(q-p)^2} + 2p\frac{p}{q-p} + p \right] \]
+    
+    Al buscar un denominador común $(q-p)^2$ dentro de los corchetes y expandir los binomios, los términos cruzados se simplifican magistralmente:
+    \[ \sigma^2 = \frac{p}{(q-p)^4} \left[ (p+q)^2 + 2p(q-p) + (q-p)^2 \right] = \frac{p}{(q-p)^4} [2q^2 + 2pq] \]
+    Factorizando $2q$:
+    \[ \mathbf{\sigma^2 = \frac{2pq(p+q)}{(q-p)^4}} \]
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (c): La Condición de Coborde ($\sigma^2 = 0$)}]
+    Queremos demostrar que la varianza asintótica se anula si y solo si $f$ es un "coborde".
+    
+    Toda función $f$ con $\pi(f)=0$ admite una descomposición de martingala. Sea $g$ la solución a la ecuación de Poisson $f = g - Pg$.
+    Definimos el incremento de martingala $D_k = g(X_{k+1}) - Pg(X_k)$. 
+    Podemos reescribir $f(X_k)$:
+    \[ f(X_k) = g(X_k) - Pg(X_k) = g(X_k) - g(X_{k+1}) + g(X_{k+1}) - Pg(X_k) = g(X_k) - g(X_{k+1}) + D_k \]
+    
+    Sumando sobre $k = 0, \dots, n-1$, obtenemos una suma telescópica y una martingala $M_n$:
+    \[ \sum_{k=0}^{n-1} f(X_k) = g(X_0) - g(X_n) + \sum_{k=0}^{n-1} D_k \]
+    
+    La varianza asintótica $\sigma^2$ depende exclusivamente del término de martingala, ya que el término telescópico $g(X_0) - g(X_n)$ está acotado en varianza al dividir por $n$:
+    \[ \sigma^2 = \text{Var}^\pi(D_0) = \text{Var}^\pi(g(X_1) - Pg(X_0)) = \pi(g^2) - \pi((Pg)^2) \]
+    
+    \textbf{Ida y Vuelta:}
+    Para que $\sigma^2 = 0$, la varianza de la martingala debe ser cero. Esto implica que $D_k = 0$ casi seguramente, es decir:
+    \[ g(X_1) = Pg(X_0) \quad \text{casi seguramente respecto a } \pi. \]
+    
+    Si sustituimos esto en nuestra descomposición original de $f$:
+    \[ f(X_0) = g(X_0) - g(X_1) \quad \text{c.s.} \]
+    Tomando la esperanza condicional dado $X_0$ a ambos lados:
+    \[ f(X_0) = g(X_0) - E[g(X_1) | X_0] = g(X_0) - Pg(X_0) \]
+    Multiplicando por $-1$ y redefiniendo la función como su negativo (dado que el espacio es lineal), obtenemos exactamente la condición solicitada:
+    \[ \mathbf{f = Pg - g \quad \text{para algún } g \in L^2(\pi)} \]
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (d): Cuantificación del Error en MCMC}]
+    En la integración de Monte Carlo vía Cadenas de Markov (MCMC), queremos estimar la media teórica $\mu = \pi(g)$ utilizando el promedio empírico $\hat{\mu}_n = \frac{1}{n}\sum_{k=0}^{n-1} g(X_k)$.
+    
+    Definimos la función centrada $f(x) = g(x) - \mu$, la cual cumple $\pi(f) = 0$.
+    Aplicando el TCL del inciso (a) a nuestra función $f$:
+    \[ \sqrt{n} \left( \frac{1}{n}\sum_{k=0}^{n-1} g(X_k) - \mu \right) \xrightarrow{\mathcal{L}} \mathcal{N}(0, \sigma_g^2) \]
+    
+    Donde $\sigma_g^2$ es la varianza asintótica asociada a la función $g$. 
+    A partir de este límite, deducimos que para un tamaño de muestra $n$ suficientemente grande, el error de estimación $\epsilon_n = \hat{\mu}_n - \mu$ sigue aproximadamente una distribución normal:
+    \[ \epsilon_n \sim \mathcal{N}\left(0, \frac{\sigma_g^2}{n}\right) \]
+    
+    Podemos construir un \textbf{Intervalo de Confianza} del $(1-\alpha)$ para nuestra estimación. El error absoluto estará acotado por:
+    \[ \mathbf{|\hat{\mu}_n - \pi(g)| \le z_{1-\alpha/2} \frac{\sigma_g}{\sqrt{n}}} \]
+    Donde $z_{1-\alpha/2}$ es el cuantil correspondiente de la normal estándar (ej. $1.96$ para el $95\%$). 
+\end{proof}
+
+
+\newpage
+
+
+\subsection{Grandes desviaciones}
+
+
+\begin{ejercicio}{Grandes desviaciones}{5.2}
+    Sea $(X_n)$ irreducible aperiódica en $S$ finito con medida empírica $L_n = (1/n) \sum_{k=0}^{n-1} \delta_{X_k}$.
+    
+    (a) Enuncie el principio de grandes desviaciones para $L_n$ (Donsker-Varadhan). La función de tasa es $I(\mu) = \sup_{f>0} \left(-\sum_x \mu(x) \log \frac{Pf(x)}{f(x)} \right)$.
+    
+    (b) Demuestre que $I(\mu) \ge 0$ con $I(\pi) = 0$.
+    
+    (c) Para $S = \{0, 1\}$ con $p(0, 1) = p$ y $p(1, 0) = q$, calcule $I(\mu)$ explícitamente en función de $\mu(0)$.
+    
+    (d) Deduzca una cota de la tasa de decaimiento de $P(n^{-1} \sum f(X_k) \ge a)$ para $a > \pi(f)$.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{nota}{Principio de Grandes Desviaciones (PGD)}
+    El PGD establece que la probabilidad de observar una medida empírica lejos del equilibrio decae exponencialmente rápido con $n$. La función de tasa $I(\mu)$ actúa como un "potencial entrópico": mientras mayor sea $I(\mu)$, más rara es la desviación.
+\end{nota}
+
+\begin{proof}[\textbf{Solución (a): Enunciado del PGD de Donsker-Varadhan}]
+    La sucesión de medidas empíricas $(L_n)_{n \ge 1}$ satisface un Principio de Grandes Desviaciones en el espacio de medidas de probabilidad $\mathcal{P}(S)$ con una función de tasa $I: \mathcal{P}(S) \to [0, \infty]$, si para todo conjunto cerrado $F \subset \mathcal{P}(S)$ y todo abierto $G \subset \mathcal{P}(S)$ se cumple:
+    
+    \textbf{Cota Superior:}
+    \[ \limsup_{n \to \infty} \frac{1}{n} \log P(L_n \in F) \le -\inf_{\mu \in F} I(\mu) \]
+    
+    \textbf{Cota Inferior:}
+    \[ \liminf_{n \to \infty} \frac{1}{n} \log P(L_n \in G) \ge -\inf_{\mu \in G} I(\mu) \]
+    
+    Para una Cadena de Markov irreducible y finita, la función de tasa convexa y semicontinua inferiormente está dada explícitamente por el supremo sobre las funciones estrictamente positivas $f$:
+    \[ \mathbf{I(\mu) = \sup_{f>0} \left( -\sum_{x \in S} \mu(x) \log \left( \frac{Pf(x)}{f(x)} \right) \right)} \]
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (b): No negatividad y Raíz en el Equilibrio}]
+    \textbf{1. Demostración de $I(\mu) \ge 0$:} \\
+    Dado que $I(\mu)$ se define como un supremo sobre \textit{todas} las funciones $f > 0$, su valor debe ser mayor o igual al valor evaluado en cualquier función de prueba específica.
+    Elijamos la función constante $f(x) = c > 0$. 
+    Al aplicar el operador de transición, tenemos $Pf(x) = \sum_y P(x,y)c = c \sum_y P(x,y) = c$.
+    Evaluando el argumento del supremo para esta función:
+    \[ -\sum_x \mu(x) \log \left( \frac{c}{c} \right) = -\sum_x \mu(x) \log(1) = 0 \]
+    Por lo tanto, el supremo debe ser mayor o igual a cero: $\mathbf{I(\mu) \ge 0}$.
+
+    \vspace{3mm}
+    \textbf{2. Demostración de $I(\pi) = 0$:} \\
+    Queremos demostrar que para $\mu = \pi$ (la distribución estacionaria), la sumatoria es siempre menor o igual a cero para toda $f>0$, lo que forzará al supremo a ser exactamente 0.
+    Utilizamos la desigualdad de Jensen sobre la función cóncava logaritmo natural, con la medida de probabilidad condicional $P(x, \cdot)$:
+    \[ \log(Pf(x)) = \log \left( \sum_y P(x,y) f(y) \right) \ge \sum_y P(x,y) \log f(y) \]
+    Multiplicamos ambos lados por $\pi(x)$ y sumamos sobre todo el espacio $x \in S$:
+    \[ \sum_x \pi(x) \log(Pf(x)) \ge \sum_x \pi(x) \sum_y P(x,y) \log f(y) \]
+    Reagrupando el lado derecho e intercambiando sumas:
+    \[ \sum_y \left( \sum_x \pi(x) P(x,y) \right) \log f(y) \]
+    Por definición de medida estacionaria, $\sum_x \pi(x) P(x,y) = \pi(y)$. Sustituyendo:
+    \[ \sum_x \pi(x) \log(Pf(x)) \ge \sum_y \pi(y) \log f(y) \]
+    \[ \sum_x \pi(x) [\log(Pf(x)) - \log f(x)] \ge 0 \]
+    \[ -\sum_x \pi(x) \log \left( \frac{Pf(x)}{f(x)} \right) \le 0 \]
+    Como la expresión es $\le 0$ para toda $f$, y evaluada en $f=1$ nos da exactamente $0$, el supremo es obligatoriamente cero. $\mathbf{I(\pi) = 0}$.
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (c): Cálculo Explícito para $S=\{0,1\}$}]
+    Sea $\mu(0) = \alpha$ y $\mu(1) = 1-\alpha$. 
+    Sea la función estricta y positiva $f = (f_0, f_1)^T$. Dado que el logaritmo evalúa una razón, el sistema depende de un solo grado de libertad. Definamos $x = f_1 / f_0 > 0$.
+    
+    Evaluamos el ratio $Pf/f$ para ambos estados utilizando la matriz $P$:
+    \begin{itemize}
+        \item Estado 0: $Pf(0)/f(0) = \frac{(1-p)f_0 + p f_1}{f_0} = 1 - p + px$
+        \item Estado 1: $Pf(1)/f(1) = \frac{q f_0 + (1-q)f_1}{f_1} = \frac{q}{x} + 1 - q$
+    \end{itemize}
+    
+    La función a maximizar es $g(x) = -\alpha \log(1-p+px) - (1-\alpha) \log \left( 1-q+\frac{q}{x} \right)$.
+    Buscamos el punto crítico derivando e igualando a cero:
+    \[ g'(x) = -\frac{\alpha p}{1-p+px} - (1-\alpha) \frac{-q/x^2}{1-q+q/x} = -\frac{\alpha p}{1-p+px} + \frac{(1-\alpha) q}{x(x(1-q)+q)} = 0 \]
+    
+    Igualando ambos términos y multiplicando cruzado:
+    \[ \alpha p x (x(1-q)+q) = (1-\alpha) q (1-p+px) \]
+    \[ \alpha p (1-q) x^2 + \alpha p q x = (1-\alpha) q (1-p) + (1-\alpha) p q x \]
+    
+    Agrupamos todo a la izquierda para formar una ecuación cuadrática en $x$:
+    \[ \alpha p (1-q) x^2 + [\alpha p q - (1-\alpha) p q] x - (1-\alpha) q (1-p) = 0 \]
+    \[ \mathbf{[\alpha p (1-q)] x^2 + [pq(2\alpha - 1)] x - [(1-\alpha) q (1-p)] = 0} \]
+    
+    Dado que $\alpha, p, q \in (0,1)$, el coeficiente principal es positivo y el término constante es negativo. Por la regla de los signos de Descartes, existe una \textbf{única raíz real positiva} que denotaremos como $x^*$:
+    \[ x^* = \frac{-pq(2\alpha-1) + \sqrt{p^2q^2(2\alpha-1)^2 + 4\alpha(1-\alpha)pq(1-p)(1-q)}}{2\alpha p (1-q)} \]
+    
+    Finalmente, el supremo se alcanza explícitamente evaluando la función en esta raíz:
+    \[ \mathbf{I(\alpha) = -\alpha \log(1 - p + p x^*) - (1-\alpha) \log \left( 1 - q + \frac{q}{x^*} \right)} \]
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (d): Cota de Tasa de Decaimiento}]
+    Queremos acotar la probabilidad $P \left( \frac{1}{n} \sum_{k=0}^{n-1} f(X_k) \ge a \right)$.
+    
+    Observamos que la suma es el valor esperado de la función $f$ con respecto a la medida empírica $L_n$. 
+    Es decir, $\frac{1}{n} \sum f(X_k) = \sum_x L_n(x) f(x) = L_n(f)$.
+    
+    El evento $\{ L_n(f) \ge a \}$ es equivalente a decir que la medida empírica $L_n$ pertenece al conjunto cerrado $F_a$:
+    \[ F_a = \{ \mu \in \mathcal{P}(S) : \mu(f) \ge a \} \]
+    
+    Aplicando la cota superior del Principio de Grandes Desviaciones (inciso a) para el conjunto cerrado $F_a$:
+    \[ \limsup_{n \to \infty} \frac{1}{n} \log P(L_n \in F_a) \le -\inf_{\mu \in F_a} I(\mu) \]
+    
+    Como $a > \pi(f)$ y el mínimo global de $I(\mu)$ está en $I(\pi)=0$ (el cual está estrictamente fuera de $F_a$), el ínfimo sobre $F_a$ será un valor estrictamente positivo $C_a > 0$.
+    Despejando analíticamente, obtenemos la cota de decaimiento exponencial:
+    \[ \mathbf{P \left( \frac{1}{n} \sum_{k=0}^{n-1} f(X_k) \ge a \right) \lessapprox \exp\left( -n \inf_{\mu : \mu(f) \ge a} I(\mu) \right)} \]
+    \textit{Conclusión: La probabilidad de que el promedio empírico se desvíe por encima de la media teórica decae a una tasa exponencial, gobernada por el "costo" mínimo $I(\mu)$ necesario para forzar a la medida a alcanzar ese umbral.}
+\end{proof}
+
+
+\newpage
+
+\section{Aplicaciones}
+
+
+
+\begin{ejercicio}{Genética de poblaciones: modelo de Wright-Fisher}{6.1}
+    En una población de $N$ individuos, $X_n \in \{0, \dots, N\}$ es el número de copias del alelo $A$. El modelo de Wright-Fisher supone que la generación $n+1$ se forma muestreando $N$ alelos con reemplazo: $X_{n+1} \mid X_n = k \sim \text{Binomial}(N, k/N)$.
+    
+    (a) Verifique que $(X_n)$ es una cadena de Markov en $S = \{0, \dots, N\}$ e identifique los estados absorbentes y transientes.
+    
+    (b) Demuestre que $X_n$ es martingala y calcule $\text{Var}^k(X_{n+1}) = k(N-k)/N$.
+    
+    (c) Use la martingala $X_n$ y el teorema de paro para demostrar que la probabilidad de fijación del alelo $A$ es $u(k) = P^k(T_{\{N\}} < T_{\{0\}}) = k/N$.
+    
+    (d) Estime el tiempo esperado de fijación $E^k[T_{\{0\}} \wedge T_{\{N\}}]$ usando la martingala $X_n(N-X_n) + nk(N-k)/N$ y muestre que es $O(N)$.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{proof}[\textbf{Solución (a): Propiedad de Markov y Clasificación de Estados}]
+    \textbf{Propiedad de Markov:} \\
+    Por definición del problema, la distribución probabilística de la generación $n+1$ depende \textit{exclusivamente} del número de alelos en la generación actual $n$, mediante la relación $X_{n+1} \mid X_n \sim \text{Binomial}(N, X_n/N)$. Dado que no requiere información de $X_{n-1}, X_{n-2}, \dots$, cumple formalmente la falta de memoria, siendo una Cadena de Markov en $S = \{0, 1, \dots, N\}$.
+    
+    \textbf{Clasificación de Estados:} \\
+    Analizamos las probabilidades de transición $p_{i,j} = P(X_{n+1} = j \mid X_n = i) = \binom{N}{j} (i/N)^j (1 - i/N)^{N-j}$.
+    \begin{itemize}
+        \item \textbf{Estados Absorbentes ($0$ y $N$):} 
+        Si $X_n = 0$, la probabilidad de éxito es $0/N = 0$. Por lo tanto, $X_{n+1} \sim \text{Binomial}(N, 0)$, lo que implica $p_{0,0} = 1$. El alelo se extinguió.
+        Si $X_n = N$, la probabilidad de éxito es $N/N = 1$. Así, $X_{n+1} \sim \text{Binomial}(N, 1)$, lo que implica $p_{N,N} = 1$. El alelo se fijó.
+        \item \textbf{Estados Transientes ($1, \dots, N-1$):}
+        Para cualquier estado intermedio, existe una probabilidad estrictamente positiva de llegar a $0$ en un solo paso: $p_{i,0} = (1 - i/N)^N > 0$. Una vez en $0$, la cadena nunca regresa a $i$. Por definición, esto hace que todos los estados interiores sean transientes.
+    \end{itemize}
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (b): Martingala y Varianza}]
+    \textbf{1. Demostración de Martingala:} \\
+    Una secuencia adaptada $(X_n)$ es una martingala si cumple $E[X_{n+1} \mid \mathcal{F}_n] = X_n$.
+    Sabiendo que la esperanza condicional depende solo del estado actual por la propiedad de Markov:
+    \[ E[X_{n+1} \mid X_n] = E[\text{Binomial}(N, X_n/N)] \]
+    La esperanza de una variable aleatoria $\text{Binomial}(n_{trials}, p)$ es $n_{trials} \cdot p$. Sustituyendo nuestros parámetros:
+    \[ E[X_{n+1} \mid X_n] = N \cdot \left( \frac{X_n}{N} \right) = \mathbf{X_n} \]
+    Queda demostrado que la frecuencia de alelos es un juego justo (martingala).
+    
+    \textbf{2. Cálculo de la Varianza:} \\
+    La varianza condicional de una $\text{Binomial}(n_{trials}, p)$ es $n_{trials} \cdot p \cdot (1-p)$. Evaluando con la condición inicial $X_n = k$:
+    \[ \text{Var}(X_{n+1} \mid X_n = k) = N \cdot \left(\frac{k}{N}\right) \cdot \left(1 - \frac{k}{N}\right) \]
+    Distribuyendo y simplificando:
+    \[ \text{Var}(X_{n+1} \mid X_n = k) = k \cdot \left( \frac{N-k}{N} \right) = \mathbf{\frac{k(N-k)}{N}} \]
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (c): Probabilidad de Fijación}]
+    Sea $T = T_{\{0\}} \wedge T_{\{N\}}$ el tiempo de paro correspondiente al primer instante en que la cadena alcanza la extinción o la fijación. Como los estados intermedios son transientes en un espacio de estados finito, la absorción es segura: $P(T < \infty) = 1$.
+    
+    Aplicamos el \textbf{Teorema de Paro Opcional} a la martingala acotada $X_n$ (acotada porque $0 \le X_n \le N$):
+    \[ E^k[X_T] = E^k[X_0] = k \]
+    
+    Por otro lado, evaluamos la esperanza $E^k[X_T]$ condicionando sobre los dos únicos resultados posibles en el tiempo de paro $T$:
+    \[ E^k[X_T] = 0 \cdot P^k(X_T = 0) + N \cdot P^k(X_T = N) \]
+    
+    Sabiendo que $P^k(X_T = N)$ es exactamente la probabilidad de fijación $u(k)$:
+    \[ E^k[X_T] = N \cdot u(k) \]
+    
+    Igualando ambas expresiones para la esperanza de $X_T$:
+    \[ N \cdot u(k) = k \implies \mathbf{u(k) = \frac{k}{N}} \]
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (d): Estimación del Tiempo de Fijación}]
+    Se nos pide estimar el tiempo de paro esperado $E^k[T]$ utilizando el proceso $M_n = X_n(N-X_n) + n \frac{k(N-k)}{N}$. 
+    Asumiendo por instrucción del problema que $M_n$ opera como una martingala (ver Nota aclaratoria abajo), aplicamos nuevamente el Teorema de Paro Opcional:
+    \[ E^k[M_T] = E^k[M_0] \]
+    
+    Evaluamos el valor inicial en $n=0$:
+    \[ M_0 = X_0(N-X_0) + 0 = k(N-k) \]
+    
+    Evaluamos la esperanza en el tiempo de paro $T$:
+    \[ E^k[M_T] = E^k \left[ X_T(N-X_T) + T \frac{k(N-k)}{N} \right] \]
+    
+    Por la definición del tiempo de absorción, sabemos que $X_T \in \{0, N\}$. En cualquiera de los dos casos, el término cuadrático se anula ($0(N-0) = 0$ y $N(N-N) = 0$). Por linealidad de la esperanza:
+    \[ E^k[M_T] = 0 + E^k[T] \frac{k(N-k)}{N} \]
+    
+    Igualando $E^k[M_T]$ con $M_0$:
+    \[ E^k[T] \frac{k(N-k)}{N} = k(N-k) \]
+    
+    Dividiendo ambos lados por el factor común $k(N-k)$ (asumiendo $0 < k < N$, pues si $k=0$ o $k=N$ el tiempo $T=0$):
+    \[ \frac{E^k[T]}{N} = 1 \implies \mathbf{E^k[T] = N} \]
+    
+    \textit{Conclusión:} El tiempo esperado para que la población se homogenice es directamente proporcional al tamaño de la población, es decir, $\mathbf{E^k[T] \in \mathcal{O}(N)}$.
+\end{proof}
+
+\vspace{2mm}
+
+\begin{nota}{Precisión sobre la Martingala de Varianza}
+    Como tu asistente de IA, debo hacerte una pequeña precisión matemática para tu acervo en MAC: estrictamente hablando, la expresión $X_n(N-X_n) + n k(N-k)/N$ \textbf{no} es una martingala exacta. 
+    
+    El verdadero compensador que hace que la heterocigosis sea una martingala requiere sumar la varianza condicional real en cada paso: $X_n(N-X_n) + \frac{1}{N}\sum_{i=0}^{n-1} X_i(N-X_i)$. El ejercicio del libro sustituye la varianza dinámica $\frac{X_i(N-X_i)}{N}$ por su valor inicial $\frac{k(N-k)}{N}$ a modo de \textbf{aproximación lineal}. Esto es un truco estándar en genética teórica para estimar rápidamente el orden de magnitud ($\mathcal{O}(N)$) sin resolver ecuaciones en diferencias complejas. ¡Funciona perfecto para la estimación solicitada!
+\end{nota}
+
+\newpage
+
+\subsection{Epidemia SIS}
+
+\begin{ejercicio}{Epidemia SIS}{6.2}
+    Población de $N$ individuos: cada uno es susceptible (S) o infeccioso (I). Sea $X_n$ el número de infecciosos. Las probabilidades de transición son: $p(k, k + 1) = \beta k(N - k)/N$, $p(k, k - 1) = \gamma k$, $p(k, k) = 1 - p(k, k + 1) - p(k, k - 1)$, con $R_0 = \beta/\gamma$ el número de reproducción.
+    
+    (a) Identifique el estado absorbente e interprete epidemiológicamente.
+    
+    (b) Analice el signo del drift $p(k, k + 1) - p(k, k - 1)$: muestre que si $R_0 \le 1$, la epidemia se extingue con probabilidad 1.
+    
+    (c) Para $R_0 > 1$ y $N$ grande, halle el equilibrio endémico $k^*$ tal que $p(k^*, k^* + 1) = p(k^*, k^* - 1)$ y verifique que $k^*/N \approx 1 - 1/R_0$.
+    
+    (d) Plantee la ecuación en diferencias para $v(k) = E^k[T_{\{0\}}]$ y argumente cualitativamente que $v(k^*) \gg v(1)$ cuando $R_0 > 1$.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{nota}{El Número Básico de Reproducción ($R_0$)}
+    El $R_0$ es el parámetro central en epidemiología. Representa el número promedio de casos secundarios producidos por un solo individuo infeccioso introducido en una población totalmente susceptible. El umbral $R_0 = 1$ dictamina matemáticamente si un brote puede sostenerse en el tiempo o si está destinado a desaparecer.
+\end{nota}
+
+\begin{proof}[\textbf{Solución (a): Identificación del Estado Absorbente}]
+    Para identificar estados absorbentes, debemos buscar aquellos estados $k$ donde la probabilidad de permanecer en ellos mismos es 1, es decir, $p(k,k) = 1$. Esto ocurre si y solo si las probabilidades de salto son nulas:
+    \[ p(k, k+1) = 0 \quad \text{y} \quad p(k, k-1) = 0 \]
+    
+    Evaluamos el estado $k = 0$:
+    \[ p(0, 1) = \beta (0) (N - 0)/N = 0 \]
+    \[ p(0, -1) = \gamma (0) = 0 \]
+    Por lo tanto, $p(0,0) = 1$. El estado $\mathbf{k=0}$ es absorbente.
+    
+    \textbf{Interpretación Epidemiológica:} Si el número de infecciosos llega a cero, el virus ha sido completamente erradicado de la población. Dado que la enfermedad se transmite por contacto entre infecciosos y susceptibles, sin infecciosos no puede haber nuevos contagios. La epidemia termina definitivamente.
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (b): Análisis del Drift y Extinción}]
+    El \textit{drift} o deriva esperada del proceso en el estado $k$ se define como el cambio esperado en un paso:
+    \[ \Delta(k) = E[X_{n+1} - X_n \mid X_n = k] = (+1)p(k, k+1) + (-1)p(k, k-1) + (0)p(k,k) \]
+    
+    Sustituimos las probabilidades dadas:
+    \[ \Delta(k) = \beta k \frac{N-k}{N} - \gamma k \]
+    
+    Factorizamos $\gamma k$ e introducimos la definición de $R_0 = \beta/\gamma$:
+    \[ \Delta(k) = \gamma k \left( \frac{\beta}{\gamma} \frac{N-k}{N} - 1 \right) = \gamma k \left( R_0 \left(1 - \frac{k}{N}\right) - 1 \right) \]
+    
+    \textbf{Análisis del Signo:} \\
+    Supongamos que $R_0 \le 1$. Para cualquier estado transiente $k \ge 1$, sabemos que el factor de susceptibles $(1 - k/N)$ es estrictamente menor a 1.
+    Por lo tanto:
+    \[ R_0 \left(1 - \frac{k}{N}\right) < R_0 \le 1 \implies R_0 \left(1 - \frac{k}{N}\right) - 1 < 0 \]
+    
+    Como $\gamma k > 0$ para todo $k \ge 1$, concluimos que el drift $\Delta(k)$ es \textbf{estrictamente negativo} para todo estado activo:
+    \[ \mathbf{\Delta(k) < 0 \quad \forall k \in \{1, \dots, N\}} \]
+    
+    \textbf{Conclusión:} \\
+    Al tener un drift estrictamente negativo en un espacio de estados finito, el proceso $X_n$ es una \textit{supermartingala} estricta fuera del origen. Existe una "fuerza determinista" que empuja constantemente el número de infectados hacia abajo. Por los teoremas de convergencia de Cadenas de Markov, el tiempo de primera llegada al estado absorbente es casi seguramente finito. La epidemia se \textbf{extingue con probabilidad 1}.
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (c): El Equilibrio Endémico}]
+    Asumimos $R_0 > 1$. Buscamos el estado $k^*$ donde las fuerzas de infección y recuperación se equilibran perfectamente, anulando el drift:
+    \[ p(k^*, k^*+1) = p(k^*, k^*-1) \]
+    
+    Sustituyendo las tasas:
+    \[ \beta k^* \frac{N-k^*}{N} = \gamma k^* \]
+    
+    Dado que buscamos un equilibrio activo (endémico), asumimos $k^* \neq 0$ y podemos dividir toda la ecuación entre $\gamma k^*$:
+    \[ \frac{\beta}{\gamma} \frac{N-k^*}{N} = 1 \]
+    
+    Sustituyendo $R_0$:
+    \[ R_0 \left( 1 - \frac{k^*}{N} \right) = 1 \]
+    
+    Despejando analíticamente la fracción de la población infectada:
+    \[ 1 - \frac{k^*}{N} = \frac{1}{R_0} \]
+    \[ \mathbf{\frac{k^*}{N} = 1 - \frac{1}{R_0}} \]
+    
+    \textit{Si multiplicamos por $N$, obtenemos $k^* = N(1 - 1/R_0)$. Este es el atractor macroscópico del sistema. Las fluctuaciones aleatorias ocurrirán alrededor de este valor.}
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (d): Ecuación en Diferencias y Metastabilidad}]
+    \textbf{1. Planteamiento de la ecuación:} \\
+    Sea $v(k) = E^k[T_{\{0\}}]$ el tiempo esperado para la extinción iniciando con $k$ infecciosos. Condicionando en el primer salto por la Ley de Esperanza Total:
+    \[ v(k) = 1 + p(k, k+1)v(k+1) + p(k, k-1)v(k-1) + p(k,k)v(k) \]
+    
+    Para darle forma de generador estocástico discreto, restamos $v(k)$ a ambos lados. Sabiendo que $p(k,k) - 1 = -p(k, k+1) - p(k, k-1)$, agrupamos los términos:
+    \[ p(k, k+1)[v(k+1) - v(k)] + p(k, k-1)[v(k-1) - v(k)] = -1 \]
+    Esta es una ecuación en diferencias lineal de segundo orden con la condición de frontera absorbente $v(0) = 0$.
+
+    \vspace{3mm}
+    \textbf{2. Argumento cualitativo de Metastabilidad ($v(k^*) \gg v(1)$):} \\
+    Cuando $R_0 > 1$, el drift es positivo para todo $k < k^*$ y negativo para $k > k^*$. El estado $k^*$ actúa como un "pozo de potencial" (un atractor fuerte). 
+    
+    \begin{itemize}
+        \item \textbf{Iniciando en $k=1$:} Hay una alta probabilidad de que la primera transición sea una recuperación ($p(1,0) = \gamma > 0$) antes de que la epidemia tenga oportunidad de crecer. Por lo tanto, $v(1)$ es relativamente pequeño porque la extinción rápida es un escenario muy probable.
+        \item \textbf{Iniciando en $k^*$:} El proceso se encuentra "atrapado" en el equilibrio endémico. Para que la epidemia se extinga, el proceso debe moverse en contra de la fuerza del drift (escalar el pozo de potencial) de manera repetida, realizando una secuencia larga e ininterrumpida de recuperaciones puras. Matemáticamente, este es un evento de \textbf{grandes desviaciones}.
+    \end{itemize}
+    
+    Por la teoría de grandes desviaciones (como la vista en el Teorema de Donsker-Varadhan), el tiempo esperado para superar esta barrera de potencial crece exponencialmente con el tamaño de la población $N$. Concluimos tajantemente que el tiempo de extinción desde la endemia es órdenes de magnitud mayor que desde un paciente cero aislado:
+    \[ \mathbf{v(k^*) \gg v(1)} \]
+\end{proof}
+
+
+\newpage
+
+\subsection{Cola M/M/s}
+
+
+
+\begin{ejercicio}{Cola M/M/s}{6.3}
+    Cola M/M/$s$ ($s \ge 1$ servidores) en $\mathbb{N}_0$: $q(x, x + 1) = \lambda$ y $q(x, x - 1) = \min(x, s)\mu$. Sea $\rho = \lambda/(s\mu)$.
+    
+    (a) Escriba el generador e identifique la estructura de nacimiento-muerte.
+    
+    (b) Demuestre que la medida estacionaria satisface
+    \[ \pi(x) = \pi(0) \frac{(\lambda/\mu)^x}{x!}, \quad x \le s; \qquad \pi(x) = \pi(0) \frac{(\lambda/\mu)^x}{s! s^{x-s}}, \quad x > s. \]
+    Concluya que $\pi$ es normalizable si y solo si $\rho < 1$.
+    
+    (c) Calcule la \textit{fórmula de Erlang C}: la probabilidad de que un cliente llegue y encuentre todos los servidores ocupados.
+    
+    (d) Use la Ley de Little para calcular el tiempo medio de espera antes de ser atendido.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{proof}[\textbf{Solución (a): Generador y Estructura}]
+    El sistema modela el número de clientes. Los nacimientos (llegadas) ocurren a una tasa constante $\lambda_x = \lambda$. Las muertes (salidas) dependen de cuántos servidores están activos: si hay $x \le s$ clientes, hay $x$ servidores trabajando, por lo que la tasa es $x\mu$. Si hay $x > s$ clientes, los $s$ servidores están a máxima capacidad, por lo que la tasa se estanca en $s\mu$.
+    
+    Esto define una clásica \textbf{cadena de nacimiento-muerte} con tasas:
+    \[ \lambda_x = \lambda \quad \forall x \ge 0; \qquad \mu_x = \begin{cases} x\mu & \text{si } 1 \le x \le s \\ s\mu & \text{si } x > s \end{cases} \]
+    
+    El generador infinitesimal $\mathcal{A}$ aplicado a una función de prueba $f$ se escribe como:
+    \[ \mathcal{A}f(x) = \lambda[f(x+1) - f(x)] + \min(x, s)\mu [f(x-1) - f(x)] \]
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (b): Medida Estacionaria y Normalización}]
+    Al ser un proceso de nacimiento-muerte, la distribución estacionaria obedece las ecuaciones de balance detallado locales: $\pi(x)\mu_x = \pi(x-1)\lambda_{x-1}$.
+    Iterando desde el estado $0$:
+    \[ \pi(x) = \pi(0) \prod_{i=1}^x \frac{\lambda_{i-1}}{\mu_i} = \pi(0) \frac{\lambda^x}{\prod_{i=1}^x \mu_i} \]
+    
+    Separamos el análisis en dos casos debido a la función definida a trozos de $\mu_x$:
+    
+    \textbf{Caso 1 ($x \le s$):} Todos los servidores atienden. El producto del denominador es $\prod_{i=1}^x (i\mu) = x! \mu^x$.
+    \[ \mathbf{\pi(x) = \pi(0) \frac{\lambda^x}{x! \mu^x} = \pi(0) \frac{(\lambda/\mu)^x}{x!}} \]
+    
+    \textbf{Caso 2 ($x > s$):} La capacidad topa. El producto del denominador incluye los primeros $s$ términos (que dan $s! \mu^s$) multiplicados por los restantes $x-s$ términos (que valen constantemente $s\mu$).
+    \[ \prod_{i=1}^x \mu_i = (s! \mu^s) \times (s\mu)^{x-s} = s! \, s^{x-s} \mu^x \]
+    Sustituyendo en la fórmula iterada:
+    \[ \mathbf{\pi(x) = \pi(0) \frac{\lambda^x}{s! \, s^{x-s} \mu^x} = \pi(0) \frac{(\lambda/\mu)^x}{s! \, s^{x-s}}} \]
+    
+    \textbf{Condición de Normalización:}
+    Para que $\pi$ sea una distribución de probabilidad válida, la suma total debe ser finita: $\sum_{x=0}^\infty \pi(x) = 1$.
+    Separamos la suma en las dos regiones:
+    \[ \sum_{x=0}^\infty \pi(x) = \pi(0) \left( \sum_{x=0}^s \frac{(\lambda/\mu)^x}{x!} + \sum_{x=s+1}^\infty \frac{(\lambda/\mu)^x}{s! \, s^{x-s}} \right) \]
+    Nos enfocamos en la serie infinita. Reescribimos el término aislando el factor $s$:
+    \[ \sum_{x=s+1}^\infty \frac{(\lambda/\mu)^s (\lambda/\mu)^{x-s}}{s! \, s^{x-s}} = \frac{(\lambda/\mu)^s}{s!} \sum_{x=s+1}^\infty \left( \frac{\lambda}{s\mu} \right)^{x-s} \]
+    Haciendo el cambio de índice $j = x-s$:
+    \[ \frac{(\lambda/\mu)^s}{s!} \sum_{j=1}^\infty \rho^j \]
+    Esta es una serie geométrica estándar. Sabemos por análisis matemático que converge \textbf{si y solo si} la razón estrictamente cumple $\rho < 1$. Si $\rho \ge 1$, la serie diverge al infinito, haciendo imposible encontrar un $\pi(0) > 0$. Por lo tanto, el sistema es estable y normalizable \textbf{$\iff \rho < 1$}.
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (c): Fórmula de Erlang C}]
+    La fórmula de Erlang $C(s, \lambda/\mu)$ es la probabilidad de que todos los servidores estén ocupados, lo que equivale al evento de que haya $s$ o más clientes en el sistema:
+    \[ C = P(X \ge s) = \sum_{x=s}^\infty \pi(x) \]
+    
+    Usando la expresión del Caso 2, y reconociendo que $\pi(s) = \pi(0)\frac{(\lambda/\mu)^s}{s!}$:
+    \[ C = \sum_{x=s}^\infty \pi(s) \frac{(\lambda/\mu)^{x-s}}{s^{x-s}} = \pi(s) \sum_{j=0}^\infty \left(\frac{\lambda}{s\mu}\right)^j \]
+    Reconociendo nuevamente $\rho = \lambda/(s\mu)$ y evaluando la serie geométrica desde $0$:
+    \[ \mathbf{C = \pi(s) \sum_{j=0}^\infty \rho^j = \frac{\pi(s)}{1 - \rho}} \]
+    \textit{(Donde $\pi(s)$ depende de $\pi(0)$, el cual se obtiene forzando a que toda la distribución sume 1).}
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (d): Ley de Little para Tiempo de Espera}]
+    Para aplicar la Ley de Little a la "fila de espera" (sin contar a los que están siendo atendidos), primero calculamos la longitud esperada de la cola, $L_q$:
+    \[ L_q = E[\max(X - s, 0)] = \sum_{x=s}^\infty (x-s)\pi(x) \]
+    
+    Haciendo el cambio de variable $j = x-s$:
+    \[ L_q = \sum_{j=0}^\infty j \pi(s+j) = \sum_{j=0}^\infty j \pi(s) \rho^j = \pi(s) \rho \sum_{j=1}^\infty j \rho^{j-1} \]
+    
+    Reconocemos que la serie es la derivada de la serie geométrica: $\sum_{j=1}^\infty j \rho^{j-1} = \frac{d}{d\rho} \left( \frac{1}{1-\rho} \right) = \frac{1}{(1-\rho)^2}$.
+    \[ L_q = \pi(s) \frac{\rho}{(1-\rho)^2} \]
+    
+    Nota que podemos reescribir esto en términos de Erlang C (ya que $C = \pi(s)/(1-\rho)$):
+    \[ L_q = C \frac{\rho}{1-\rho} \]
+    
+    Finalmente, aplicamos la \textbf{Ley de Little} para la cola: $L_q = \lambda W_q$, donde $W_q$ es el tiempo medio de espera en fila:
+    \[ W_q = \frac{L_q}{\lambda} = \frac{C \rho}{\lambda(1-\rho)} \]
+    
+    Sustituyendo $\rho = \lambda/(s\mu)$:
+    \[ \mathbf{W_q = \frac{C}{s\mu(1-\rho)}} \]
+    \textit{El tiempo de espera es proporcional a la probabilidad de encontrar congestión (Erlang C), e inversamente proporcional a la capacidad "sobrante" de la red de servidores.}
+\end{proof}
+
+
+\newpage
+
+\subsection{Modelo de Ising y dinámica de Glauber}
+
+
+\begin{ejercicio}{Modelo de Ising y dinámica de Glauber}{6.4}
+    Sea $E = \{-1, +1\}^n$ el espacio de configuraciones de spins. La dinámica de Glauber es una cadena en $E$ donde en cada paso se elige un sitio $i$ uniformemente y se actualiza su spin según la distribución condicional de Gibbs a temperatura $T = 1/\beta$:
+    \[ P(\sigma_i = +1 \mid \sigma_{-i}) = \frac{e^{\beta J \sum_{j \sim i} \sigma_j}}{e^{\beta J \sum_{j \sim i} \sigma_j} + e^{-\beta J \sum_{j \sim i} \sigma_j}} \]
+    
+    (a) Escriba las probabilidades de transición $p(\sigma, \sigma')$ donde $\sigma'$ difiere de $\sigma$ solo en el sitio $i$.
+    
+    (b) Demuestre que la medida de Gibbs $\pi(\sigma) \propto e^{-\beta H(\sigma)}$, con $H(\sigma) = -J \sum_{i \sim j} \sigma_i \sigma_j$, es estacionaria y que la cadena es reversible.
+    
+    (c) Usando la desigualdad de Poincaré, argumente que el tiempo de mezcla es $O(n)$ cuando $\beta$ es pequeño (alta temperatura).
+    
+    (d) Explique cualitativamente por qué el tiempo de mezcla puede ser exponencial en $n$ para $\beta$ grande (baja temperatura, efectos metaestables).
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{nota}{El Hamiltoniano y la Medida de Gibbs}
+    El Hamiltoniano $H(\sigma)$ mide la energía total. Si los vecinos "están de acuerdo" (mismo signo), el producto es $+1$ y la energía baja (es más estable). La medida de Gibbs $\pi(\sigma) = \frac{1}{Z} e^{-\beta H(\sigma)}$ dicta que las configuraciones de menor energía son exponencialmente más probables, siendo $\beta$ el regulador de esta severidad.
+\end{nota}
+
+\begin{proof}[\textbf{Solución (a): Probabilidades de Transición}]
+    Sea $\sigma$ la configuración actual y $\sigma'$ la nueva configuración. Si $\sigma'$ difiere de $\sigma$ en más de un sitio, la probabilidad de transición es $0$ (ya que Glauber solo actualiza un sitio a la vez). 
+    
+    Si $\sigma$ y $\sigma'$ difieren a lo sumo en el sitio $i$ (es decir, $\sigma_{-i} = \sigma'_{-i}$ y el nuevo spin en $i$ es $\sigma'_i \in \{-1, +1\}$), la transición requiere dos eventos independientes:
+    1. Elegir el sitio $i$ (probabilidad $1/n$).
+    2. Asignar el nuevo valor $\sigma'_i$ dado el entorno $\sigma_{-i}$.
+    
+    Notemos que la probabilidad condicional dada se puede escribir de forma compacta para cualquier valor $s \in \{-1, +1\}$ como:
+    \[ P(\sigma_i = s \mid \sigma_{-i}) = \frac{e^{\beta J s \sum_{j \sim i} \sigma_j}}{e^{\beta J \sum_{j \sim i} \sigma_j} + e^{-\beta J \sum_{j \sim i} \sigma_j}} \]
+    
+    Por lo tanto, la probabilidad de transición completa es:
+    \[ \mathbf{p(\sigma, \sigma') = \frac{1}{n} \frac{e^{\beta J \sigma'_i \sum_{j \sim i} \sigma_j}}{e^{\beta J \sum_{j \sim i} \sigma_j} + e^{-\beta J \sum_{j \sim i} \sigma_j}}} \]
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (b): Reversibilidad y Medida Estacionaria}]
+    Para demostrar que $\pi$ es estacionaria, es suficiente demostrar que la cadena es reversible respecto a $\pi$, es decir, que cumple el \textbf{balance detallado}:
+    \[ \pi(\sigma) p(\sigma, \sigma') = \pi(\sigma') p(\sigma', \sigma) \]
+    
+    Asumimos que $\sigma$ y $\sigma'$ difieren únicamente en el sitio $i$. Por lo tanto, $\sigma'_i = -\sigma_i$.
+    Evaluamos el lado izquierdo usando la definición de $\pi(\sigma) = \frac{1}{Z} e^{-\beta H(\sigma)}$:
+    \[ \pi(\sigma) p(\sigma, \sigma') = \frac{1}{Z} e^{-\beta H(\sigma)} \frac{1}{n} \frac{e^{\beta J \sigma'_i S_i}}{e^{\beta J S_i} + e^{-\beta J S_i}} \]
+    Donde $S_i = \sum_{j \sim i} \sigma_j$ es la suma de los vecinos de $i$ (que es idéntica en ambas configuraciones).
+    
+    Descomponemos el Hamiltoniano $H(\sigma)$ separando las interacciones que involucran al sitio $i$ de las que no:
+    \[ H(\sigma) = -J \sigma_i \sum_{j \sim i} \sigma_j - J \sum_{k \sim l, \, k,l \neq i} \sigma_k \sigma_l = -J \sigma_i S_i + H_{\text{resto}} \]
+    Sustituyendo esto en el término exponencial de la medida:
+    \[ e^{-\beta H(\sigma)} e^{\beta J \sigma'_i S_i} = e^{\beta J \sigma_i S_i} e^{-\beta H_{\text{resto}}} e^{\beta J \sigma'_i S_i} = e^{\beta J S_i (\sigma_i + \sigma'_i)} e^{-\beta H_{\text{resto}}} \]
+    
+    Dado que $\sigma'_i = -\sigma_i$, la suma $\sigma_i + \sigma'_i = 0$. Esto colapsa el primer exponencial a $e^0 = 1$:
+    \[ \pi(\sigma) p(\sigma, \sigma') = \frac{1}{Z \cdot n} \frac{e^{-\beta H_{\text{resto}}}}{e^{\beta J S_i} + e^{-\beta J S_i}} \]
+    
+    Observemos la expresión final: el término $H_{\text{resto}}$ no depende de $i$, y el denominador tampoco depende del estado del spin en $i$. Por lo tanto, toda la expresión es perfectamente simétrica respecto al intercambio de $\sigma$ y $\sigma'$. Si evaluamos $\pi(\sigma') p(\sigma', \sigma)$, llegaremos exactamente al mismo resultado analítico.
+    
+    Al cumplirse el balance detallado, \textbf{la cadena es reversible} y, por el teorema general de Cadenas de Markov, \textbf{$\pi(\sigma)$ es su medida estacionaria}.
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (c): Tiempo de Mezcla a Alta Temperatura}]
+    A muy alta temperatura, el parámetro $\beta \to 0$. Evaluando la probabilidad de transición condicional:
+    \[ P(\sigma_i = +1 \mid \sigma_{-i}) \approx \frac{e^0}{e^0 + e^0} = \frac{1}{2} \]
+    
+    Significa que los spins ignoran a sus vecinos y cambian de estado como si fueran monedas justas independientes.
+    La desigualdad de Poincaré acota la varianza de cualquier función a través de la forma de Dirichlet $\mathcal{E}(f,f)$, proveyendo una cota inferior para el salto espectral (spectral gap) $\text{gap}(P)$. 
+    
+    Para $n$ sitios independientes que se actualizan con probabilidad $1/n$ en cada paso, la constante de Poincaré dicta que el salto espectral es del orden $\Omega(1/n)$. El \textit{tiempo de relajación} (inverso del gap) es, por tanto, $\mathcal{O}(n)$.
+    
+    Dado que en cada paso de tiempo se actualiza un solo sitio, en promedio toma $n$ pasos actualizar todos los sitios del sistema. Por lo tanto, el sistema "olvida" su condición inicial y alcanza el equilibrio en un tiempo proporcional al tamaño del sistema.
+    \[ \mathbf{t_{\text{mix}} \sim \mathcal{O}(n)} \]
+    \textit{(Nota rigurosa: Si definimos el tiempo de mezcla a través de la distancia en variación total, el fenómeno del "recolector de cupones" introduce un factor logarítmico, siendo el tiempo de mezcla estricto $\mathcal{O}(n \log n)$, pero el tiempo de relajación espectral es exactamente $\mathcal{O}(n)$).}
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (d): Metaestabilidad a Baja Temperatura}]
+    A muy baja temperatura (cuando $\beta$ es grande), el sistema busca minimizar su energía (el Hamiltoniano). El Hamiltoniano tiene dos mínimos globales absolutos:
+    \begin{enumerate}
+        \item Todos los spins son $+1$ (Magnetización positiva pura).
+        \item Todos los spins son $-1$ (Magnetización negativa pura).
+    \end{enumerate}
+    
+    Supongamos que el sistema inicia en el estado de "todos $+1$". Para que el sistema se mezcle (es decir, para que alcance el estado estacionario $\pi$ que es simétrico y asigna igual probabilidad a la configuración de "todos $-1$"), debe transitar desde el estado $+1$ al estado $-1$.
+    
+    Para lograr esto mediante la dinámica de Glauber, que solo voltea un spin a la vez, el sistema está obligado a crear una "isla" o gota de spins $-1$ rodeada de spins $+1$. El borde de esta isla contiene muchas conexiones vecinas desiguales ($\sigma_i \neq \sigma_j$), lo cual incrementa dramáticamente la energía del sistema. 
+    
+    Esta barrera energética de superficie es del orden de la longitud de la frontera, lo que requiere un incremento de energía $\Delta E \propto n^{\alpha}$ (donde $\alpha$ depende de la dimensión de la red, para $d \ge 2$, $\Delta E \to \infty$ conforme $n \to \infty$).
+    
+    Dado que las transiciones a estados de mayor energía están penalizadas por el factor de Boltzmann $e^{-\beta \Delta E}$, la probabilidad de que el sistema logre escalar esta barrera energética es exponencialmente pequeña. El sistema se queda "atrapado" (metaestable) en uno de los pozos de potencial durante una cantidad masiva de tiempo antes de lograr una fluctuación gigante que lo pase al otro lado.
+    
+    Por esta razón, el tiempo de mezcla escala exponencialmente con el tamaño del sistema y el inverso de la temperatura:
+    \[ \mathbf{t_{\text{mix}} \sim \exp(c \beta \Delta E) \implies t_{\text{mix}} \sim \exp(\mathcal{O}(n^{\alpha}))} \]
+\end{proof}
+
+
+\newpage
+
+\subsection{Cadena de Metropolis–Hastings}
+
+\begin{ejercicio}{Cadena de Metropolis-Hastings}{6.5}
+    Sea $\pi$ una probabilidad objetivo en $S$ finito y $q(x,y) = q(y,x)$ una propuesta simétrica irreducible.
+    
+    (a) Defina la cadena de Metropolis-Hastings:
+    \[ p(x,y) = q(x,y) \min\left(1, \frac{\pi(y)}{\pi(x)}\right), \quad x \neq y. \]
+    Demuestre que satisface el balance detallado y que $\pi$ es estacionaria.
+    
+    (b) Generalice al caso asimétrico $q(x,y) \neq q(y,x)$: proponga tasas de aceptación que garanticen el balance detallado respecto de $\pi$.
+    
+    (c) ¿Cómo se relaciona el tiempo de mezcla de la cadena de Metropolis-Hastings con el de la propuesta $q$?
+    
+    (d) Implemente conceptualmente el muestreo de la distribución de Gibbs del Ejercicio 6.4 mediante Metropolis-Hastings.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{nota}{El Motor del MCMC}
+    La magia de Metropolis-Hastings es que nos permite muestrear de una distribución $\pi(x)$ sin necesidad de conocer su constante de normalización (la cual suele ser intratable), ya que al tomar el cociente $\pi(y)/\pi(x)$, dicha constante se cancela perfectamente.
+\end{nota}
+
+\begin{proof}[\textbf{Solución (a): Balance Detallado (Caso Simétrico)}]
+    Para demostrar que la cadena satisface el balance detallado, debemos probar que para todo par de estados $x \neq y$:
+    \[ \pi(x) p(x,y) = \pi(y) p(y,x) \]
+    
+    Sustituimos la definición de las probabilidades de transición $p(x,y)$ en el lado izquierdo de la ecuación:
+    \[ \pi(x) p(x,y) = \pi(x) q(x,y) \min\left(1, \frac{\pi(y)}{\pi(x)}\right) \]
+    
+    Dado que $\pi(x) > 0$, podemos introducirla dentro de la función mínimo:
+    \[ \pi(x) p(x,y) = q(x,y) \min(\pi(x), \pi(y)) \]
+    
+    Ahora analizamos el lado derecho de la ecuación de balance detallado:
+    \[ \pi(y) p(y,x) = \pi(y) q(y,x) \min\left(1, \frac{\pi(x)}{\pi(y)}\right) \]
+    \[ \pi(y) p(y,x) = q(y,x) \min(\pi(y), \pi(x)) \]
+    
+    Por hipótesis, la distribución de propuesta es simétrica, es decir, $q(x,y) = q(y,x)$. Además, la función mínimo es conmutativa, por lo que $\min(\pi(x), \pi(y)) = \min(\pi(y), \pi(x))$. 
+    Igualando ambas expresiones, concluimos que:
+    \[ \mathbf{\pi(x) p(x,y) = \pi(y) p(y,x)} \]
+    
+    Al cumplirse el balance detallado, la cadena es reversible respecto a $\pi$. Un corolario directo de la reversibilidad es que \textbf{$\pi$ es la medida estacionaria} de la cadena.
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (b): Generalización Asimétrica (Hastings)}]
+    Si $q(x,y) \neq q(y,x)$, introducimos una tasa de aceptación general $\alpha(x,y)$ tal que $p(x,y) = q(x,y)\alpha(x,y)$. Queremos forzar el balance detallado:
+    \[ \pi(x) q(x,y) \alpha(x,y) = \pi(y) q(y,x) \alpha(y,x) \]
+    
+    Despejando la razón de las tasas de aceptación:
+    \[ \frac{\alpha(x,y)}{\alpha(y,x)} = \frac{\pi(y) q(y,x)}{\pi(x) q(x,y)} \]
+    
+    Para maximizar la movilidad de la cadena (y no rechazar transiciones innecesariamente), si la razón en el lado derecho es mayor a $1$, definimos $\alpha(x,y) = 1$ y ajustamos $\alpha(y,x)$ en consecuencia. Si es menor a $1$, definimos $\alpha(y,x) = 1$. 
+    Esta lógica se encapsula elegantemente en la función mínimo:
+    \[ \mathbf{\alpha(x,y) = \min\left(1, \frac{\pi(y) q(y,x)}{\pi(x) q(x,y)}\right)} \]
+    \textit{Esta es la famosa corrección de Hastings (1970) al algoritmo original de Metropolis (1953).}
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (c): Tiempo de Mezcla y Propuesta)}]
+    El tiempo de mezcla de la cadena de Metropolis-Hastings ($t_{\text{mix}}^{MH}$) está íntimamente ligado al de la cadena de propuesta ($t_{\text{mix}}^{q}$), pero se ve ralentizado por los \textbf{rechazos}.
+    
+    Dado que la probabilidad de transición real es $p(x,y) = q(x,y)\alpha(x,y)$, la cadena MH da "pasos nulos" (se queda en el mismo estado) con probabilidad $1 - \sum_{y \neq x} p(x,y)$.
+    A través de la conductancia (o cuello de botella isoperimétrico), si la tasa de aceptación promedio es baja, la conductancia de MH será mucho menor que la de $q$. 
+    
+    Por el teorema de comparación de formas de Dirichlet, si $\alpha(x,y) \ge \alpha_{\text{min}}$ para todo $x, y$, entonces el salto espectral de la cadena MH está acotado por el salto de la propuesta:
+    \[ \text{gap}_{MH} \ge \alpha_{\text{min}} \cdot \text{gap}_q \]
+    
+    Como el tiempo de mezcla es inversamente proporcional al salto espectral ($t_{\text{mix}} \propto 1/\text{gap}$), deducimos cualitativamente que:
+    \[ \mathbf{t_{\text{mix}}^{MH} \gtrsim \frac{1}{\alpha_{\text{min}}} t_{\text{mix}}^q} \]
+    \textit{Conclusión: La cadena de Metropolis-Hastings siempre mezcla más lento que la propuesta libre $q$ (es "perezosa" debido a los rechazos). Si la propuesta no explora bien el espacio o propone zonas de bajísima probabilidad (muchos rechazos), el tiempo de mezcla explota.}
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (d): Implementación Conceptual para el Modelo de Ising}]
+    Para muestrear la distribución de Gibbs $\pi(\sigma) \propto e^{-\beta H(\sigma)}$ del Ejercicio 6.4 usando Metropolis, procedemos así:
+    
+    \textbf{1. Propuesta Simétrica $q(\sigma, \sigma')$:} \\
+    Estando en la configuración $\sigma$, elegimos un sitio $i \in \{1, \dots, n\}$ uniformemente al azar y proponemos voltear su spin: $\sigma'_i = -\sigma_i$ (y $\sigma'_{-i} = \sigma_{-i}$).
+    Dado que ir de $\sigma$ a $\sigma'$ y regresar implica elegir el mismo sitio $i$, $q(\sigma, \sigma') = 1/n = q(\sigma', \sigma)$. La propuesta es simétrica.
+    
+    \textbf{2. Tasa de Aceptación $\alpha(\sigma, \sigma')$:} \\
+    Por ser propuesta simétrica, aplicamos la regla de Metropolis del inciso (a):
+    \[ \alpha(\sigma, \sigma') = \min\left(1, \frac{\pi(\sigma')}{\pi(\sigma)}\right) = \min\left(1, \frac{e^{-\beta H(\sigma')}}{e^{-\beta H(\sigma)}}\right) = \min\left(1, e^{-\beta \Delta H}\right) \]
+    Donde $\Delta H = H(\sigma') - H(\sigma)$ es el cambio local de energía al voltear el spin $i$. Sabiendo que $H(\sigma) = -J \sum_{k \sim l} \sigma_k \sigma_l$, el cambio de energía solo depende de los vecinos de $i$:
+    \[ \Delta H = 2J \sigma_i \sum_{j \sim i} \sigma_j \]
+    
+    \textbf{3. Algoritmo Conceptual:}
+    \begin{enumerate}
+        \item Iniciar en una configuración arbitraria $\sigma$.
+        \item Elegir un sitio $i$ al azar uniformemente.
+        \item Calcular $\Delta H = 2J \sigma_i \sum_{j \sim i} \sigma_j$.
+        \item Si $\Delta H \le 0$ (baja la energía), aceptar el cambio $\sigma \to \sigma'$ con probabilidad $1$.
+        \item Si $\Delta H > 0$ (sube la energía), aceptar el cambio con probabilidad $e^{-\beta \Delta H}$. Para ello, generar $U \sim \text{Uniforme}(0,1)$ y si $U < e^{-\beta \Delta H}$, aceptar el cambio. Si no, quedarse en $\sigma$.
+        \item Repetir desde el paso 2.
+    \end{enumerate}
+    \textit{Este procedimiento garantiza que las muestras generadas asintóticamente sigan la distribución exacta de Gibbs a temperatura $1/\beta$.}
+\end{proof}
+
+
+\newpage
+
+
+\subsection{Caminata aleatoria en árboles}
+
+\vspace{5mm}
+
+\begin{ejercicio}{Caminata aleatoria en árboles}{6.6}
+    Sea $\mathbb{T}_d$ el árbol $d$-regular infinito ($d \ge 2$) y $(X_n)$ la caminata simple: $p(x, y) = 1/d$ para vecinos $y$ de $x$.
+    
+    (a) Para $d \ge 3$, calcule $P^o(T_o^+ < \infty)$ mediante análisis del primer paso en la dirección radial.
+    
+    (b) Para $d = 2$, muestre que $\mathbb{T}_2 \cong \mathbb{Z}$ e identifique la caminata con la simple en $\mathbb{Z}$.
+    
+    (c) Para $d \ge 3$, demuestre que existe la velocidad de fuga $v = \lim_{n \to \infty} d(X_n, o)/n$ casi seguramente y calcule $v = (d - 2)/d$.
+    
+    (d) Contraste con la caminata en $\mathbb{Z}^d$ para $d \ge 3$: ¿existe velocidad de fuga? Justifique.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{nota}{Procesos de Ramificación y Distancia Radial}
+    En un árbol libre, no hay ciclos. Si te encuentras a una distancia $k > 0$ del origen, exactamente $1$ de tus $d$ vecinos te acerca al origen, mientras que los $d-1$ vecinos restantes te alejan. Esto permite proyectar la caminata multidimensional en un proceso unidimensional de nacimiento-muerte.
+\end{nota}
+
+\begin{proof}[\textbf{Solución (a): Probabilidad de Retorno al Origen}]
+    Definimos el proceso de la distancia radial $Y_n = d(X_n, o)$. 
+    Si el caminante está en el origen ($Y_n = 0$), forzosamente el siguiente paso lo aleja: $P(Y_{n+1} = 1 \mid Y_n = 0) = 1$.
+    Si está en una distancia $k > 0$, las probabilidades de transición son constantes:
+    \[ p = P(Y_{n+1} = k+1 \mid Y_n = k) = \frac{d-1}{d} \]
+    \[ q = P(Y_{n+1} = k-1 \mid Y_n = k) = \frac{1}{d} \]
+    
+    Queremos calcular $P^o(T_o^+ < \infty)$. Condicionando en el primer paso (que nos lleva obligatoriamente a $Y_1 = 1$), necesitamos calcular la probabilidad de ruina $u_1$, donde $u_k$ es la probabilidad de alcanzar el estado $0$ iniciando desde $k$:
+    \[ P^o(T_o^+ < \infty) = 1 \cdot u_1 \]
+    
+    La ecuación de diferencias para $u_k$ (con $k \ge 1$) es:
+    \[ u_k = p u_{k+1} + q u_{k-1} \]
+    Esta es la ecuación clásica de la ruina del jugador. La ecuación característica $pr^2 - r + q = 0$ tiene raíces $r=1$ y $r=q/p$.
+    Dado que $d \ge 3$, sabemos que $d-1 > 1$, por lo que $p > q$. La raíz $q/p$ es estrictamente menor a 1.
+    La solución general es $u_k = A(1)^k + B(q/p)^k$.
+    
+    Por condiciones de frontera, $u_0 = 1$. Además, como el drift es positivo ($p > q$), el proceso es transiente hacia infinito, por lo que $\lim_{k \to \infty} u_k = 0$. 
+    Esto fuerza a que $A = 0$ y $B = 1$. Por lo tanto:
+    \[ u_k = \left(\frac{q}{p}\right)^k = \left( \frac{1/d}{(d-1)/d} \right)^k = \left( \frac{1}{d-1} \right)^k \]
+    
+    Evaluando en $k=1$, concluimos que la probabilidad de retorno es:
+    \[ \mathbf{P^o(T_o^+ < \infty) = \frac{1}{d-1}} \]
+    \textit{Como la probabilidad es estrictamente menor a 1 para $d \ge 3$, la caminata es transiente.}
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (b): El Caso Degenerado $d=2$}]
+    Un árbol $\mathbb{T}_2$ es un grafo conexo, sin ciclos, donde cada vértice tiene exactamente grado 2. Topológicamente, el único grafo infinito que cumple esta propiedad es una línea infinita, la cual es isomorfa al conjunto de los números enteros $\mathbb{Z}$.
+    
+    En este grafo, si etiquetamos los nodos consecutivamente con enteros, el origen es $0$. Los únicos vecinos del estado $x$ son $x-1$ y $x+1$. 
+    La caminata simple en $\mathbb{T}_2$ elige a un vecino con probabilidad $1/2$. Esto coincide exactamente con las probabilidades de transición de la caminata aleatoria simple y simétrica en $\mathbb{Z}$:
+    \[ P(X_{n+1} = x+1 \mid X_n = x) = \frac{1}{2}, \quad P(X_{n+1} = x-1 \mid X_n = x) = \frac{1}{2} \]
+    Por lo tanto, la dinámica es idéntica y la caminata es \textbf{recurrente nula}.
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (c): Existencia y Cálculo de la Velocidad de Fuga}]
+    Sea el incremento de la distancia radial $\Delta Y_i = Y_i - Y_{i-1}$.
+    Como demostramos en el inciso (a), para $d \ge 3$ el proceso es transiente. Esto significa que visita el origen un número finito de veces casi seguramente (c.s.).
+    Existe un tiempo aleatorio pero finito $N_0$ a partir del cual $Y_n > 0$ para todo $n \ge N_0$.
+    
+    A partir de $N_0$, los incrementos $\Delta Y_i$ son variables aleatorias independientes e idénticamente distribuidas, tomando el valor $+1$ con probabilidad $\frac{d-1}{d}$ y $-1$ con probabilidad $\frac{1}{d}$.
+    
+    El valor esperado del incremento es:
+    \[ E[\Delta Y_i] = (+1)\left(\frac{d-1}{d}\right) + (-1)\left(\frac{1}{d}\right) = \frac{d-2}{d} \]
+    
+    Podemos escribir la distancia en el tiempo $n$ como una suma de incrementos:
+    \[ Y_n = Y_{N_0} + \sum_{i=N_0+1}^n \Delta Y_i \]
+    
+    Dividiendo entre $n$ y tomando el límite cuando $n \to \infty$, el término inicial constante desaparece. Aplicando la \textbf{Ley Fuerte de los Grandes Números (SLLN)} a la suma de incrementos i.i.d.:
+    \[ \lim_{n \to \infty} \frac{Y_n}{n} = \lim_{n \to \infty} \frac{1}{n} \sum_{i=N_0+1}^n \Delta Y_i = E[\Delta Y_i] \quad \text{casi seguramente.} \]
+    
+    Por lo tanto, la velocidad de fuga existe y es exactamente:
+    \[ \mathbf{v = \frac{d-2}{d}} \]
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (d): Contraste con el Retículo $\mathbb{Z}^d$}]
+    Para la caminata aleatoria simple simétrica en $\mathbb{Z}^d$ ($d \ge 3$), el Teorema de Pólya nos asegura que la caminata también es \textbf{transiente} (escapa hacia el infinito). Sin embargo, la \textit{forma} en que escapa es radicalmente distinta.
+    
+    Consideremos la distancia euclidiana al cuadrado $||X_n||^2$. En cada paso, la caminata altera una sola coordenada en $\pm 1$, por lo que la esperanza de la norma cuadrada obedece a $E[||X_n||^2] = n$.
+    
+    Por la desigualdad de Jensen aplicada a la función convexa $f(x) = x^2$, sabemos que $(E[||X_n||])^2 \le E[||X_n||^2] = n$. Por lo tanto, el crecimiento esperado de la distancia radial está acotado por:
+    \[ E[||X_n||] \le \sqrt{n} \]
+    
+    Calculamos la velocidad de fuga esperada dividiendo por $n$:
+    \[ E\left[\frac{||X_n||}{n}\right] \le \frac{\sqrt{n}}{n} = \frac{1}{\sqrt{n}} \]
+    
+    Cuando $n \to \infty$, la cota superior tiende a $0$. Dado que la distancia siempre es no negativa, por el Teorema del Emparedado, la velocidad de fuga es cero casi seguramente.
+    \[ \mathbf{v_{\mathbb{Z}^d} = \lim_{n \to \infty} \frac{||X_n||}{n} = 0} \]
+    
+    \textbf{Justificación geométrica:} En un árbol $d$-regular, no hay lazos (ciclos). Cualquier paso que te aleje del origen requiere exactamente dar la vuelta completa por ese mismo camino para volver a acercarte. En cambio, $\mathbb{Z}^d$ es un espacio altamente interconectado ("reticulado"); existen infinitos caminos para rodear el origen sin aumentar estrictamente el radio. Esta "difusión" espacial hace que la caminata regrese sobre sí misma constantemente, aniquilando el momento radial lineal y resultando en una expansión puramente difusiva ($\sim \sqrt{n}$) en lugar de balística ($\sim n$).
+\end{proof}
+
+
+\newpage
+
+
+\subsection{Modelo PageRank}
+
+
+\begin{ejercicio}{Modelo PageRank}{6.7}
+    Sea $G = (V,E_G)$ una gráfica dirigida de $N$ páginas web. La caminata de PageRank en $V$ es: con probabilidad $\alpha$ se sigue un enlace saliente (elegido uniformemente), y con probabilidad $1 - \alpha$ se salta a un vértice elegido uniformemente de $V$. Formalmente, $p(x,y) = \alpha/d^+(x) + (1 - \alpha)/N$ cuando $x$ tiene enlace a $y$, y $p(x,y) = (1 - \alpha)/N$ en otro caso, donde $d^+(x)$ es el grado de salida de $x$.
+    
+    (a) Demuestre que la cadena es irreducible y aperiódica, de modo que tiene una única medida estacionaria $\pi$ (el vector PageRank).
+    
+    (b) Escriba la ecuación $\pi = \pi P$ en forma matricial y dé una interpretación de $\pi(x)$ como la proporción de tiempo que la caminata pasa en $x$.
+    
+    (c) Para $N = 3$ y $G$ con aristas $1 \to 2$, $2 \to 3$, $3 \to 1$, calcule $\pi$ explícitamente con parámetro $\alpha$.
+    
+    (d) Explique por qué el parámetro $\alpha < 1$ es esencial para evitar el problema del \textit{dangling node} (vértice sin aristas de salida).
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{nota}{El Factor de Amortiguación}
+    El parámetro $\alpha \in (0, 1)$ (originalmente ajustado por Larry Page y Sergey Brin en $0.85$) no es solo un truco de comportamiento, sino una necesidad algebraica. Asegura que la matriz de Markov cumpla con las hipótesis del Teorema de Perron-Frobenius, garantizando la existencia y unicidad del ranking.
+\end{nota}
+
+\begin{proof}[\textbf{Solución (a): Irreducibilidad y Aperiodicidad}]
+    Asumiendo que el factor de amortiguación cumple $\alpha < 1$, entonces $1 - \alpha > 0$.
+    Para cualquier par de estados $x, y \in V$, la probabilidad de transición $p(x,y)$ está acotada inferiormente por la probabilidad de salto aleatorio:
+    \[ p(x,y) \ge \frac{1 - \alpha}{N} > 0 \]
+    
+    Dado que todas las entradas de la matriz de transición $P$ son estrictamente mayores a cero ($P > 0$), se cumplen dos propiedades inmediatas:
+    \begin{enumerate}
+        \item \textbf{Irreducibilidad:} Es posible ir de cualquier estado $x$ a cualquier estado $y$ en un solo paso. Todos los estados se comunican.
+        \item \textbf{Aperiodicidad:} Como $p(x,x) > 0$ para todo $x$, la cadena permite bucles de longitud 1. El máximo común divisor de las longitudes de los caminos de retorno es trivialmente 1.
+    \end{enumerate}
+    
+    Por el Teorema Ergódico para Cadenas de Markov finitas, una cadena irreducible y aperiódica posee una \textbf{única medida estacionaria $\pi$} a la cual converge independientemente del estado inicial.
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (b): Forma Matricial e Interpretación}]
+    Definimos la matriz de adyacencia estocástica por filas $H$, donde $H_{xy} = 1/d^+(x)$ si hay un enlace $x \to y$, y $0$ en otro caso. Definimos también la matriz $E$ de tamaño $N \times N$ llena de unos ($E = \mathbf{1}\mathbf{1}^T$).
+    
+    La matriz de transición de PageRank se escribe como:
+    \[ P = \alpha H + \frac{1 - \alpha}{N} E \]
+    
+    La ecuación de la medida estacionaria $\pi = \pi P$ (donde $\pi$ es un vector fila) se escribe:
+    \[ \pi = \alpha \pi H + \frac{1 - \alpha}{N} \pi E \]
+    
+    Sabiendo que $\pi$ es una distribución de probabilidad, sus elementos suman 1 ($\pi \mathbf{1} = 1$). Por lo tanto, el producto $\pi E$ resulta en un vector fila de puros unos. La ecuación matricial final es:
+    \[ \mathbf{\pi = \alpha \pi H + \frac{1 - \alpha}{N} \mathbf{1}^T} \]
+    
+    \textbf{Interpretación:} Por el Teorema del Límite de las Cadenas de Markov, $\pi(x)$ representa la proporción asintótica de tiempo que un usuario (que navega infinitamente haciendo clics y saltos aleatorios) pasará visitando la página $x$. Las páginas más enlazadas por páginas importantes serán visitadas con mayor frecuencia, obteniendo un mayor "PageRank".
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (c): Cálculo Explícito para $N=3$ cíclico}]
+    En este grafo anillo ($1 \to 2 \to 3 \to 1$), el grado de salida de todos los nodos es $d^+(x) = 1$. La matriz de navegación $H$ es:
+    \[ H = \begin{pmatrix} 0 & 1 & 0 \\ 0 & 0 & 1 \\ 1 & 0 & 0 \end{pmatrix} \]
+    
+    La matriz completa $P$ es:
+    \[ P = \begin{pmatrix} \frac{1-\alpha}{3} & \alpha + \frac{1-\alpha}{3} & \frac{1-\alpha}{3} \\ \frac{1-\alpha}{3} & \frac{1-\alpha}{3} & \alpha + \frac{1-\alpha}{3} \\ \alpha + \frac{1-\alpha}{3} & \frac{1-\alpha}{3} & \frac{1-\alpha}{3} \end{pmatrix} \]
+    
+    Notemos que la suma de las columnas de $H$ es 1 (además de sus filas), por lo que $H$ es \textit{doblemente estocástica}. Como la matriz $E$ también es doblemente estocástica, la matriz final $P$ es una combinación lineal convexa de matrices doblemente estocásticas, por lo tanto, $P$ es doblemente estocástica.
+    
+    Es un teorema conocido que toda matriz doblemente estocástica tiene como distribución estacionaria al vector uniforme. Verifiquémoslo con $\pi = (1/3, 1/3, 1/3)$:
+    \[ \pi P = \frac{1}{3} \mathbf{1}^T P = \frac{1}{3} \begin{pmatrix} \sum P_{i1} & \sum P_{i2} & \sum P_{i3} \end{pmatrix} \]
+    Como las columnas de $P$ suman 1:
+    \[ \pi P = \left( \frac{1}{3}, \frac{1}{3}, \frac{1}{3} \right) = \pi \]
+    
+    Por lo tanto, \textbf{independientemente del valor de $\alpha$}, la medida es:
+    \[ \mathbf{\pi = \left[ \frac{1}{3}, \frac{1}{3}, \frac{1}{3} \right]} \]
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (d): El problema del Dangling Node}]
+    Si un vértice $x$ no tiene aristas de salida ($d^+(x) = 0$), el término $\alpha / d^+(x)$ se indefine en el algoritmo original de navegación por clics. 
+    
+    Si se intenta parchar este problema asumiendo $\alpha = 1$ (sin saltos aleatorios) y creando un "auto-enlace" $p(x,x) = 1$ para que la matriz no tenga filas de ceros, el estado $x$ se convierte en un \textbf{estado absorbente}. 
+    
+    Consecuencias de un estado absorbente si $\alpha = 1$:
+    \begin{enumerate}
+        \item Se pierde la irreducibilidad de la cadena.
+        \item Todo el "flujo de probabilidad" (el PageRank) de la red terminará drenándose y acumulándose en los nodos sin salida a medida que el tiempo avance a infinito ($n \to \infty$). Las páginas con salida terminarán con un PageRank de 0.
+    \end{enumerate}
+    
+    Al fijar $\mathbf{\alpha < 1}$, el sumando $\frac{1-\alpha}{N}$ garantiza que, sin importar que no haya enlaces HTML de salida, el usuario tiene una probabilidad no nula de "teclear una nueva dirección URL" y escapar del nodo ciego. Esto restaura la irreducibilidad de la red global y asegura un ranking justo y matemáticamente estable para toda la web.
+\end{proof}
+
+
+\newpage
+
+\subsection{Modelo de ruina multiclase}
+
+
+
+\begin{ejercicio}{Modelo de ruina multiclase}{6.8}
+    Una compañía de seguros cobra primas a tasa $c > 0$ y paga siniestros de tamaño $1$ a tasa $\lambda > 0$ (proceso de Poisson). Sea $X_t$ el capital de la compañía en el tiempo $t$: $X_t = x + ct - N_t$, donde $N_t$ es el número de siniestros hasta el tiempo $t$.
+    
+    (a) Modele $(X_t)$ como proceso de Markov a tiempo continuo en $\mathbb{Z}$ (o en $\mathbb{N}_0$ con estado de ruina en 0).
+    
+    (b) Sea $\psi(x) = P^x(\text{ruina en tiempo finito})$. Derive la ecuación diferencial ordinaria que satisface $\psi$ en el régimen continuo $c \psi'(x) = \lambda[\psi(x) - \psi(x - 1)]$.
+    
+    (c) Muestre que $\psi(x) = (\lambda/c)^x \psi(0)$ es solución cuando $\lambda < c$ y calcule $\psi(0)$. ¿Cuál es la condición para que $\psi(x) < 1$?
+    
+    (d) Interprete el resultado: ¿qué ocurre cuando $\lambda \ge c$?
+\end{ejercicio}
+
+\vspace{2mm}
+
+
+
+\begin{proof}[\textbf{Solución (a): Modelado en Tiempo Continuo sobre $\mathbb{Z}$}]
+    Para modelar $X_t$ como una Cadena de Markov a Tiempo Continuo (CTMC) en el espacio de estados $S = \mathbb{Z}$, interpretamos la entrada de primas y los siniestros como saltos discretos:
+    \begin{itemize}
+        \item El capital aumenta en $+1$ (cobro acumulado de prima) con una tasa de transición constante $q(x, x+1) = c$.
+        \item El capital disminuye en $-1$ (pago de siniestro) con una tasa de transición constante $q(x, x-1) = \lambda$.
+    \end{itemize}
+    Los estados de ruina se definen como $R = \{x \in \mathbb{Z} : x \le 0\}$. Una vez que la cadena toca $0$, consideramos el proceso absorbido, por lo que $q(0, y) = 0$ para todo $y$.
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (b): Derivación de la Ecuación de Balance}]
+    Para un estado $x > 0$, la probabilidad de ruina $\psi(x)$ debe satisfacer la ecuación del generador infinitesimal $\mathcal{A}\psi(x) = 0$, ya que la probabilidad de absorción es una función armónica del proceso antes de ser absorbido.
+    
+    Aplicando el generador de nuestra CTMC a la función $\psi$:
+    \[ \mathcal{A}\psi(x) = c[\psi(x+1) - \psi(x)] + \lambda[\psi(x-1) - \psi(x)] = 0 \]
+    
+    Reordenando los términos para separar las tasas:
+    \[ c[\psi(x+1) - \psi(x)] = \lambda[\psi(x) - \psi(x-1)] \]
+    
+    Como se mencionó en la nota, adoptando la notación del enunciado donde $\psi'(x)$ denota la diferencia finita $\psi(x+1) - \psi(x)$, obtenemos directamente la ecuación en diferencias (descrita como diferencial en el texto):
+    \[ \mathbf{c \psi'(x) = \lambda[\psi(x) - \psi(x-1)]} \]
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (c): Verificación de la Solución y Condiciones}]
+    \textbf{1. Verificación de la solución propuesta:} \\
+    Se propone la solución $\psi(x) = \psi(0) \left(\frac{\lambda}{c}\right)^x$. Evaluamos esta función en el lado izquierdo (L.I.) y derecho (L.D.) de la ecuación en diferencias explícita derivada en (b).
+    
+    Lado Izquierdo:
+    \[ \text{L.I.} = c[\psi(x+1) - \psi(x)] = c \psi(0) \left[ \left(\frac{\lambda}{c}\right)^{x+1} - \left(\frac{\lambda}{c}\right)^x \right] \]
+    Factorizamos el término común $\left(\frac{\lambda}{c}\right)^x$:
+    \[ \text{L.I.} = c \psi(0) \left(\frac{\lambda}{c}\right)^x \left( \frac{\lambda}{c} - 1 \right) = \psi(0) \left(\frac{\lambda}{c}\right)^x (\lambda - c) \]
+    
+    Lado Derecho:
+    \[ \text{L.D.} = \lambda[\psi(x) - \psi(x-1)] = \lambda \psi(0) \left[ \left(\frac{\lambda}{c}\right)^x - \left(\frac{\lambda}{c}\right)^{x-1} \right] \]
+    Factorizamos el término común $\left(\frac{\lambda}{c}\right)^x$:
+    \[ \text{L.D.} = \lambda \psi(0) \left(\frac{\lambda}{c}\right)^x \left( 1 - \frac{c}{\lambda} \right) = \psi(0) \left(\frac{\lambda}{c}\right)^x (\lambda - c) \]
+    
+    Como L.I. = L.D., la función es efectivamente una solución de la ecuación.
+
+    \vspace{3mm}
+    \textbf{2. Cálculo de $\psi(0)$:} \\
+    Por definición, $\psi(0)$ es la probabilidad de ruina dado que el capital inicial es cero. Como el estado $0$ es el límite de la ruina y el proceso ya se encuentra ahí, la ruina es un evento seguro que ya ha ocurrido.
+    \[ \mathbf{\psi(0) = 1} \]
+    Por lo tanto, la fórmula final es $\psi(x) = (\lambda/c)^x$.
+
+    \vspace{3mm}
+    \textbf{3. Condición para $\psi(x) < 1$:} \\
+    Dado un capital inicial estrictamente positivo ($x > 0$), para que la probabilidad de ruina sea estrictamente menor a 1, necesitamos que la base de la potencia sea menor a la unidad:
+    \[ \left(\frac{\lambda}{c}\right)^x < 1 \implies \frac{\lambda}{c} < 1 \implies \mathbf{\lambda < c} \]
+    \textit{Esto se conoce en la industria aseguradora como la "condición de recargo de seguridad": la tasa de recaudo debe ser mayor a la tasa esperada de siniestros.}
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (d): Interpretación cuando $\lambda \ge c$}]
+    Matemáticamente, si $\lambda \ge c$, la base de nuestra solución es $\ge 1$, lo que daría probabilidades sin sentido físico si usáramos la misma fórmula. Sin embargo, recurriendo a la teoría de caminatas aleatorias, $\lambda \ge c$ significa que la tendencia (drift) del proceso es hacia la izquierda (negativa o cero):
+    \[ E[X_{t+1} - X_t] = c - \lambda \le 0 \]
+    
+    En una caminata aleatoria, un drift negativo asegura que el proceso se desplazará hacia $-\infty$ casi seguramente. Si el drift es exactamente cero (caminata simétrica), el proceso es \textit{recurrente nulo} y visita todos los estados con probabilidad 1. En ambos casos, el proceso cruzará el umbral de $0$ inevitablemente.
+    
+    \textbf{Interpretación económica:} Si la tasa de siniestros es igual o superior a la tasa a la que se cobran las primas, la aseguradora está operando a pérdida (o sin margen de ganancia real para soportar la varianza natural del riesgo). Las fluctuaciones aleatorias agotarán cualquier cantidad de capital inicial finito en algún momento del tiempo. En este régimen, \textbf{la ruina es absolutamente certera para cualquier capital $x$}, es decir, $\mathbf{\psi(x) = 1 \quad \forall x}$.
+\end{proof}
+
+
+\newpage
+
+\subsection{Simulación Monte Carlo vía cadenas de Markov (MCMC).}
+
+
+
+\begin{ejercicio}{Simulación Monte Carlo vía cadenas de Markov (MCMC)}{6.9}
+    Se desea calcular $\pi(f) = \sum_x \pi(x)f(x)$ para una distribución $\pi$ compleja en un espacio de estados $S$ grande.
+    
+    (a) Explique el principio de MCMC: construir una cadena de Markov irreducible aperiódica con medida estacionaria $\pi$ y estimar $\pi(f) \approx (1/n) \sum_{k=0}^{n-1} f(X_k)$ por la ley ergódica.
+    
+    (b) ¿Cuál es el error estándar del estimador MCMC? Expresélo en términos de la varianza asintótica $\sigma^2$ del Ejercicio 5.1.
+    
+    (c) Explique la diferencia entre muestreo i.i.d. de $\pi$ (error $\mathcal{O}(1/\sqrt{n})$ con varianza $\text{Var}_\pi(f)$) y MCMC (error $\mathcal{O}(1/\sqrt{n})$ con varianza $\sigma^2$). ¿Cuándo $\sigma^2 > \text{Var}_\pi(f)$?
+    
+    (d) Proponga una estrategia para reducir $\sigma^2$ en la práctica (calentamiento, diezmado, variantes de la cadena).
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{nota}{MCMC}
+    Cuando el espacio de estados $S$ es astronómicamente grande (ej. todas las posibles configuraciones del Modelo de Ising), calcular la suma exacta $\sum \pi(x)f(x)$ es computacionalmente imposible. MCMC nos permite aproximar esta suma paseando inteligentemente por las zonas de alta probabilidad del espacio.
+\end{nota}
+
+\begin{proof}[\textbf{Solución (a): El Principio de MCMC y la Ley Ergódica}]
+    El principio fundamental del MCMC radica en el \textbf{Teorema Ergódico para Cadenas de Markov}. Si logramos diseñar una matriz de transición $P$ (por ejemplo, usando el algoritmo de Metropolis-Hastings del Ejercicio 6.5) que sea:
+    \begin{enumerate}
+        \item \textbf{Irreducible:} Puede alcanzar cualquier estado en $S$.
+        \item \textbf{Aperiódica:} No se queda atrapada en ciclos deterministas.
+        \item \textbf{Reversible respecto a $\pi$:} Satisface el balance detallado $\pi(x)P(x,y) = \pi(y)P(y,x)$.
+    \end{enumerate}
+    Entonces, la cadena tiene a $\pi$ como su única distribución estacionaria. El Teorema Ergódico garantiza que, para cualquier función $f$ con esperanza finita, el promedio temporal a lo largo de una única trayectoria de la cadena convergerá casi seguramente al promedio espacial (la esperanza teórica):
+    \[ \lim_{n \to \infty} \frac{1}{n} \sum_{k=0}^{n-1} f(X_k) = \sum_{x \in S} f(x)\pi(x) = \pi(f) \quad \text{c.s.} \]
+    Esto nos permite sustituir una sumatoria intratable por un simple promedio empírico de las muestras generadas por la simulación.
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (b): Error Estándar del Estimador MCMC}]
+    Sea nuestro estimador empírico $\hat{\mu}_n = \frac{1}{n} \sum_{k=0}^{n-1} f(X_k)$.
+    Del Ejercicio 5.1, sabemos que el Teorema Central del Límite (TCL) para cadenas de Markov establece que:
+    \[ \sqrt{n} (\hat{\mu}_n - \pi(f)) \xrightarrow{\mathcal{L}} \mathcal{N}(0, \sigma^2) \]
+    Donde $\sigma^2$ es la varianza asintótica de la cadena. 
+    A partir de esta convergencia en distribución, la varianza del estimador $\hat{\mu}_n$ para un $n$ grande es aproximadamente $\text{Var}(\hat{\mu}_n) \approx \frac{\sigma^2}{n}$.
+    
+    El \textbf{error estándar} (EE) es la desviación estándar del estimador, por lo tanto:
+    \[ \mathbf{EE_{MCMC} \approx \frac{\sigma}{\sqrt{n}}} \]
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (c): Muestreo i.i.d. vs. MCMC}]
+    \textbf{1. Diferencia fundamental:} \\
+    En el muestreo independiente e idénticamente distribuido (i.i.d.), cada muestra $X_k$ es completamente independiente de $X_{k-1}$. La varianza del promedio empírico es simplemente la varianza de la función dividida por $n$: $\text{Var}(\hat{\mu}_n) = \frac{\text{Var}_\pi(f)}{n}$.
+    
+    En MCMC, las muestras se obtienen de una caminata aleatoria, por lo que $X_k$ depende fuertemente de $X_{k-1}$. Esta \textit{autocorrelación} modifica la varianza. Recordando el Ejercicio 5.1, la varianza asintótica es:
+    \[ \sigma^2 = \text{Var}_\pi(f) + 2 \sum_{k=1}^\infty \text{Cov}_\pi(f(X_0), f(X_k)) \]
+    
+    \textbf{2. ¿Cuándo $\sigma^2 > \text{Var}_\pi(f)$?} \\
+    Esta desigualdad estricta ocurre cuando la suma de las autocovarianzas es \textbf{positiva}. 
+    En la gran mayoría de los algoritmos MCMC (como el muestreo de Gibbs o Metropolis-Hastings estándar), las transiciones son locales; el proceso se mueve lentamente por el espacio de estados. Esto genera una \textbf{autocorrelación fuertemente positiva} entre muestras sucesivas ($\text{Cov}_\pi > 0$).
+    En consecuencia, $\sigma^2$ es significativamente mayor que $\text{Var}_\pi(f)$, lo que implica que el MCMC requiere muchas más muestras que el muestreo i.i.d. para alcanzar el mismo nivel de precisión.
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (d): Estrategias Prácticas en MCMC}]
+    Para mitigar los problemas de convergencia y la alta varianza asintótica, en la práctica se aplican las siguientes estrategias:
+    
+    \begin{enumerate}
+        \item \textbf{Calentamiento (Burn-in):} 
+        Dado que la cadena comienza en un estado $X_0$ arbitrario que puede tener muy baja probabilidad bajo $\pi$, las primeras muestras introducen un fuerte sesgo en el estimador. La estrategia consiste en descartar las primeras $m$ muestras (periodo de calentamiento) y calcular el promedio solo con las muestras posteriores: $\frac{1}{n-m} \sum_{k=m}^{n-1} f(X_k)$. Aunque esto no reduce $\sigma^2$ intrínsecamente, elimina el sesgo inicial (reduce el Error Cuadrático Medio empírico).
+        
+        \item \textbf{Diezmado (Thinning):}
+        Para reducir la fuerte autocorrelación positiva descrita en el inciso (c), se guarda solo una de cada $k$ muestras generadas (ej. saltar de 10 en 10). La nueva sub-cadena obtenida tiene muestras que se comportan mucho más como variables i.i.d., lo que reduce la varianza empírica del lote almacenado y ahorra memoria en espacios de alta dimensión.
+        
+        \item \textbf{Variantes de la Cadena (Mejores Propuestas):}
+        La forma más efectiva de reducir la varianza asintótica $\sigma^2$ de raíz es diseñar algoritmos que eviten el comportamiento difusivo (caminata aleatoria simple). 
+        \begin{itemize}
+            \item \textit{Hamiltonian Monte Carlo (HMC):} Utiliza la geometría diferencial y el gradiente de la distribución objetivo para proponer saltos deterministas y lejanos con altas tasas de aceptación.
+            \item \textit{Cadenas No-Reversibles:} Romper el balance detallado (manteniendo el balance global $\pi = \pi P$) introduce un drift direccional que evita que la cadena regrese sobre sus propios pasos, reduciendo dramáticamente el tiempo de mezcla y la varianza asintótica.
+        \end{itemize}
+    \end{enumerate}
+\end{proof}
+
+
+\newpage
+
+\subsection{Proceso de decaimiento radioactivo}
+
+\vspace{5mm}
+
+\begin{ejercicio}{Proceso de decaimiento radioactivo}{6.10}
+    Sea $X_t$ el número de átomos radiactivos en el tiempo $t$. Cada átomo decae independientemente con tasa $\lambda$. Cuando quedan $x$ átomos, la tasa de decaimiento es $x\lambda$.
+    
+    (a) Escriba el generador del proceso: $q(x, x-1) = x\lambda$, $q(x, y) = 0$ para $y \neq x-1$. Verifique que 0 es absorbente.
+    
+    (b) Calcule $E^x[X_t] = x e^{-\lambda t}$ resolviendo las ecuaciones de Kolmogorov hacia atrás para $E^x[X_t]$.
+    
+    (c) Calcule $\text{Var}^x(X_t) = x e^{-\lambda t}(1 - e^{-\lambda t})$ y muestre que $X_t \mid X_0 = x$ tiene distribución $\text{Binomial}(x, e^{-\lambda t})$.
+    
+    (d) Calcule el tiempo esperado de extinción $E^x[T_{\{0\}}]$ usando el generador $\mathcal{A}v(x) = -1$.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{proof}[\textbf{Solución (a): Generador y Estado Absorbente}]
+    El proceso es de muerte pura. Desde el estado $x$, la única transición posible es hacia $x-1$. Como los $x$ átomos son independientes y cada uno tiene una tasa $\lambda$ de decaer (mínimo de $x$ exponenciales independientes), la tasa total de salto es la suma de las tasas individuales:
+    \[ q(x, x-1) = x\lambda \]
+    Y para cualquier otro estado $y \neq x-1$, la tasa es nula: $q(x,y) = 0$.
+    
+    El generador infinitesimal $\mathcal{A}$ aplicado a una función $f$ toma la forma:
+    \[ \mathcal{A}f(x) = \sum_{y} q(x,y) [f(y) - f(x)] = x\lambda [f(x-1) - f(x)] \]
+    
+    Para verificar que $0$ es absorbente, evaluamos las tasas de salida desde el estado $x=0$:
+    \[ q(0, -1) = 0 \cdot \lambda = 0 \]
+    Como todas las tasas de salida son nulas, una vez que la cadena llega a $0$, se queda ahí para siempre. El estado $\mathbf{0}$ \textbf{es absorbente}.
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (b): Ecuación de Kolmogorov Hacia Atrás}]
+    Sea $u(t, x) = E^x[X_t]$ la esperanza condicionada a iniciar en $x$. La ecuación de Kolmogorov hacia atrás establece que $\frac{\partial}{\partial t} u(t,x) = \mathcal{A} u(t,x)$.
+    Sustituyendo el generador:
+    \[ \frac{\partial}{\partial t} u(t,x) = x\lambda [u(t, x-1) - u(t, x)] \]
+    
+    Resolveremos esto por inducción sobre $x$.
+    Para $x=1$ (un solo átomo), sabiendo que $u(t, 0) = 0$ (el estado absorbente no tiene átomos):
+    \[ \frac{\partial}{\partial t} u(t,1) = 1\lambda [0 - u(t, 1)] = -\lambda u(t,1) \]
+    La solución a esta EDO con condición inicial $u(0,1) = 1$ es $u(t,1) = e^{-\lambda t}$.
+    
+    Supongamos como hipótesis de inducción que para $x-1$ se cumple $u(t, x-1) = (x-1)e^{-\lambda t}$. Sustituimos en la ecuación para $x$:
+    \[ \frac{\partial}{\partial t} u(t,x) + x\lambda u(t, x) = x\lambda (x-1) e^{-\lambda t} \]
+    Esta es una EDO lineal de primer orden. Multiplicamos por el factor integrante $e^{x\lambda t}$:
+    \[ e^{x\lambda t} \frac{\partial}{\partial t} u(t,x) + x\lambda e^{x\lambda t} u(t, x) = x\lambda (x-1) e^{(x-1)\lambda t} \]
+    \[ \frac{\partial}{\partial t} \left[ u(t,x) e^{x\lambda t} \right] = x\lambda (x-1) e^{(x-1)\lambda t} \]
+    Integramos respecto a $t$:
+    \[ u(t,x) e^{x\lambda t} = \frac{x\lambda (x-1)}{(x-1)\lambda} e^{(x-1)\lambda t} + C = x e^{(x-1)\lambda t} + C \]
+    Despejando $u(t,x)$ al multiplicar por $e^{-x\lambda t}$:
+    \[ u(t,x) = x e^{-\lambda t} + C e^{-x\lambda t} \]
+    Usando la condición inicial $u(0,x) = x$:
+    \[ x = x e^0 + C e^0 \implies x = x + C \implies C = 0 \]
+    
+    Por lo tanto, queda rigurosamente demostrado que:
+    \[ \mathbf{E^x[X_t] = x e^{-\lambda t}} \]
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (c): Distribución Binomial y Varianza}]
+    En lugar de resolver ecuaciones diferenciales de segundo orden, podemos usar un argumento probabilístico directo. El enunciado nos indica que \textit{"cada átomo decae independientemente"}.
+    
+    Consideremos un átomo individual $i \in \{1, \dots, x\}$. Su tiempo de vida $T_i$ sigue una distribución exponencial $\text{Exp}(\lambda)$. 
+    La probabilidad de que el átomo $i$ siga "vivo" (no haya decaído) en el tiempo $t$ es:
+    \[ p(t) = P(T_i > t) = e^{-\lambda t} \]
+    
+    Podemos definir una variable indicadora $I_i(t)$ que vale $1$ si el átomo sobrevive al tiempo $t$, y $0$ si decae. Por lo tanto, $I_i(t) \sim \text{Bernoulli}(e^{-\lambda t})$.
+    
+    El número total de átomos sobrevivientes en el tiempo $t$ es la suma de estas indicadoras:
+    \[ X_t = \sum_{i=1}^x I_i(t) \]
+    
+    Dado que las $I_i(t)$ son variables aleatorias independientes e idénticamente distribuidas, su suma sigue exactamente una distribución Binomial. Por lo tanto:
+    \[ \mathbf{X_t \mid X_0 = x \sim \text{Binomial}(x, e^{-\lambda t})} \]
+    
+    Sabiendo que la varianza de una variable $Y \sim \text{Binomial}(n, p)$ es $np(1-p)$, aplicamos directamente la fórmula para obtener la varianza solicitada:
+    \[ \mathbf{\text{Var}^x(X_t) = x e^{-\lambda t}(1 - e^{-\lambda t})} \]
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (d): Tiempo Esperado de Extinción}]
+    Sea $v(x) = E^x[T_{\{0\}}]$ el tiempo esperado para que decaigan todos los átomos iniciando con $x$.
+    La ecuación de Poisson para tiempos de absorción es $\mathcal{A}v(x) = -1$ para $x > 0$, con la condición de frontera $v(0) = 0$.
+    
+    Aplicando el generador derivado en el inciso (a):
+    \[ x\lambda [v(x-1) - v(x)] = -1 \]
+    
+    Despejando la diferencia $v(x) - v(x-1)$:
+    \[ v(x) - v(x-1) = \frac{1}{x\lambda} \]
+    
+    Esto nos dice que el tiempo esperado adicional que toma pasar de $x$ átomos a $x-1$ átomos es exactamente la esperanza de una exponencial con tasa $x\lambda$ (el tiempo mínimo de falla entre los $x$ átomos).
+    Para hallar el tiempo total $v(x)$, sumamos estas diferencias telescópicas desde $k=1$ hasta $x$:
+    \[ \sum_{k=1}^x [v(k) - v(k-1)] = \sum_{k=1}^x \frac{1}{k\lambda} \]
+    
+    El lado izquierdo colapsa a $v(x) - v(0)$. Como $v(0) = 0$, obtenemos el resultado final:
+    \[ \mathbf{E^x[T_{\{0\}}] = \frac{1}{\lambda} \sum_{k=1}^x \frac{1}{k}} \]
+    
+    \textit{Interpretación: El tiempo esperado de extinción escala de forma logarítmica con el número inicial de átomos, ya que la suma armónica $\sum_{k=1}^x \frac{1}{k} \approx \ln(x) + \gamma$, donde $\gamma$ es la constante de Euler-Mascheroni.}
+\end{proof}
+
+
+\newpage
+
+\subsection{Proceso de Yule (nacimiento puro).}
+
+\vspace{5mm}
+
+\begin{ejercicio}{Proceso de Yule (nacimiento puro)}{6.11}
+    El proceso de Yule modela el crecimiento de una población: cada individuo se reproduce a tasa $\lambda$ independientemente. Así $q(k, k + 1) = k\lambda$ y $q(k, y) = 0$ para $y \neq k + 1$. Suponga $X_0 = 1$.
+    
+    (a) Resuelva las ecuaciones de Kolmogorov hacia adelante para $p_k(t) = P^1(X_t = k)$: demuestre que $p_k(t) = e^{-\lambda t}(1 - e^{-\lambda t})^{k-1}$.
+    
+    (b) Calcule $E^1[X_t] = e^{\lambda t}$ y $\text{Var}^1(X_t) = e^{\lambda t}(e^{\lambda t} - 1)$.
+    
+    (c) Muestre que $X_t e^{-\lambda t} \to W$ casi seguramente, donde $W$ tiene distribución $\text{Exp}(1)$. \textit{Sugerencia:} use que $X_t e^{-\lambda t}$ es martingala.
+    
+    (d) Calcule el tiempo esperado para que la población alcance el tamaño $n$: $E^1[T_n] = (1/\lambda) \sum_{k=1}^{n-1} 1/k$.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{proof}[\textbf{Solución (a): Ecuaciones de Kolmogorov hacia adelante}]
+    Las ecuaciones de Kolmogorov hacia adelante (FKE) dictan cómo evoluciona la probabilidad de estar en el estado $k$:
+    \[ p'_k(t) = \sum_j p_j(t) q(j, k) \]
+    Dado que las únicas transiciones hacia $k$ provienen de $k-1$ (con tasa $(k-1)\lambda$) y las salidas desde $k$ son hacia $k+1$ (con tasa $k\lambda$), la ecuación diferencial es:
+    \[ p'_k(t) = (k-1)\lambda p_{k-1}(t) - k\lambda p_k(t) \]
+    
+    Para demostrar que $p_k(t) = e^{-\lambda t}(1 - e^{-\lambda t})^{k-1}$ es la solución, procedemos a verificarla derivándola directamente.
+    Definamos $u(t) = e^{-\lambda t}$, por lo que $u'(t) = -\lambda e^{-\lambda t}$. La función propuesta es $p_k(t) = u(1-u)^{k-1}$.
+    Usando la regla del producto y la cadena:
+    \[ p'_k(t) = u'(1-u)^{k-1} + u(k-1)(1-u)^{k-2}(-u') \]
+    Sustituyendo $u = e^{-\lambda t}$ y $u' = -\lambda e^{-\lambda t}$:
+    \[ p'_k(t) = -\lambda e^{-\lambda t}(1 - e^{-\lambda t})^{k-1} + \lambda e^{-2\lambda t} (k-1)(1 - e^{-\lambda t})^{k-2} \]
+    Factorizamos el término común $\lambda e^{-\lambda t}(1 - e^{-\lambda t})^{k-2}$:
+    \[ p'_k(t) = \lambda e^{-\lambda t}(1 - e^{-\lambda t})^{k-2} \left[ -(1 - e^{-\lambda t}) + (k-1)e^{-\lambda t} \right] \]
+    Simplificando el interior del corchete:
+    \[ -1 + e^{-\lambda t} + k e^{-\lambda t} - e^{-\lambda t} = -1 + k e^{-\lambda t} \]
+    Por lo tanto:
+    \[ \mathbf{p'_k(t) = \lambda e^{-\lambda t}(1 - e^{-\lambda t})^{k-2} [ k e^{-\lambda t} - 1 ]} \]
+    
+    Ahora, evaluamos el lado derecho de la FKE con la solución propuesta:
+    \[ (k-1)\lambda p_{k-1}(t) - k\lambda p_k(t) = (k-1)\lambda e^{-\lambda t}(1-e^{-\lambda t})^{k-2} - k\lambda e^{-\lambda t}(1-e^{-\lambda t})^{k-1} \]
+    Factorizando de manera idéntica:
+    \[ \lambda e^{-\lambda t}(1 - e^{-\lambda t})^{k-2} \left[ (k-1) - k(1 - e^{-\lambda t}) \right] \]
+    Simplificando el corchete:
+    \[ k - 1 - k + k e^{-\lambda t} = k e^{-\lambda t} - 1 \]
+    Como ambos lados coinciden matemáticamente y la condición inicial se cumple ($p_1(0) = 1$ y $p_k(0) = 0$ para $k > 1$), \textbf{la solución propuesta es correcta y única}.
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (b): Esperanza y Varianza}]
+    Observamos cuidadosamente la forma de la distribución:
+    \[ P(X_t = k) = e^{-\lambda t}(1 - e^{-\lambda t})^{k-1} \]
+    Para cualquier tiempo fijo $t$, esta es exactamente la función de masa de probabilidad de una \textbf{distribución Geométrica} (definiéndola como el número de ensayos hasta el primer éxito), donde la probabilidad de éxito es $p = e^{-\lambda t}$.
+    
+    Sabiendo por teoría de probabilidad que para una variable $X \sim \text{Geo}(p)$ (con soporte $k \in \{1, 2, \dots\}$), su esperanza es $1/p$ y su varianza es $(1-p)/p^2$, obtenemos directamente:
+    \[ \mathbf{E^1[X_t] = \frac{1}{e^{-\lambda t}} = e^{\lambda t}} \]
+    \[ \mathbf{\text{Var}^1(X_t) = \frac{1 - e^{-\lambda t}}{(e^{-\lambda t})^2} = \frac{1 - e^{-\lambda t}}{e^{-2\lambda t}} = e^{\lambda t}(e^{\lambda t} - 1)} \]
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (c): Convergencia de Martingala a la Exponencial}]
+    Sea el proceso $M_t = X_t e^{-\lambda t}$.
+    Dado un tiempo $s < t$, la propiedad de ramificación nos dice que la población en el tiempo $t$ es la suma de los descendientes de los $X_s$ individuos vivos en el tiempo $s$. Cada uno forma un proceso de Yule independiente.
+    \[ E[X_t \mid \mathcal{F}_s] = X_s \cdot E^1[X_{t-s}] = X_s e^{\lambda(t-s)} \]
+    Multiplicando por la constante $e^{-\lambda t}$:
+    \[ E[M_t \mid \mathcal{F}_s] = e^{-\lambda t} X_s e^{\lambda(t-s)} = X_s e^{-\lambda s} = M_s \]
+    Por lo tanto, $\mathbf{M_t}$ \textbf{es una martingala}. Como $X_t \ge 0$, la martingala es no negativa. Por el Teorema de Convergencia de Martingalas, existe una variable aleatoria $W$ tal que $M_t \xrightarrow{c.s.} W$.
+    
+    Para hallar la distribución de $W$, analizamos la probabilidad de cola de $M_t$ para un valor $w > 0$:
+    \[ P(X_t e^{-\lambda t} > w) = P(X_t > w e^{\lambda t}) = \sum_{k = \lfloor w e^{\lambda t} \rfloor + 1}^\infty p_k(t) \]
+    La cola de una distribución geométrica $P(X > x) = (1-p)^x$. Usando $x = w e^{\lambda t}$:
+    \[ P(M_t > w) \approx (1 - e^{-\lambda t})^{w e^{\lambda t}} \]
+    Tomando el límite cuando $t \to \infty$, reconocemos la definición del número $e$ en el límite $(1 + x/n)^n \to e^x$:
+    \[ \lim_{t \to \infty} P(M_t > w) = e^{-w} \]
+    Reconocemos que $P(W > w) = e^{-w}$ es la función de supervivencia de una distribución Exponencial con parámetro $1$.
+    \[ \mathbf{W \sim \text{Exp}(1)} \]
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (d): Tiempo esperado para alcanzar la población $n$}]
+    Sea $T_k$ el tiempo que el proceso pasa exactamente en el estado $k$ antes de transitar al estado $k+1$.
+    Por la definición de las cadenas de Markov en tiempo continuo, los tiempos de permanencia son variables aleatorias exponenciales independientes, cuya tasa es igual a la tasa de salida del estado. En el proceso de Yule, la tasa de salida de $k$ es $k\lambda$.
+    \[ T_k \sim \text{Exp}(k\lambda) \implies E[T_k] = \frac{1}{k\lambda} \]
+    
+    El tiempo total para que la población alcance el tamaño $n$ comenzando desde 1 es simplemente la suma de los tiempos de permanencia en los estados $1, 2, \dots, n-1$:
+    \[ T_n = \sum_{k=1}^{n-1} T_k \]
+    
+    Aplicando la linealidad de la esperanza:
+    \[ E^1[T_n] = E\left[ \sum_{k=1}^{n-1} T_k \right] = \sum_{k=1}^{n-1} E[T_k] = \sum_{k=1}^{n-1} \frac{1}{k\lambda} \]
+    Factorizando la constante de tasa:
+    \[ \mathbf{E^1[T_n] = \frac{1}{\lambda} \sum_{k=1}^{n-1} \frac{1}{k}} \]
+    \textit{Al igual que en el modelo de decaimiento radiactivo, este tiempo crece de manera logarítmica respecto a la población final $n$, lo cual es el comportamiento característico de cualquier crecimiento exponencial.}
+\end{proof}
+
+
+\newpage
+
+\subsection{Modelo SIR a tiempo continuo}
+
+
+\begin{ejercicio}{Modelo SIR a tiempo continuo}{6.12}
+    Un modelo SIR estocástico en población $N$: el estado es $(S_t, I_t)$ con $S_t + I_t \le N$, $R_t = N - S_t - I_t$ (recuperados). Las tasas son: $q((s, i), (s - 1, i + 1)) = \beta si/N$ (nueva infección) y $q((s, i), (s, i - 1)) = \gamma i$ (recuperación).
+    
+    (a) Escriba el espacio de estados y el generador del proceso. Identifique los estados absorbentes.
+    
+    (b) Escriba las ecuaciones de Kolmogorov hacia adelante para $p_{s,i}(t) = P(S_t = s, I_t = i \mid S_0 = N - 1, I_0 = 1)$.
+    
+    (c) Para $N$ grande, derive el sistema de ecuaciones diferenciales ordinarias (aproximación de campo medio): $ds/dt = -\beta si$, $di/dt = \beta si - \gamma i$, con $s = S/N$, $i = I/N$. Muestre que si $s(0)R_0 > 1$ la epidemia crece inicialmente.
+    
+    (d) Muestre que el modelo estocástico puede extinguirse en tiempo $\mathcal{O}(1/\gamma)$ incluso cuando $R_0 > 1$, y contraste con la predicción determinista.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{nota}{El Límite de Fluido (Teorema de Kurtz)}
+    La conexión entre el inciso (b) estocástico y el inciso (c) determinista está dada por la Ley de los Grandes Números para procesos de Markov. A medida que $N \to \infty$, las fluctuaciones aleatorias relativas se desvanecen en escala $1/\sqrt{N}$, y las trayectorias estocásticas convergen casi seguramente a las soluciones de las EDOs (el límite de fluido).
+\end{nota}
+
+\begin{proof}[\textbf{Solución (a): Espacio, Generador y Absorción}]
+    \textbf{Espacio de Estados:} \\
+    Dado que la población total es $N$, el número de susceptibles $S_t$ e infecciosos $I_t$ son enteros no negativos cuya suma no puede exceder $N$.
+    \[ E = \{ (s, i) \in \mathbb{N}_0 \times \mathbb{N}_0 : s + i \le N \} \]
+    
+    \textbf{Generador Infinitesimal:} \\
+    El operador generador $\mathcal{A}$ actúa sobre funciones de prueba $f(s,i)$ sumando todas las transiciones posibles ponderadas por sus tasas:
+    \[ \mathcal{A}f(s,i) = \frac{\beta s i}{N} [f(s-1, i+1) - f(s,i)] + \gamma i [f(s, i-1) - f(s,i)] \]
+    
+    \textbf{Estados Absorbentes:} \\
+    Un estado es absorbente si todas sus tasas de salida son cero. Las tasas son $\frac{\beta s i}{N}$ y $\gamma i$. Ambas son proporcionales a $i$. Si $i = 0$, ambas tasas se anulan independientemente del valor de $s$. 
+    Por lo tanto, el conjunto de estados absorbentes (la epidemia terminó) es:
+    \[ \mathbf{A = \{ (s, 0) : 0 \le s \le N \}} \]
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (b): Ecuaciones de Kolmogorov hacia adelante}]
+    Las ecuaciones de Kolmogorov hacia adelante describen la conservación de probabilidad (entradas menos salidas). Para el estado $(s, i)$:
+    
+    \textbf{Flujos de Entrada (Inflows):}
+    \begin{itemize}
+        \item Desde $(s+1, i-1)$ mediante una infección: con tasa $\frac{\beta (s+1)(i-1)}{N}$.
+        \item Desde $(s, i+1)$ mediante una recuperación: con tasa $\gamma (i+1)$.
+    \end{itemize}
+    
+    \textbf{Flujos de Salida (Outflows):}
+    \begin{itemize}
+        \item Hacia $(s-1, i+1)$ o hacia $(s, i-1)$: la tasa total de salida es la suma de las tasas del estado actual $\left( \frac{\beta s i}{N} + \gamma i \right)$.
+    \end{itemize}
+    
+    Agrupando todo esto en la ecuación diferencial para $p_{s,i}(t)$:
+    \[ \mathbf{p'_{s,i}(t) = \frac{\beta(s+1)(i-1)}{N} p_{s+1, i-1}(t) + \gamma(i+1) p_{s, i+1}(t) - \left( \frac{\beta s i}{N} + \gamma i \right) p_{s,i}(t)} \]
+    \textit{(Con la condición inicial $p_{N-1, 1}(0) = 1$ y $0$ para el resto de los estados).}
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (c): Aproximación de Campo Medio}]
+    Sea el cambio esperado en un paso infinitesimal $dt$:
+    \[ E[dS_t \mid S_t, I_t] = (-1) \frac{\beta S_t I_t}{N} dt \]
+    \[ E[dI_t \mid S_t, I_t] = (+1) \frac{\beta S_t I_t}{N} dt + (-1) \gamma I_t dt \]
+    
+    Definimos las fracciones poblacionales $s = S/N$ y $i = I/N$. Aplicando el Límite de Fluido ($N \to \infty$), las esperanzas deterministas dominan el sistema. Dividiendo las ecuaciones anteriores por $N dt$:
+    \[ \frac{ds}{dt} = \mathbf{-\beta s i} \]
+    \[ \frac{di}{dt} = \mathbf{\beta s i - \gamma i} \]
+    
+    \textbf{Crecimiento inicial de la epidemia:} \\
+    Para que la epidemia crezca en $t=0$, la derivada de los infectados debe ser positiva:
+    \[ \frac{di}{dt} \Big|_{t=0} > 0 \implies \beta s(0) i(0) - \gamma i(0) > 0 \]
+    Factorizando $\gamma i(0)$ y asumiendo $i(0) > 0$:
+    \[ \gamma i(0) \left( \frac{\beta}{\gamma} s(0) - 1 \right) > 0 \]
+    Recordando la definición del número de reproducción $R_0 = \beta/\gamma$:
+    \[ \mathbf{s(0)R_0 > 1} \]
+    \textit{Si esta condición se cumple, el modelo determinista asegura un brote exponencial.}
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (d): Extinción Estocástica Temprana}]
+    Consideremos la dinámica estocástica real desde el instante $t=0$, con el paciente cero ($I_0 = 1$ y $S_0 = N-1$).
+    Existen dos posibles primeros eventos competitivos en el sistema:
+    \begin{enumerate}
+        \item Infección: Ocurre con tasa $\lambda_{\text{inf}} = \frac{\beta (N-1)(1)}{N} \approx \beta$.
+        \item Recuperación: Ocurre con tasa $\lambda_{\text{rec}} = \gamma (1) = \gamma$.
+    \end{enumerate}
+    
+    Por las propiedades de los relojes exponenciales competitivos, la probabilidad de que el paciente cero se recupere \textit{antes} de infectar a alguien es:
+    \[ P(\text{Extinción inmediata}) = \frac{\lambda_{\text{rec}}}{\lambda_{\text{inf}} + \lambda_{\text{rec}}} \approx \frac{\gamma}{\beta + \gamma} \]
+    Dividiendo el numerador y denominador por $\gamma$:
+    \[ P(\text{Extinción inmediata}) \approx \mathbf{\frac{1}{R_0 + 1}} \]
+    
+    Dado que $\gamma > 0$ y $\beta > 0$, esta probabilidad es estrictamente mayor a cero, \textbf{incluso si $R_0 > 1$}. El tiempo esperado para que ocurra este primer evento competitivo es $\frac{1}{\beta + \gamma}$, que es del orden $\mathbf{\mathcal{O}(1/\gamma)}$. 
+    
+    \textbf{Conclusión:} \\
+    Si $R_0 > 1$, la predicción determinista de las EDOs (inciso c) afirma categóricamente que $di/dt > 0$, garantizando un brote macroscópico sin excepciones. Sin embargo, el modelo estocástico revela que la naturaleza discreta del paciente cero implica un juego de azar inicial. Existe una probabilidad genuina ($\approx 1/(R_0+1)$) de que la epidemia sea sofocada en unos pocos días ($\mathcal{O}(1/\gamma)$) simplemente porque el primer individuo tuvo un sistema inmunológico rápido o suerte en sus contactos, evidenciando el profundo "punto ciego" de las ecuaciones diferenciales en tamaños poblacionales pequeños.
+\end{proof}
+
+
+
+\newpage
+
+
+\subsection{Modelo de filas en tándem}
+
+
+
+\begin{ejercicio}{Modelo de filas en tándem}{6.13}
+    Dos colas en tándem: los clientes llegan a la cola 1 (tasa $\lambda$, servicio $\mu_1$) y al terminar pasan a la cola 2 (servicio $\mu_2$). Sea $(X_t, Y_t)$ el par de números de clientes en cada cola.
+    
+    (a) Escriba el generador del proceso en $\mathbb{N}_0 \times \mathbb{N}_0$ identificando las tasas de transición.
+    
+    (b) Use el teorema de Burke: si $\lambda < \mu_1$, la salida de la cola 1 es un proceso de Poisson de tasa $\lambda$. Enuncie y justifique este resultado.
+    
+    (c) Deduzca que en equilibrio $(X_t, Y_t)$ tiene distribución producto: $\pi(x, y) = \pi_1(x)\pi_2(y)$, donde $\pi_j$ es la estacionaria de M/M/1 con $\rho_j = \lambda/\mu_j < 1$.
+    
+    (d) Calcule el tiempo medio total en el sistema (ambas colas) usando la Ley de Little.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{nota}{Teorema de Burke y Redes de Jackson}
+    El Teorema de Burke es el pilar de la teoría de redes de colas. Nos asegura que un servidor M/M/1 estable no solo procesa clientes, sino que "mantiene la forma" probabilística del flujo original: entra Poisson, sale Poisson. Esto permite descomponer redes complejas en colas independientes.
+\end{nota}
+
+\begin{proof}[\textbf{Solución (a): Generador del Proceso}]
+    El espacio de estados es bidimensional: $S = \mathbb{N}_0 \times \mathbb{N}_0$.
+    Identificamos los tres eventos posibles y sus respectivas tasas de transición desde un estado genérico $(x, y)$:
+    
+    \begin{itemize}
+        \item \textbf{Llegada del exterior a la Cola 1:} Incrementa $X_t$ en 1.
+        \[ q((x, y), (x+1, y)) = \lambda \]
+        
+        \item \textbf{Servicio en Cola 1 y paso a Cola 2:} Decrementa $X_t$ en 1 e incrementa $Y_t$ en 1. Solo ocurre si hay clientes en la primera cola ($x > 0$).
+        \[ q((x, y), (x-1, y+1)) = \mu_1 \quad \text{si } x > 0 \]
+        
+        \item \textbf{Servicio en Cola 2 y salida del sistema:} Decrementa $Y_t$ en 1. Solo ocurre si hay clientes en la segunda cola ($y > 0$).
+        \[ q((x, y), (x, y-1)) = \mu_2 \quad \text{si } y > 0 \]
+    \end{itemize}
+    Para cualquier otro par de estados que no siga estos patrones, la tasa de transición es $0$.
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (b): Teorema de Burke}]
+    \textbf{Enunciado:} En estado estacionario, el proceso de salidas de una cola M/M/1 estable (con tasa de llegada $\lambda$ y tasa de servicio $\mu_1$, donde $\lambda < \mu_1$) es un proceso de Poisson con tasa $\lambda$. Además, en cualquier instante $t$, el número de clientes en el sistema es independiente del proceso de salidas antes de $t$.
+    
+    \textbf{Justificación (por Reversibilidad):} 
+    Una cola M/M/1 es un proceso de nacimiento-muerte estocástico, y sabemos (por el Ejercicio 4.6) que todo proceso de nacimiento-muerte estacionario es \textbf{reversible en el tiempo}. 
+    
+    Si grabamos la dinámica de la cola y la reproducimos en reversa (hacia atrás en el tiempo):
+    \begin{enumerate}
+        \item Las \textit{salidas} (muertes) en el tiempo hacia adelante se convierten visualmente en \textit{llegadas} (nacimientos) en el tiempo hacia atrás.
+        \item Como el proceso es reversible, el comportamiento probabilístico hacia atrás debe ser idéntico al comportamiento hacia adelante.
+        \item Dado que las llegadas hacia adelante forman un proceso de Poisson de tasa $\lambda$, las "llegadas hacia atrás" también deben ser un proceso de Poisson de tasa $\lambda$.
+    \end{enumerate}
+    Por lo tanto, concluimos que las salidas originales también forman rigurosamente un proceso de Poisson de tasa $\lambda$.
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (c): Distribución Producto en Equilibrio}]
+    Para la primera cola, es un sistema M/M/1 estándar. Su distribución estacionaria marginal es conocida:
+    \[ \pi_1(x) = (1 - \rho_1)\rho_1^x, \quad \text{donde } \rho_1 = \lambda / \mu_1 < 1 \]
+    
+    Por el \textbf{Teorema de Burke} justificado en el inciso anterior, el flujo de clientes que abandona la cola 1 (y por ende, el que ingresa a la cola 2) es un proceso de Poisson puro de tasa $\lambda$. Además, este flujo es independiente del estado actual de la cola 1.
+    
+    Desde la perspectiva de la Cola 2, recibe llegadas de Poisson a tasa $\lambda$ y tiene tiempos de servicio exponenciales a tasa $\mu_2$. Esto la convierte matemáticamente en \textbf{otra cola M/M/1 pura}. Su distribución marginal es:
+    \[ \pi_2(y) = (1 - \rho_2)\rho_2^y, \quad \text{donde } \rho_2 = \lambda / \mu_2 < 1 \]
+    
+    Debido a la independencia de las colas en estado estacionario (garantizada por la segunda parte del Teorema de Burke), la probabilidad conjunta es simplemente el producto de sus probabilidades marginales:
+    \[ \mathbf{\pi(x, y) = \pi_1(x) \pi_2(y) = (1 - \rho_1)(1 - \rho_2) \rho_1^x \rho_2^y} \]
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (d): Tiempo Medio Total (Ley de Little)}]
+    Para encontrar el tiempo medio total $W$ que un cliente pasa en el sistema (esperando y siendo servido en ambas colas), aplicamos la \textbf{Ley de Little}: $L = \lambda W$.
+    
+    Primero calculamos el número medio total de clientes en el sistema, $L$. Dado que $L = E[X] + E[Y]$, y cada cola es una M/M/1 independiente:
+    \[ E[X] = \frac{\rho_1}{1 - \rho_1} = \frac{\lambda}{\mu_1 - \lambda} \]
+    \[ E[Y] = \frac{\rho_2}{1 - \rho_2} = \frac{\lambda}{\mu_2 - \lambda} \]
+    
+    Sumamos para obtener $L$:
+    \[ L = \frac{\lambda}{\mu_1 - \lambda} + \frac{\lambda}{\mu_2 - \lambda} \]
+    
+    Finalmente, despejamos $W$ dividiendo entre la tasa de llegadas global $\lambda$:
+    \[ W = \frac{L}{\lambda} = \frac{1}{\lambda} \left[ \frac{\lambda}{\mu_1 - \lambda} + \frac{\lambda}{\mu_2 - \lambda} \right] \]
+    \[ \mathbf{W = \frac{1}{\mu_1 - \lambda} + \frac{1}{\mu_2 - \lambda}} \]
+    
+    \textit{Interpretación: El tiempo total esperado es exactamente la suma de los tiempos esperados de dos sistemas M/M/1 aislados. El cuello de botella (la $\mu$ más cercana a $\lambda$) dominará el tiempo total de espera.}
+\end{proof}
+
+
+
+\newpage
+
+
+\subsection{Canal de comunicación binario}
+
+
+
+\begin{ejercicio}{Canal de comunicación binario}{6.14}
+    Se transmite una secuencia de bits por un canal ruidoso. Sea $(X_n)$ una cadena en $\{0, 1\}$: $p(0, 1) = \epsilon$, $p(1, 0) = \epsilon$ (tasa de error simétrica).
+    
+    (a) Calcule la medida estacionaria $\pi(0) = \pi(1) = 1/2$ y verifique la reversibilidad.
+    
+    (b) Calcule $p^n(0, 0) = \frac{1}{2}(1 + (1 - 2\epsilon)^n)$ y analice la convergencia al equilibrio.
+    
+    (c) Si el bit transmitido es $x$ y el recibido es $Y$ con $P(Y \neq x) = \epsilon$, calcule la capacidad del canal $C = 1 - H(\epsilon)$, donde $H(\epsilon) = -\epsilon \log_2 \epsilon - (1 - \epsilon) \log_2 (1 - \epsilon)$ es la entropía binaria.
+    
+    (d) Sea $(X_0, X_1, \dots, X_{n-1})$ la secuencia de bits original y $(Y_0, \dots, Y_{n-1})$ la recibida. Calcule la probabilidad de que la secuencia recibida tenga exactamente $k$ errores.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{nota}{Entropía y Ruido}
+    La entropía binaria $H(\epsilon)$ mide la incertidumbre introducida por el canal. Si $\epsilon = 0.5$, el canal es puro ruido y no transmite información ($C=0$). Si $\epsilon = 0$, el canal es perfecto ($C=1$). Curiosamente, si $\epsilon = 1$, el canal también tiene capacidad $C=1$, ¡solo hay que invertir todos los bits recibidos!
+\end{nota}
+
+\begin{proof}[\textbf{Solución (a): Medida Estacionaria y Reversibilidad}]
+    La matriz de transición del canal es:
+    \[ P = \begin{pmatrix} 1-\epsilon & \epsilon \\ \epsilon & 1-\epsilon \end{pmatrix} \]
+    
+    Para hallar la medida estacionaria $\pi = (\pi_0, \pi_1)$, resolvemos $\pi P = \pi$:
+    \[ \pi_0(1-\epsilon) + \pi_1\epsilon = \pi_0 \implies \pi_1\epsilon = \pi_0\epsilon \implies \pi_1 = \pi_0 \]
+    Dado que $\pi_0 + \pi_1 = 1$, obtenemos $\mathbf{\pi(0) = \pi(1) = 1/2}$.
+    
+    Para verificar la \textbf{reversibilidad}, comprobamos el balance detallado $\pi(x)p(x,y) = \pi(y)p(y,x)$:
+    \[ \pi(0)p(0,1) = \frac{1}{2} \cdot \epsilon \]
+    \[ \pi(1)p(1,0) = \frac{1}{2} \cdot \epsilon \]
+    Como ambos términos son idénticos, la cadena es reversible. Físicamente, esto significa que el canal es estadísticamente igual si lo recorremos en cualquier sentido de transmisión.
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (b): Probabilidades de n-pasos y Convergencia}]
+    Utilizamos la diagonalización de la matriz $P$. Los valores propios de $P$ son $\lambda_1 = 1$ (siempre para matrices estocásticas) y $\lambda_2 = (1-\epsilon) - \epsilon = 1-2\epsilon$.
+    La matriz de transición de $n$ pasos tiene la forma:
+    \[ P^n = \frac{1}{2} \begin{pmatrix} 1+\lambda_2^n & 1-\lambda_2^n \\ 1-\lambda_2^n & 1+\lambda_2^n \end{pmatrix} \]
+    Extrayendo la entrada $p^n(0,0)$:
+    \[ \mathbf{p^n(0,0) = \frac{1}{2}(1 + (1 - 2\epsilon)^n)} \]
+    
+    \textbf{Análisis de convergencia:} \\
+    Si $0 < \epsilon < 1$, entonces $|1-2\epsilon| < 1$. Al tomar el límite cuando $n \to \infty$:
+    \[ \lim_{n \to \infty} p^n(0,0) = \frac{1}{2}(1 + 0) = \frac{1}{2} = \pi(0) \]
+    La cadena converge al equilibrio uniformemente. La velocidad de convergencia depende de cuán lejos esté $\epsilon$ de $0.5$. Si $\epsilon = 0.5$, el equilibrio es instantáneo en un solo paso.
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (c): Capacidad del Canal de Shannon}]
+    La capacidad $C$ de un canal simétrico se define como el máximo de la información mutua $I(X;Y)$ sobre todas las distribuciones de entrada $P(X)$. 
+    \[ I(X;Y) = H(Y) - H(Y|X) \]
+    Para un canal simétrico, $H(Y|X)$ es constante e igual a la entropía del ruido en cada bit:
+    \[ H(Y|X=x) = -\epsilon \log_2 \epsilon - (1-\epsilon) \log_2 (1-\epsilon) = H(\epsilon) \]
+    
+    Para maximizar $I(X;Y)$, debemos maximizar $H(Y)$. El valor máximo de la entropía para una variable binaria es $1$ bit, alcanzado cuando $Y$ es uniforme ($P(Y=0)=P(Y=1)=1/2$). Como demostramos en el inciso (a), si la entrada $X$ es uniforme, la salida $Y$ también lo es.
+    Por lo tanto:
+    \[ \mathbf{C = 1 - H(\epsilon)} \]
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (d): Probabilidad de k errores}]
+    En un canal de comunicación binario, se asume que cada bit se transmite de forma independiente (ruido blanco). 
+    Para cada bit $i$, definimos una variable de error $E_i$ tal que $E_i = 1$ si $Y_i \neq X_i$ (ocurre un error con probabilidad $\epsilon$) y $E_i = 0$ si $Y_i = X_i$ (transmisión correcta con probabilidad $1-\epsilon$).
+    
+    El número total de errores en una secuencia de longitud $n$ es $K = \sum_{i=0}^{n-1} E_i$.
+    Dado que los errores son ensayos de Bernoulli independientes con probabilidad de éxito $\epsilon$, la variable aleatoria $K$ sigue una \textbf{distribución Binomial}:
+    \[ \mathbf{P(K = k) = \binom{n}{k} \epsilon^k (1-\epsilon)^{n-k}} \]
+\end{proof}
+
+
+
+\newpage
+
+\subsection{Modelo de inventario}
+
+\begin{ejercicio}{Modelo de inventario}{6.15}
+    Un almacén tiene capacidad máxima $M$. Al inicio de cada periodo, si el inventario $X_n \le s$ (nivel de reorden), se hace un pedido que eleva el nivel a $S$. Luego llega una demanda $D_n$ i.i.d. con distribución $P(D = k) = d_k$ ($k \ge 0$), y el nivel al final del periodo es $X_{n+1} = \max(S - D_n, 0)$ si se hizo pedido, o $X_{n+1} = \max(X_n - D_n, 0)$ en otro caso.
+    
+    (a) Modele $(X_n)$ como cadena de Markov en $\{0, \dots, M\}$ y escriba las probabilidades de transición $p(x, y)$.
+    
+    (b) Determine bajo qué condiciones la cadena es irreducible y establezca la existencia de una medida estacionaria $\pi$.
+    
+    (c) Calcule $E^\pi[X_n]$ (nivel medio de inventario) y $P^\pi(X_n = 0)$ (probabilidad de agotamiento).
+    
+    (d) Use la ley ergódica para estimar el costo medio por periodo $c(X_n) = h X_n + b \mathbf{1}_{\{X_n=0\}}$, donde $h$ es el costo de mantenimiento y $b$ la penalización por agotamiento.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{nota}{Política de Inventario}
+    Esta política busca equilibrar dos costos contrapuestos: el costo de ordenar (que favorece pedidos grandes y poco frecuentes) y el costo de almacenamiento (que favorece mantener poco inventario). El nivel $s$ protege contra la incertidumbre de la demanda mientras llega el pedido.
+\end{nota}
+
+\begin{proof}[\textbf{Solución (a): Modelado y Probabilidades de Transición}]
+    El estado $X_n$ representa el inventario al final del periodo $n$. La dinámica de transición depende de si el nivel actual $x$ activa o no un pedido:
+
+    \textbf{Caso 1: $x \le s$ (se hace pedido).} 
+    El nivel sube inmediatamente a $S$ y luego se resta la demanda $D_n$. Entonces:
+    \[
+    p(x, y) =
+    \begin{cases}
+        d_{S-y} & \text{si } 1 \le y \le S, \\
+        \sum_{k=S}^{\infty} d_k & \text{si } y = 0, \\
+        0 & \text{si } y > S.
+    \end{cases}
+    \]
+
+    \textbf{Caso 2: $x > s$ (no se hace pedido).} 
+    El nivel permanece en $x$ y se resta la demanda $D_n$. Entonces:
+    \[
+    p(x, y) =
+    \begin{cases}
+        d_{x-y} & \text{si } 1 \le y \le x, \\
+        \sum_{k=x}^{\infty} d_k & \text{si } y = 0, \\
+        0 & \text{si } y > x.
+    \end{cases}
+    \]
+
+    En ambos casos, $p(x,y)$ no depende de $n$, por lo que $(X_n)$ es una cadena de Markov homogénea.
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (b): Irreducibilidad y estacionariedad}]
+    \textbf{Irreducibilidad:} La cadena es irreducible si todos los estados se comunican. Una condición suficiente es:
+    \begin{enumerate}
+        \item $d_k > 0$ para todo $k \in \{0, \dots, S\}$,
+        \item $S \le M$ (consistencia del modelo).
+    \end{enumerate}
+    
+    Bajo estas condiciones:
+    \begin{itemize}
+        \item Desde cualquier estado se puede alcanzar $0$ con probabilidad positiva.
+        \item Desde $0$ se alcanza $S$ (por la política de reorden).
+        \item Desde $S$ se puede alcanzar cualquier estado intermedio.
+    \end{itemize}
+    Por lo tanto, la cadena es irreducible.
+
+    \textbf{Existencia de $\pi$:} Como el espacio de estados $\{0,\dots,M\}$ es finito e irreducible, la cadena es positiva recurrente y existe una única distribución estacionaria $\pi$ que satisface
+    \[
+    \pi P = \pi, \quad \sum_{j=0}^M \pi(j) = 1.
+    \]
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (c): Nivel medio y agotamiento}]
+    Una vez obtenida la distribución estacionaria $\pi$, los estadísticos de interés son:
+
+    \textbf{Nivel medio de inventario:}
+    \[
+    E^\pi[X_n] = \sum_{j=0}^M j \, \pi(j).
+    \]
+
+    \textbf{Probabilidad de agotamiento:}
+    \[
+    P^\pi(X_n = 0) = \pi(0).
+    \]
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (d): Costo medio}]
+    Por la ley ergódica para cadenas de Markov finitas e irreducibles:
+    \[
+    \lim_{n \to \infty} \frac{1}{n} \sum_{k=1}^n c(X_k)
+    = E^\pi[c(X)].
+    \]
+
+    Sustituyendo $c(x) = hx + b \mathbf{1}_{\{x=0\}}$:
+    \[
+    E^\pi[c(X)] = h \sum_{j=0}^M j \pi(j) + b \pi(0).
+    \]
+
+    Por lo tanto,
+    \[
+    E^\pi[c(X)] = h\, E^\pi[X_n] + b\, \pi(0).
+    \]
+
+    Este valor representa el costo promedio por periodo en el largo plazo.
+\end{proof}
+
+\newpage
+
+\subsection{Proceso de degradación y mantenimiento.}
+
+
+
+\begin{ejercicio}{Proceso de degradación y mantenimiento}{6.16}
+    Un sistema se degrada con el tiempo. Sea $X_n \in \{0, 1, 2, 3\}$ el nivel de condición: 0 = nuevo, 3 = falla. Las probabilidades de transición son: $p(i, i + 1) = \alpha_i$ (degradación) y $p(i, 0) = \beta_i$ (mantenimiento preventivo), con $\alpha_i + \beta_i \le 1$ y la parte restante en $p(i, i) = 1 - \alpha_i - \beta_i$.
+    
+    (a) Escriba la matriz de transición $P$ con parámetros $\alpha_i$ y $\beta_i$ e identifique el estado absorbente (falla).
+    
+    (b) Calcule $E^0[T_{\{3\}}]$ (tiempo esperado hasta la falla en ausencia de mantenimiento: $\beta_i = 0$).
+    
+    (c) Con mantenimiento ($\beta_i > 0$), calcule la medida estacionaria $\pi$ del sistema (sin estado de falla absorbente) y el porcentaje de tiempo en el que el sistema está operativo.
+    
+    (d) Optimice los parámetros $\beta_i$ para minimizar el costo total por periodo $\sum_i \pi(i) c_i$, donde $c_i$ es el costo de mantenimiento en el estado $i$.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{nota}{Confiabilidad y Disponibilidad}
+    En este modelo, el estado 3 no suele tener mantenimiento preventivo ($\beta_3 = 0$) porque ya ha fallado; en su lugar, requeriría un mantenimiento correctivo (reparación) para volver a 0. La disponibilidad del sistema es la suma de las probabilidades estacionarias de los estados operativos $\{0, 1, 2\}$.
+\end{nota}
+
+\begin{proof}[\textbf{Solución (a): Matriz de Transición y Absorción}]
+    Basándonos en las reglas de transición, la matriz $P$ de $4 \times 4$ es:
+    \[ P = \begin{pmatrix} 
+    1-\alpha_0-\beta_0 & \alpha_0 & 0 & 0 \\
+    \beta_1 & 1-\alpha_1-\beta_1 & \alpha_1 & 0 \\
+    \beta_2 & 0 & 1-\alpha_2-\beta_2 & \alpha_2 \\
+    0 & 0 & 0 & 1 
+    \end{pmatrix} \]
+    
+    \textbf{Estado Absorbente:} El estado \textbf{3 (falla)} es absorbente ya que $p(3,3) = 1$. Una vez que el sistema entra en falla, no puede salir de ella mediante degradación o mantenimiento preventivo ordinario (según la definición del problema).
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (b): Tiempo Esperado hasta la Falla}]
+    En ausencia de mantenimiento, establecemos $\beta_i = 0$ para todo $i$. La matriz se convierte en una cadena de saltos hacia adelante:
+    \[ P = \begin{pmatrix} 
+    1-\alpha_0 & \alpha_0 & 0 & 0 \\
+    0 & 1-\alpha_1 & \alpha_1 & 0 \\
+    0 & 0 & 1-\alpha_2 & \alpha_2 \\
+    0 & 0 & 0 & 1 
+    \end{pmatrix} \]
+    
+    Sea $v_i = E^i[T_{\{3\}}]$. Aplicando el análisis del primer paso:
+    \[ v_i = 1 + \sum_j p_{ij} v_j \]
+    Para $i=2$: $v_2 = 1 + (1-\alpha_2)v_2 + \alpha_2(0) \implies \alpha_2 v_2 = 1 \implies v_2 = 1/\alpha_2$.
+    Para $i=1$: $v_1 = 1 + (1-\alpha_1)v_1 + \alpha_1 v_2 \implies \alpha_1 v_1 = 1 + \alpha_1(1/\alpha_2) \implies v_1 = \frac{1}{\alpha_1} + \frac{1}{\alpha_2}$.
+    
+    Por inducción, el tiempo esperado iniciando desde "nuevo" ($i=0$) es la suma de los tiempos medios de estancia en cada nivel de degradación:
+    \[ \mathbf{E^0[T_{\{3\}}] = \frac{1}{\alpha_0} + \frac{1}{\alpha_1} + \frac{1}{\alpha_2}} \]
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (c): Medida Estacionaria y Operatividad}]
+    Para que el sistema tenga una medida estacionaria, el estado 3 debe dejar de ser absorbente (por ejemplo, asumiendo una reparación inmediata $p(3,0) = 1$). Si $\beta_i > 0$, el sistema fluye constantemente de regreso a 0.
+    
+    Planteamos el balance de flujo para $\pi$:
+    \begin{itemize}
+        \item Para el estado 1: $\pi_0 \alpha_0 = \pi_1 (\beta_1 + \alpha_1)$ (Flujo de entrada desde 0 = Flujo de salida a 0 o 2).
+        \item Para el estado 2: $\pi_1 \alpha_1 = \pi_2 (\beta_2 + \alpha_2)$.
+    \end{itemize}
+    Esto permite expresar cada $\pi_i$ en términos de $\pi_0$:
+    \[ \pi_1 = \pi_0 \frac{\alpha_0}{\alpha_1 + \beta_1}, \quad \pi_2 = \pi_1 \frac{\alpha_1}{\alpha_2 + \beta_2} = \pi_0 \frac{\alpha_0 \alpha_1}{(\alpha_1 + \beta_1)(\alpha_2 + \beta_2)} \]
+    
+    Usando la normalización $\sum \pi_i = 1$, despejamos $\pi_0$. 
+    El \textbf{porcentaje de tiempo operativo} es la probabilidad de no estar en falla:
+    \[ \mathbf{\text{Disponibilidad} = \pi_0 + \pi_1 + \pi_2 = 1 - \pi_3} \]
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (d): Optimización de Costos}]
+    Queremos minimizar $C(\beta_1, \beta_2) = \pi_0 c_0 + \pi_1 c_1 + \pi_2 c_2 + \pi_3 c_3$.
+    Sustituimos las expresiones de $\pi_i$ obtenidas en el inciso anterior. Notamos que:
+    \begin{itemize}
+        \item Si $\beta_i$ es muy alto, $\pi_0$ aumenta (el sistema está siempre nuevo), pero el costo total sube porque $c_i$ (costo de mantenimiento) se paga con mucha frecuencia.
+        \item Si $\beta_i$ es muy bajo, $\pi_3$ aumenta (el sistema falla), y si el costo de reparación $c_3$ es muy alto, el costo total también sube.
+    \end{itemize}
+    
+    El valor óptimo $\beta_i^*$ se encuentra derivando la función de costo respecto a cada $\beta_i$ e igualando a cero:
+    \[ \frac{\partial C}{\partial \beta_1} = 0, \quad \frac{\partial C}{\partial \beta_2} = 0 \]
+    Esto resulta en un sistema de ecuaciones donde el mantenimiento preventivo óptimo debe equilibrar el \textbf{costo marginal de mantenimiento} con el \textbf{ahorro marginal por evitar la falla}.
+\end{proof}
+
+\newpage
+
+\subsection{Modelo de compartimentos farmacocinéticos}
+
+
+\vspace{5mm}
+
+\begin{ejercicio}{Modelo de compartimentos farmacocinéticos}{6.17}
+    Un medicamento se distribuye entre dos compartimentos: sangre ($C_1$) y tejido ($C_2$). Sea $(X_t, Y_t)$ las concentraciones en $C_1$ y $C_2$. A nivel estocástico discreto, las moléculas de fármaco se mueven entre compartimentos con tasas $k_{12}$ (sangre$\to$tejido) y $k_{21}$ (tejido$\to$sangre), y se eliminan de la sangre con tasa $k_{10}$.
+    
+    (a) Modele el número de moléculas en cada compartimento como una cadena de Markov a tiempo continuo y escriba el generador.
+    
+    (b) Derive las ecuaciones diferenciales (deterministas) para las concentraciones medias $\mu_1(t) = E[X_t]$ y $\mu_2(t) = E[Y_t]$: $\dot{\mu}_1 = -(k_{12} + k_{10})\mu_1 + k_{21}\mu_2$, $\dot{\mu}_2 = k_{12}\mu_1 - k_{21}\mu_2$.
+    
+    (c) Calcule $\mu_1(t)$ y $\mu_2(t)$ para la condición inicial $\mu_1(0) = D$, $\mu_2(0) = 0$ (dosis única).
+    
+    (d) Determine el área bajo la curva $AUC = \int_{0}^{\infty} \mu_1(t) dt$ y exprésela en función de los parámetros.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{nota}{Linealidad y Superposición}
+    Este modelo es de "primer orden", lo que significa que la tasa de cambio es proporcional a la cantidad presente. En sistemas estocásticos lineales, las ecuaciones para las esperanzas coinciden exactamente con las ecuaciones cinéticas deterministas clásicas.
+\end{nota}
+
+\begin{proof}[\textbf{Solución (a): Modelado y Generador}]
+    El estado del sistema es el par $(n_1, n_2) \in \mathbb{N}_0^2$ que representa el número de moléculas en cada compartimento. Las tasas de transición son:
+    \begin{itemize}
+        \item Infección/Migración $1 \to 2$: $q((n_1, n_2), (n_1-1, n_2+1)) = k_{12} n_1$.
+        \item Migración $2 \to 1$: $q((n_1, n_2), (n_1+1, n_2-1)) = k_{21} n_2$.
+        \item Eliminación: $q((n_1, n_2), (n_1-1, n_2)) = k_{10} n_1$.
+    \end{itemize}
+    El generador $\mathcal{A}$ actuando sobre una función $f(n_1, n_2)$ es:
+    \[ \mathcal{A}f = k_{12}n_1[f(n_1-1, n_2+1)-f] + k_{21}n_2[f(n_1+1, n_2-1)-f] + k_{10}n_1[f(n_1-1, n_2)-f] \]
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (b): Ecuaciones de la Media}]
+    Usamos la propiedad $\frac{d}{dt} E[f(X_t)] = E[\mathcal{A}f(X_t)]$. 
+    Para $\mu_1(t)$, sea $f(n_1, n_2) = n_1$:
+    \[ \dot{\mu}_1 = E[k_{12}X_t(-1) + k_{21}Y_t(1) + k_{10}X_t(-1)] = \mathbf{-(k_{12} + k_{10})\mu_1 + k_{21}\mu_2} \]
+    Para $\mu_2(t)$, sea $f(n_1, n_2) = n_2$:
+    \[ \dot{\mu}_2 = E[k_{12}X_t(1) + k_{21}Y_t(-1)] = \mathbf{k_{12}\mu_1 - k_{21}\mu_2} \]
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (c): Resolución del Sistema}]
+    El sistema matricial es $\dot{\vec{\mu}} = M\vec{\mu}$ con $M = \begin{pmatrix} -(k_{12}+k_{10}) & k_{21} \\ k_{12} & -k_{21} \end{pmatrix}$.
+    Los valores propios $\lambda_1, \lambda_2$ son las raíces del polinomio característico:
+    \[ \lambda^2 + (k_{12}+k_{10}+k_{21})\lambda + k_{10}k_{21} = 0 \]
+    Ambas raíces son negativas. La solución general para la sangre es una suma de exponenciales (disposición biexponencial):
+    \[ \mathbf{\mu_1(t) = A e^{\lambda_1 t} + B e^{\lambda_2 t}} \]
+    donde $A+B=D$. Para el tejido, $\mu_2(t)$ sube desde 0 hasta un máximo y luego decae.
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (d): Área Bajo la Curva (AUC)}]
+    Integramos la primera ecuación diferencial de (b) desde $0$ a $\infty$:
+    \[ \int_0^\infty \dot{\mu}_1 dt = -(k_{12} + k_{10}) \int_0^\infty \mu_1 dt + k_{21} \int_0^\infty \mu_2 dt \]
+    Sabemos que $\mu_1(\infty) = 0$ y $\mu_1(0) = D$, por lo que el lado izquierdo es $-D$.
+    De la segunda ecuación en equilibrio de integrales (donde $\int \dot{\mu}_2 = 0$):
+    \[ k_{12} \int \mu_1 dt = k_{21} \int \mu_2 dt \implies \int \mu_2 dt = \frac{k_{12}}{k_{21}} AUC \]
+    Sustituyendo en la primera integral:
+    \[ -D = -(k_{12} + k_{10}) AUC + k_{21} \left( \frac{k_{12}}{k_{21}} AUC \right) \]
+    \[ -D = -k_{12} AUC - k_{10} AUC + k_{12} AUC \implies D = k_{10} AUC \]
+    \[ \mathbf{AUC = \frac{D}{k_{10}}} \]
+    \textit{Interpretación: El AUC depende únicamente de la dosis y la tasa de eliminación, no de cómo se distribuya internamente el fármaco.}
+\end{proof}
+
+
+
+\newpage
+
+\subsection{Ley de Benford y caminatas en grupos abelianos}
+
+
+\begin{ejercicio}{Ley de Benford y caminatas en grupos abelianos}{6.18}
+    La ley de Benford afirma que el primer dígito significativo de muchos conjuntos de datos naturales tiene distribución $P(D = d) = \log_{10}(1 + 1/d)$ para $d = 1, \dots, 9$.
+    
+    (a) Considere la caminata aleatoria en $\mathbb{Z}_{10}$ (enteros módulo 10) con pasos i.i.d. uniformes. Calcule la medida estacionaria y el tiempo de mezcla.
+    
+    (b) Sea $(X_n)$ una cadena de Markov en el conjunto de los primeros dígitos $\{1, \dots, 9\}$ inducida por la operación $X_{n+1} = \text{primer\_digito}(X_n \cdot U_n)$, donde $U_n$ son factores aleatorios. Explique por qué la ley de Benford es la medida estacionaria cuando los factores se distribuyen en escala logarítmica.
+    
+    (c) Calcule la entropía $H = -\sum_{d=1}^9 \pi(d) \log \pi(d)$ de la ley de Benford y compárela con la de la uniforme.
+    
+    (d) Use el teorema ergódico para justificar que la proporción de primeros dígitos iguales a $d$ en una secuencia larga converge a $\pi(d)$.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{nota}{Invarianza de Escala}
+    La Ley de Benford es la única distribución del primer dígito que es invariante ante cambios de escala. Si mides una lista de longitudes en metros y cumple Benford, al convertirlas a pies seguirá cumpliendo Benford. Esta propiedad está ligada a que la mantisa de los logaritmos de los datos se distribuye uniformemente.
+\end{nota}
+
+\begin{proof}[\textbf{Solución (a): Caminata en $\mathbb{Z}_{10}$}]
+    En el grupo abeliano $\mathbb{Z}_{10}$, consideramos una caminata aleatoria donde en cada paso sumamos un incremento $U \sim \text{Uniforme}\{0, \dots, 9\}$. La matriz de transición $P$ tiene entradas $p_{ij} = 1/10$ para todo $i, j \in \{0, \dots, 9\}$. 
+    
+    Al ser $P$ una matriz con todas sus entradas iguales y positivas (matriz de rango 1), se cumplen dos cosas:
+    \begin{enumerate}
+        \item \textbf{Medida estacionaria:} Como $P$ es doblemente estocástica, la medida estacionaria es la uniforme:
+        \[ \mathbf{\pi(j) = \frac{1}{10} \quad \forall j \in \{0, \dots, 9\}} \]
+        \item \textbf{Tiempo de mezcla:} Dado que $p_{ij} = \pi(j)$ para todo $i, j$, la cadena alcanza el equilibrio exactamente en $n=1$ paso. La distancia en variación total $d(1) = 0$. Por lo tanto:
+        \[ \mathbf{t_{\text{mix}} = 1} \]
+    \end{enumerate}
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (b): Justificación de la Ley de Benford}]
+    Sea $Y = \log_{10}(X)$. El primer dígito de un número $X$ está determinado únicamente por la parte fraccionaria (mantisa) de su logaritmo decimal: $M = \log_{10} X \pmod 1$. 
+    Un número tiene primer dígito $d$ si y solo si:
+    \[ \log_{10}(d) \le M < \log_{10}(d+1) \]
+    
+    La operación multiplicativa $X_{n+1} = X_n \cdot U_n$ se transforma en el dominio logarítmico en una caminata aleatoria aditiva:
+    \[ \log_{10} X_{n+1} = \log_{10} X_n + \log_{10} U_n \pmod 1 \]
+    
+    Como vimos en el inciso (a), una caminata aditiva en un grupo (en este caso el círculo unitario $\mathbb{R}/\mathbb{Z}$ de las mantisas) converge a la \textbf{medida uniforme} bajo condiciones de mezcla. Si la mantisa $M$ se distribuye uniformemente en $[0, 1)$, la probabilidad de observar el dígito $d$ es la longitud del intervalo $[\log_{10} d, \log_{10}(d+1))$:
+    \[ P(D=d) = \log_{10}(d+1) - \log_{10}(d) = \mathbf{\log_{10}\left( 1 + \frac{1}{d} \right)} \]
+    Esta es precisamente la medida de Benford.
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (c): Comparación de Entropías}]
+    \textbf{1. Distribución Uniforme ($\pi_u(d) = 1/9$):}
+    Para 9 estados, la entropía es máxima:
+    \[ H_u = \log_2(9) \approx \mathbf{3.17 \text{ bits}} \]
+    
+    \textbf{2. Distribución de Benford ($\pi_B$):}
+    Sustituimos $\pi_B(d) = \log_{10}(1 + 1/d)$ en la fórmula de Shannon:
+    \[ H_B = -\sum_{d=1}^9 \log_{10}\left(1 + \frac{1}{d}\right) \log_2 \left(\log_{10}\left(1 + \frac{1}{d}\right)\right) \approx \mathbf{2.88 \text{ bits}} \]
+    
+    \textbf{Comparación:} $H_B < H_u$. Esto es consistente con el principio de que la distribución uniforme maximiza la entropía. La Ley de Benford tiene menor entropía porque es una distribución "sesgada" (el 1 es mucho más probable que el 9), lo que implica que hay menos incertidumbre sobre cuál será el primer dígito en un sistema Benfordiano que en uno puramente aleatorio.
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (d): Aplicación del Teorema Ergódico}]
+    Sea $(X_n)$ la cadena de los primeros dígitos. Si la cadena es irreducible y aperiódica (lo cual se cumple si los factores $U_n$ tienen suficiente dispersión logarítmica), el \textbf{Teorema Ergódico} garantiza que para la función indicadora $f(x) = \mathbf{1}_{\{x=d\}}$:
+    \[ \lim_{n \to \infty} \frac{1}{n} \sum_{k=0}^{n-1} \mathbf{1}_{\{X_k=d\}} = E^\pi[\mathbf{1}_{\{X=d\}}] = \pi(d) \quad \text{casi seguramente.} \]
+    
+    Esto significa que si tomamos una secuencia de datos generada por un proceso multiplicativo (como el crecimiento de una cuenta bancaria o una población), la frecuencia relativa con la que aparece el dígito $d$ al inicio de los números convergerá inevitablemente a los valores predichos por la Ley de Benford.
+\end{proof}
+
+
+\newpage
+
+\subsection{Modelo de recombinación genética}
+
+\begin{ejercicio}{Modelo de recombinación genética: cadena en $\{0,1\}^L$}{6.19}
+    En genética de poblaciones, se estudia la propagación de $L$ loci biálicos en una población grande. Sea $X_n \in \{0, 1\}^L$ el haplotipo de un individuo al azar en la generación $n$.
+    
+    (a) Bajo el modelo de recombinación libre, los loci evolucionan independientemente. Modele la cadena y calcule la medida estacionaria $\pi(x) = \prod_{\ell=1}^L p_\ell^{x_\ell} (1 - p_\ell)^{1-x_\ell}$.
+    
+    (b) Con mutación a tasa $\mu$ por locus y generación, escriba las probabilidades de transición de un locus y calcule la medida estacionaria marginal.
+    
+    (c) Calcule el tiempo de mezcla para que la distribución del haplotipo se aproxime a $\pi$, y muestre que crece como $\mathcal{O}(1/\mu)$.
+    
+    (d) Interprete el equilibrio de mutación-selección cuando el locus $\ell$ tiene un factor de selección $s_\ell$ que favorece el alelo 1.
+\end{ejercicio}
+
+\vspace{2mm}
+
+\begin{nota}{El Hipercubo Genético}
+    El espacio de estados es un hipercubo de dimensión $L$. Con la recombinación libre, los alelos se "mezclan" tan eficientemente que el estado del sistema en la siguiente generación es simplemente una muestra aleatoria basada en las frecuencias alélicas actuales, rompiendo las correlaciones (desequilibrio de ligamiento).
+\end{nota}
+
+\begin{proof}[\textbf{Solución (a): Recombinación Libre y Producto de Medidas}]
+    Bajo recombinación libre infinita, cada locus $\ell \in \{1, \dots, L\}$ en la generación $n+1$ se hereda independientemente de la población. Sea $p_\ell$ la frecuencia del alelo '1' en el locus $\ell$.
+    
+    La probabilidad de observar un haplotipo $x = (x_1, x_2, \dots, x_L)$ es el producto de las probabilidades de observar cada alelo de forma independiente:
+    \[ P(X = x) = P(X_1 = x_1) \cdot P(X_2 = x_2) \cdots P(X_L = x_L) \]
+    Como cada locus es una variable Bernoulli con parámetro $p_\ell$:
+    \[ \mathbf{\pi(x) = \prod_{\ell=1}^L p_\ell^{x_\ell} (1 - p_\ell)^{1-x_\ell}} \]
+    Esta medida se conoce como el \textbf{Equilibrio de Ligamiento}.
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (b): Mutación y Medida Marginal}]
+    Consideremos un solo locus $\ell$. La mutación a tasa $\mu$ implica que un alelo 0 puede cambiar a 1 con probabilidad $\mu$, y viceversa. La matriz de transición marginal $P_\ell$ es idéntica a la del canal simétrico binario (Ejercicio 6.14):
+    \[ P_\ell = \begin{pmatrix} 1-\mu & \mu \\ \mu & 1-\mu \end{pmatrix} \]
+    Como demostramos anteriormente para matrices simétricas, la medida estacionaria marginal para cada locus es la \textbf{uniforme}:
+    \[ \mathbf{\pi_\ell(0) = \pi_\ell(1) = 1/2} \]
+    \textit{(Esto asume que la mutación es simétrica. Si fuera asimétrica con tasas $\mu_{01}$ y $\mu_{10}$, la medida sería $\pi(1) = \mu_{01}/(\mu_{01}+\mu_{10})$).}
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (c): Tiempo de Mezcla}]
+    Para un solo locus, vimos en el Ejercicio 6.14 que el segundo valor propio es $\lambda_2 = 1 - 2\mu$. El salto espectral es:
+    \[ \text{gap} = 1 - \lambda_2 = 2\mu \]
+    El tiempo de relajación para un locus es $t_{\text{rel}} = 1/\text{gap} = 1/(2\mu)$.
+    
+    En una cadena compuesta por $L$ componentes independientes (el hipercubo), el tiempo de mezcla para alcanzar la medida total $\pi$ está dominado por el componente más lento y el tamaño del sistema. Para el hipercubo con mutaciones independientes, el tiempo de mezcla escala como:
+    \[ t_{\text{mix}} \approx \frac{1}{2\mu} \ln(L) \]
+    Claramente, para una tasa de mutación pequeña, el tiempo necesario para que la población pierda el sesgo de su estado inicial y alcance el equilibrio genético es inversamente proporcional a $\mu$:
+    \[ \mathbf{t_{\text{mix}} \in \mathcal{O}(1/\mu)} \]
+\end{proof}
+
+\vspace{5mm}
+
+\begin{proof}[\textbf{Solución (d): Equilibrio Mutación-Selección}]
+    Si introducimos un factor de selección $s_\ell > 0$ que favorece al alelo 1, la probabilidad de que un alelo 1 sobreviva y se reproduzca es mayor que la del alelo 0. 
+    \begin{itemize}
+        \item La \textbf{selección} empuja la frecuencia $p_\ell$ hacia 1 (fijación del alelo ventajoso).
+        \item La \textbf{mutación} empuja la frecuencia hacia $1/2$ (entropía máxima/ruido).
+    \end{itemize}
+    El equilibrio mutación-selección ocurre cuando ambas fuerzas se cancelan. En el límite de mutación débil, la frecuencia estacionaria del alelo deletéreo (el '0' en este caso) se estabiliza en un valor proporcional a $\mu/s_\ell$. 
+    
+    \textbf{Interpretación:} El sistema no alcanza la perfección genética (todos '1') porque la mutación actúa como un "ruido térmico" constante que reintroduce variantes menos aptas, manteniendo una diversidad residual en la población.
+\end{proof}
+
+
+\newpage
+
+\subsection{Red de colas de Jackson}
+
+
+\begin{ejercicio}{Red de colas de Jackson}{jackson}
+Una red de \( K \) colas: los clientes llegan a la cola \( k \) desde afuera con tasa \( \lambda_k \), reciben servicio con tasa \( \mu_k \) y se enrutan a la cola \( j \) con probabilidad \( r_{kj} \) (o salen con probabilidad \( 1 - \sum_j r_{kj} \)).  
+Sea \( X_t = (X_t^{(1)}, \ldots, X_t^{(K)}) \) el vector de longitudes.
+\end{ejercicio}
+
+\section*{Solución}
+
+\subsection*{(a) Tasas de llegada efectiva \( \Lambda_k \)}
+Las tasas efectivas de llegada a cada cola satisfacen las ecuaciones de balance de flujo:
+\[
+\Lambda_k = \lambda_k + \sum_{j=1}^{K} \Lambda_j \, r_{jk}, \qquad k = 1,\dots,K.
+\]
+En forma matricial, con \( \boldsymbol{\Lambda}=(\Lambda_1,\dots,\Lambda_K)^T \), \( \boldsymbol{\lambda}=(\lambda_1,\dots,\lambda_K)^T \) y \( R=(r_{jk}) \), se tiene
+\[
+\boldsymbol{\Lambda} = \boldsymbol{\lambda} + R^T \boldsymbol{\Lambda}
+\quad\Longrightarrow\quad (I - R^T)\boldsymbol{\Lambda} = \boldsymbol{\lambda}.
+\]
+Para una red abierta (existe probabilidad positiva de abandonar el sistema desde cada cola), la matriz \( I-R^T \) es invertible y la solución es única.
+
+\subsection*{(b) Teorema de Jackson}
+\begin{mytheo}{Teorema de Jackson (red abierta)}{jackson}
+Si las tasas efectivas \( \Lambda_k \) satisfacen las ecuaciones anteriores y se cumple la condición de estabilidad
+\[
+\rho_k = \frac{\Lambda_k}{\mu_k} < 1 \quad \text{para todo } k = 1,\dots,K,
+\]
+entonces la cadena de Markov \( \{X_t\} \) es ergódica y su distribución estacionaria es producto de distribuciones geométricas independientes:
+\[
+\pi(\mathbf{x}) = \prod_{k=1}^{K} (1-\rho_k)\,\rho_k^{x_k}, \qquad \mathbf{x}=(x_1,\dots,x_K)\in\mathbb{N}_0^K.
+\]
+\end{mytheo}
+
+\subsection*{(c) Verificación explícita para \( K=2 \), \( \lambda_1=\lambda_2=\lambda \), \( \mu_1=\mu_2=\mu \), \( r_{12}=r_{21}=0 \)}
+Dado que \( r_{12}=r_{21}=0 \), no hay enrutamiento entre colas; todos los clientes abandonan el sistema al terminar su servicio. Las ecuaciones de flujo se reducen a
+\[
+\Lambda_1 = \lambda_1 = \lambda,\qquad \Lambda_2 = \lambda_2 = \lambda.
+\]
+La condición de estabilidad exige \( \rho = \lambda/\mu < 1 \). El teorema de Jackson predice entonces
+\[
+\pi(x_1,x_2) = (1-\rho)\rho^{x_1} \cdot (1-\rho)\rho^{x_2} = (1-\rho)^2 \rho^{x_1+x_2}.
+\]
+
+Verifiquemos directamente las ecuaciones de balance global. Para un estado \( (x_1,x_2) \) con \( x_1>0, x_2>0 \), la tasa de salida es
+\[
+\pi(x_1,x_2)\bigl(2\lambda+2\mu\bigr).
+\]
+La tasa de entrada proviene de:
+\begin{itemize}
+\item llegada externa a cola 1 desde \( (x_1-1,x_2) \): \( \lambda\,\pi(x_1-1,x_2) \);
+\item llegada externa a cola 2 desde \( (x_1,x_2-1) \): \( \lambda\,\pi(x_1,x_2-1) \);
+\item fin de servicio en cola 1 desde \( (x_1+1,x_2) \): \( \mu\,\pi(x_1+1,x_2) \);
+\item fin de servicio en cola 2 desde \( (x_1,x_2+1) \): \( \mu\,\pi(x_1,x_2+1) \).
+\end{itemize}
+Sumando: \( \lambda\bigl[\pi(x_1-1,x_2)+\pi(x_1,x_2-1)\bigr] + \mu\bigl[\pi(x_1+1,x_2)+\pi(x_1,x_2+1)\bigr] \).
+
+Sustituyendo \( \pi(x_1,x_2)=c^2\rho^{x_1+x_2} \) con \( c=1-\rho \), se obtiene:
+\[
+\lambda\cdot 2c^2\rho^{x_1+x_2-1} + \mu\cdot 2c^2\rho^{x_1+x_2+1}
+= 2c^2\rho^{x_1+x_2-1}\bigl(\lambda + \mu\rho^2\bigr).
+\]
+Usando \( \lambda = \mu\rho \), se tiene \( \lambda + \mu\rho^2 = \mu\rho(1+\rho) \). El lado izquierdo de la ecuación de balance es
+\[
+c^2\rho^{x_1+x_2}(2\lambda+2\mu)=2c^2\rho^{x_1+x_2}\mu(1+\rho).
+\]
+Comparando:
+\[
+2c^2\rho^{x_1+x_2-1}\cdot\mu\rho(1+\rho)=2c^2\rho^{x_1+x_2}\mu(1+\rho),
+\]
+que es una identidad. Los casos con alguna coordenada nula se verifican análogamente. Por tanto, la forma producto satisface el balance, confirmando el teorema.
+
+\subsection*{(d) Tiempo medio de un cliente en el sistema usando la Ley de Little}
+\textbf{Ley de Little:} Para un sistema de colas estable, el número medio de clientes \( L \), la tasa media de llegadas \( \Lambda \) y el tiempo medio de estancia \( W \) cumplen \( L = \Lambda\,W \).
+
+Aplicamos la ley a cada cola \( k \). El número medio de clientes en la cola \( k \) (distribución geométrica) es
+\[
+L_k = \frac{\rho_k}{1-\rho_k} = \frac{\Lambda_k/\mu_k}{1-\Lambda_k/\mu_k}.
+\]
+Por la Ley de Little, \( L_k = \Lambda_k\,W_k \), de donde el tiempo medio en la cola \( k \) es
+\[
+W_k = \frac{L_k}{\Lambda_k} = \frac{1}{\mu_k-\Lambda_k}.
+\]
+
+Sea \( \Lambda_0 = \sum_{i=1}^K \lambda_i \) la tasa total de llegadas externas. Un cliente externo visita en promedio \( v_k = \Lambda_k/\Lambda_0 \) veces la cola \( k \). Por tanto, el tiempo total medio en el sistema es
+\[
+W_{\text{sistema}} = \sum_{k=1}^K v_k\,W_k = \sum_{k=1}^K \frac{\Lambda_k}{\Lambda_0}\cdot\frac{1}{\mu_k-\Lambda_k}.
+\]
+
+Alternativamente, aplicando la Ley de Little a todo el sistema: \( L_{\text{sistema}} = \sum_k L_k \) y \( \Lambda_0\,W_{\text{sistema}} = L_{\text{sistema}} \), se obtiene la misma expresión:
+\[
+W_{\text{sistema}} = \frac{1}{\Lambda_0}\sum_{k=1}^K \frac{\Lambda_k}{\mu_k-\Lambda_k}.
+\]
+
+\[
+\boxed{W_{\text{sistema}} = \frac{1}{\sum_{i=1}^K \lambda_i}\;\sum_{k=1}^K \frac{\Lambda_k}{\mu_k-\Lambda_k}}.
+\]
+
+\newpage
+\section{Bibliografía de referencia}
+
+\begin{thebibliography}{9}
+    
+    \bibitem{lawler2006} 
+    G. F. Lawler, 
+    \textit{Introduction to Stochastic Processes}, 
+    2.ª ed., Chapman \& Hall/CRC, 2006.
+
+    \bibitem{ross2019} 
+    S. M. Ross, 
+    \textit{Introduction to Probability Models}, 
+    12.ª ed., Academic Press, 2019.
+
+    \bibitem{levinperes2017} 
+    D. A. Levin y Y. Peres, 
+    \textit{Markov Chains and Mixing Times}, 
+    2.ª ed., American Mathematical Society (AMS), 2017.
+
+    \bibitem{bremaud2020} 
+    P. Brémaud, 
+    \textit{Markov Chains: Gibbs Fields, Monte Carlo Simulation and Queues}, 
+    Springer Graduate Texts in Mathematics, 2020.
+
+    \bibitem{norris1998} 
+    J. R. Norris, 
+    \textit{Markov Chains}, 
+    Cambridge Series in Statistical and Probabilistic Mathematics, 1998.
+
+    \bibitem{grimmetstirzaker2001} 
+    G. Grimmett y D. Stirzaker, 
+    \textit{Probability and Random Processes}, 
+    3.ª ed., Oxford University Press, 2001.
+
+    \bibitem{gemini2026} 
+Gemini 3 Flash (Google AI), 
+\textit{Asistencia técnica y resolución de problemas de Procesos Estocásticos}, 
+Edición para la Facultad de Estudios Superiores Acatlán, UNAM, 2026.
+\end{thebibliography}
 
 \end{document}

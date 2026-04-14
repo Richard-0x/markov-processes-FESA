@@ -1,0 +1,225 @@
+\documentclass{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish, es-tabla]{babel}
+\usepackage{helvet}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{graphicx} 
+\usetheme{UNAM} 
+
+\title{Procesos Estocásticos}
+\subtitle{Generador Infinitesimal en Tiempo Continuo}
+\author{Ricardo López Ramírez}
+\date{\today}
+\institute{\url{423092556@pcpuma.acatlan.unam.com.mx}}
+
+\begin{document}
+\begin{frame}[plain,t]
+\titlepage
+\end{frame}
+
+\begin{frame}
+\frametitle{Índice}
+\tableofcontents
+\end{frame}
+
+
+\section{Construcción Matricial}
+
+\begin{frame}
+\frametitle{Construcción Matricial}
+\framesubtitle{Definición de las tasas de transición}
+
+Sea $(X_t)_{t \ge 0}$ una Cadena de Markov en Tiempo Continuo. El sistema se rige por \textbf{tasas instantáneas de transición}, definidas por el límite de $p_{ij}(h) = P(X_{t+h} = j \mid X_t = i)$ cuando $h \to 0^+$:
+
+\begin{block}{Definición de Tasas}
+\small  
+\begin{itemize}
+    \item \textbf{Tasa de salto hacia $j \neq i$:}
+    \[ q_{ij} = \lim_{h \to 0^+} \frac{p_{ij}(h)}{h} \implies p_{ij}(h) = q_{ij}h + o(h) \]
+    
+    \item \textbf{Tasa de salida del estado $i$:}
+    \[ q_i = \lim_{h \to 0^+} \frac{1 - p_{ii}(h)}{h} \implies p_{ii}(h) = 1 - q_ih + o(h) \]
+\end{itemize}
+\end{block}
+
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Construcción Matricial}
+\framesubtitle{Propiedades de la Matriz Generadora $Q$}
+
+Agrupando estas tasas formamos la \textbf{matriz generadora infinitesimal} $Q$, con entradas extradiagonales $q_{ij}$ y diagonal $q_{ii} = -q_i$.
+
+Para que $Q$ sea un generador válido, debe cumplir:
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Construcción Matricial}
+\framesubtitle{Interpretación Probabilística}
+
+La matriz $Q$ nos permite simular la trayectoria del proceso separando el \textit{cuándo} y el \textit{a dónde} salta el sistema.
+
+\begin{theorem}[Construcción mediante saltos]
+Si $Q$ es conservativa y estable, la dinámica en el estado $i$ equivale a:
+\begin{enumerate}
+    \item Un \textbf{tiempo de permanencia} (holding time) aleatorio antes de saltar, con distribución exponencial:
+    \[ T_i \sim \text{Exp}(q_i) \implies E[T_i] = \frac{1}{-q_{ii}} \]
+    
+    \item Una \textbf{cadena de saltos embebida} que elige el destino $j$ con probabilidad:
+    \[ \pi_{ij} = \frac{q_{ij}}{q_i} \quad \text{para } i \neq j \]
+\end{enumerate}
+\end{theorem}
+
+\end{frame}
+
+
+
+\section{Semigrupos y Exponencial Matricial}
+
+\begin{frame}
+\frametitle{Semigrupos de Transición}
+\framesubtitle{Propiedades de la familia de matrices $P(t)$}
+
+Sea $P(t)$ la matriz cuyas entradas son $p_{ij}(t) = P(X_{t+s}=j \mid X_s=i)$. En tiempo continuo, la familia de matrices $\{P(t)\}_{t \ge 0}$ forma un \textbf{semigrupo estándar de transición}.
+
+\vspace{0.2cm}
+Debe satisfacer tres propiedades fundamentales:
+
+
+
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Semigrupos de Transición}
+\framesubtitle{El Generador como derivada en el origen}
+
+¿Cómo se relaciona la matriz de probabilidades $P(t)$ con las tasas de salto $Q$? 
+
+\vspace{0.3cm}
+El generador infinitesimal $Q$ es, por definición, la \textbf{derivada del semigrupo} evaluada en $t = 0$:
+
+\begin{theorem}[Generador del Semigrupo]
+\[ Q = P'(0) = \lim_{h \to 0^+} \frac{P(h) - I}{h} \]
+\end{theorem}
+
+\vspace{0.2cm}
+Esto implica que, para un intervalo de tiempo $h$ extremadamente pequeño, la matriz de transición se aproxima linealmente por las tasas de salto:
+\[ P(h) = I + hQ + o(h) \]
+
+\end{frame}
+
+% fórmula de la Exponencial Matricial 
+\begin{frame}
+\frametitle{Solución Matricial}
+\framesubtitle{La fórmula $P(t) = e^{tQ}$}
+
+Al igual que la solución escalar de $y' = qy$ es $y(t) = e^{qt}$, la evolución del sistema en espacios de estados finitos se obtiene mediante la \textbf{exponencial de matrices}.
+
+\begin{block}{Exponencial Matricial}
+Se define a través de su serie de Taylor:
+\[ P(t) = e^{tQ} = \sum_{n=0}^\infty \frac{t^n Q^n}{n!} = I + tQ + \frac{t^2 Q^2}{2!} + \dots \]
+\end{block}
+\end{frame}
+
+
+\section{Ecuaciones Diferenciales de Kolmogorov}
+\begin{frame}
+\frametitle{Ecuaciones de Kolmogorov}
+\framesubtitle{Derivación a partir de Chapman-Kolmogorov}
+
+Para encontrar las probabilidades de transición, partimos de la propiedad fundamental del semigrupo (Chapman-Kolmogorov):
+\[ P(t+h) = P(t)P(h) = P(h)P(t) \]
+
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Ecuaciones de Kolmogorov}
+\framesubtitle{Ecuación Hacia Atrás }
+
+
+\begin{block}{Kolmogorov}
+\[ \mathbf{P'(t) = Q P(t)} \]
+Condicionada sobre el \textbf{primer salto} que da el sistema al salir del estado inicial.
+\end{block}
+
+\vspace{0.2cm}
+\footnotesize{\textit{Nota: Esta ecuación siempre es válida (incluso en espacios de estado infinitos) bajo condiciones mínimas de regularidad.}}
+\end{frame}
+
+% Ecuación Hacia Adelante
+\begin{frame}
+\frametitle{Ecuaciones de Kolmogorov}
+\framesubtitle{Ecuación Hacia Adelante (Forward Equation)}
+
+\begin{block}{Kolmogorov }
+\[ \mathbf{P'(t) = P(t) Q} \]
+Condicionada sobre el \textbf{último salto} que da el sistema antes del tiempo $t$.
+\end{block}
+
+\vspace{0.2cm}
+\footnotesize{\textit{Nota: En espacios de estado infinitos, esta ecuación requiere condiciones más estrictas (como no explosión) para ser válida, ya que implica intercambiar límites y sumas infinitas.}}
+\end{frame}
+
+
+
+\section{Explosión y Regularidad}
+
+\begin{frame}
+\frametitle{Condición de Explosión}
+\framesubtitle{¿Qué significa explotar en una CTMC?}
+
+En espacios de estado infinitos (ej. $S = \mathbb{N}$), surge un fenómeno conocido como \textbf{explosión}.
+
+\begin{block}{Definición de Explosión}
+Sea $T_n \sim \text{Exp}(-q_{X_n X_n})$ el tiempo que el sistema pasa en el $n$-ésimo estado visitado. El tiempo total para dar infinitos saltos es:
+\[ \zeta = \sum_{n=0}^\infty T_n \]
+Decimos que la cadena \textbf{explota} si $\zeta < \infty$ El sistema realiza infinitos saltos en un tiempo finito.
+\end{block}
+
+\vspace{0.2cm}
+Si por el contrario, $P(\zeta = \infty) = 1$, decimos que la cadena es \textbf{regular} (estable). En un sistema regular, la matriz $Q$ determina completamente la evolución en todo tiempo $t \ge 0$.
+
+\end{frame}
+
+% Criterio para Procesos de Nacimiento 
+\begin{frame}
+\frametitle{Condición de Explosión}
+\framesubtitle{El criterio exacto para Procesos de Nacimiento Puro}
+
+Para entender cuándo ocurre la explosión, analizamos un proceso de nacimiento puro (donde las transiciones solo van de $n \to n+1$) con tasas de nacimiento $\lambda_n$.
+
+El tiempo total esperado para dar infinitos saltos es la suma de los tiempos esperados en cada estado:
+\[ E[\zeta] = \sum_{n=0}^\infty E[T_n] = \sum_{n=0}^\infty \frac{1}{\lambda_n} \]
+
+\begin{theorem}[Condición de Explosión]
+Un proceso de nacimiento puro con tasas $\lambda_n$ explota si y solo si la serie de los tiempos esperados converge:
+\[ \sum_{n=0}^\infty \frac{1}{\lambda_n} < \infty \]
+\end{theorem}
+
+\end{frame}
+
+% Comparación: n vs n^2 
+\begin{frame}
+\frametitle{Condición de Explosión}
+\framesubtitle{Ejemplo clásico: Crecimiento lineal vs Cuadrático}
+
+Comparemos dos sistemas de nacimiento puro usando el teorema anterior:
+
+\vspace{0.3cm}
+\textbf{1. Sistema Regular (Crecimiento Lineal): $\lambda_n = n$}
+\[ \sum_{n=1}^\infty \frac{1}{n} = 1 + \frac{1}{2} + \frac{1}{3} + \dots = \infty \]
+Esta es la serie armónica, que diverge. \textbf{El sistema es regular}. Aunque los saltos son más rápidos, nunca alcanza el infinito en tiempo finito.
+
+\vspace{0.3cm}
+\textbf{2. Sistema Explosivo (Crecimiento Cuadrático): $\lambda_n = n^2$}
+\[ \sum_{n=1}^\infty \frac{1}{n^2} = 1 + \frac{1}{4} + \frac{1}{9} + \dots = \frac{\pi^2}{6} \approx 1.645 \]
+Esta serie converge. \textbf{El sistema explota} en un tiempo promedio de $\approx 1.645$ unidades de tiempo.
+
+\end{frame}
+
+\end{document}

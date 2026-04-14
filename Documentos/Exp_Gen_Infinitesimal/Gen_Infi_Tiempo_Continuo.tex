@@ -154,7 +154,7 @@ Condicionada sobre el \textbf{primer salto} que da el sistema al salir del estad
 % Ecuación Hacia Adelante
 \begin{frame}
 \frametitle{Ecuaciones de Kolmogorov}
-\framesubtitle{Ecuación Hacia Adelante (Forward Equation)}
+\framesubtitle{Ecuación Hacia Adelante}
 
 \begin{block}{Kolmogorov }
 \[ \mathbf{P'(t) = P(t) Q} \]
@@ -173,7 +173,6 @@ Condicionada sobre el \textbf{último salto} que da el sistema antes del tiempo 
 \frametitle{Condición de Explosión}
 \framesubtitle{¿Qué significa explotar en una CTMC?}
 
-En espacios de estado infinitos (ej. $S = \mathbb{N}$), surge un fenómeno conocido como \textbf{explosión}.
 
 \begin{block}{Definición de Explosión}
 Sea $T_n \sim \text{Exp}(-q_{X_n X_n})$ el tiempo que el sistema pasa en el $n$-ésimo estado visitado. El tiempo total para dar infinitos saltos es:
@@ -182,19 +181,19 @@ Decimos que la cadena \textbf{explota} si $\zeta < \infty$ El sistema realiza in
 \end{block}
 
 \vspace{0.2cm}
-Si por el contrario, $P(\zeta = \infty) = 1$, decimos que la cadena es \textbf{regular} (estable). En un sistema regular, la matriz $Q$ determina completamente la evolución en todo tiempo $t \ge 0$.
+Si por el contrario, $P(\zeta = \infty) = 1$. En un sistema regular, la matriz $Q$
 
 \end{frame}
 
-% Criterio para Procesos de Nacimiento 
+
 \begin{frame}
 \frametitle{Condición de Explosión}
 \framesubtitle{El criterio exacto para Procesos de Nacimiento Puro}
 
-Para entender cuándo ocurre la explosión, analizamos un proceso de nacimiento puro (donde las transiciones solo van de $n \to n+1$) con tasas de nacimiento $\lambda_n$.
+Cuándo ocurre la explosión, analizamos un proceso de nacimiento puro (donde las transiciones solo van de $n \to n+1$) con tasas de nacimiento $\lambda_n$.
 
 El tiempo total esperado para dar infinitos saltos es la suma de los tiempos esperados en cada estado:
-\[ E[\zeta] = \sum_{n=0}^\infty E[T_n] = \sum_{n=0}^\infty \frac{1}{\lambda_n} \]
+
 
 \begin{theorem}[Condición de Explosión]
 Un proceso de nacimiento puro con tasas $\lambda_n$ explota si y solo si la serie de los tiempos esperados converge:
@@ -203,23 +202,22 @@ Un proceso de nacimiento puro con tasas $\lambda_n$ explota si y solo si la seri
 
 \end{frame}
 
-% Comparación: n vs n^2 
+
 \begin{frame}
 \frametitle{Condición de Explosión}
-\framesubtitle{Ejemplo clásico: Crecimiento lineal vs Cuadrático}
+\framesubtitle{Crecimiento lineal vs Cuadrático}
 
 Comparemos dos sistemas de nacimiento puro usando el teorema anterior:
 
 \vspace{0.3cm}
 \textbf{1. Sistema Regular (Crecimiento Lineal): $\lambda_n = n$}
-\[ \sum_{n=1}^\infty \frac{1}{n} = 1 + \frac{1}{2} + \frac{1}{3} + \dots = \infty \]
+\[ \sum_{n=1}^\infty \frac{1}{n} =  \dots = \infty \]
 Esta es la serie armónica, que diverge. \textbf{El sistema es regular}. Aunque los saltos son más rápidos, nunca alcanza el infinito en tiempo finito.
 
 \vspace{0.3cm}
 \textbf{2. Sistema Explosivo (Crecimiento Cuadrático): $\lambda_n = n^2$}
-\[ \sum_{n=1}^\infty \frac{1}{n^2} = 1 + \frac{1}{4} + \frac{1}{9} + \dots = \frac{\pi^2}{6} \approx 1.645 \]
-Esta serie converge. \textbf{El sistema explota} en un tiempo promedio de $\approx 1.645$ unidades de tiempo.
-
+\[ \sum_{n=1}^\infty \frac{1}{n^2} = \dots = \frac{\pi^2}{6} \approx 1.645 \]
+Esta serie converge.\textbf{El sistema explota} en un tiempo promedio de $\approx 1.645$.
 \end{frame}
 
 \end{document}

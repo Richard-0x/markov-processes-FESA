@@ -15,7 +15,18 @@
 \usetikzlibrary{external}
 \tikzexternalize[prefix=build-tikz/]
 \usepackage{hyperref}
+\usepackage{xcolor}
 %--------------------------------------------------------------------------------
+\lstset{
+    language=Python,
+    basicstyle=\footnotesize\ttfamily,
+    frame=single,
+    numbers=left,
+    inputencoding=utf8,
+    extendedchars=true,
+    breaklines=true,
+    showstringspaces=false
+}
 
 \newtcbtheorem[number within=section]{ejercicio}{Ejercicio}{
     enhanced,
@@ -100,7 +111,7 @@
     {\Large \textit{Optimal stopping, martingalas y cambios de medida}}\\[0.5cm]
     \vfill
     \rule{\linewidth}{0.5mm}\\[0.3cm]
-    {\Large \textit{Alumno: Ricardo López Ramírez}}\\
+    {\Large \textit{Ricardo López Ramírez}}\\
     \rule{\linewidth}{0.5mm}\\[0.8cm]
     
 
@@ -1206,6 +1217,1714 @@ print(f"N_sum - Var Empirica:   {var_emp_sum:.4f} | Teorica: {param_teorico_sum:
 
 \newpage
 
-\section{Modelos de colas M/M/k y M/M/infinito}
+\section{Modelos de colas M/M/k y M/M/}
+
+\begin{ejercicio}{Modelo M/M/k: Tasas y generador}{3.1}
+    Considere una cola M/M/k con capacidad infinita, llegadas de tasa $\lambda$ y $k$ servidores idénticos con tasas de servicio $\mu$. Sea $X_t$ el número de clientes en el sistema. Muestre que es una cadena nacimiento-muerte con $\alpha(n,n+1) = \lambda$ y $\alpha(n,n-1) = \mu \min\{n,k\}$ para $n\ge 1$. Escriba el generador y las ecuaciones de balance global.
+\end{ejercicio}
+
+\begin{proof}[Solución  3.1]
+    \textbf{Tasas de transición (Nacimiento y Muerte):}
+    \begin{itemize}
+        \item \textbf{Llegadas (Nacimientos):} El proceso de llegadas es un Poisson de intensidad $\lambda$, independiente del estado del sistema, por lo que la tasa de transición hacia arriba es constante: $\alpha(n, n+1) = \lambda$ para todo $n \ge 0$.
+        \item \textbf{Servicio (Muertes):} Los tiempos de servicio son variables aleatorias exponenciales independientes de parámetro $\mu$. Si hay $n$ clientes en el sistema:
+        \begin{itemize}
+            \item Si $n \le k$: Todos los $n$ clientes están siendo atendidos. La tasa a la que ocurre la primera terminación es el mínimo de $n$ variables $\text{Exp}(\mu)$, que es una $\text{Exp}(n\mu)$. Por tanto, $\alpha(n, n-1) = n\mu$.
+            \item Si $n > k$: Hay $k$ clientes en los servidores y $n-k$ en la fila. Solo $k$ servidores están activos. La tasa a la que ocurre la primera terminación es el mínimo de $k$ variables $\text{Exp}(\mu)$, que es una $\text{Exp}(k\mu)$. Por tanto, $\alpha(n, n-1) = k\mu$.
+        \end{itemize}
+        Ambos casos se unifican elegantemente con la función mínimo: $\alpha(n, n-1) = \mu \min\{n,k\}$.
+    \end{itemize}
+
+    \textbf{Generador Infinitesimal $A$:}
+    Las entradas de la matriz $A$ fuera de la diagonal están dadas por las tasas anteriores. Para la diagonal principal, usamos que la suma de cada fila es cero, $A(n,n) = -(\alpha(n, n+1) + \alpha(n, n-1))$.
+    \[ A(n,m) = \begin{cases} 
+        \lambda & \text{si } m = n+1 \\
+        n\mu & \text{si } m = n-1 \text{ y } 1 \le n \le k \\
+        k\mu & \text{si } m = n-1 \text{ y } n > k \\
+        -\lambda & \text{si } n = m = 0 \\
+        -(\lambda + n\mu) & \text{si } n = m \text{ y } 1 \le n \le k \\
+        -(\lambda + k\mu) & \text{si } n = m \text{ y } n > k \\
+        0 & \text{en otro caso}
+    \end{cases} \]
+
+    \textbf{Ecuaciones de balance  ($\pi A = 0$):}
+    Igualamos la tasa de flujo que entra a cada estado con la tasa de flujo que sale (Tasa in = Tasa out):
+    \begin{align*}
+        \text{Estado } 0: \quad &\lambda \pi_0 = \mu \pi_1 \\
+        \text{Estado } 1 \le n < k: \quad &(\lambda + n\mu) \pi_n = \lambda \pi_{n-1} + (n+1)\mu \pi_{n+1} \\
+        \text{Estado } n \ge k: \quad &(\lambda + k\mu) \pi_n = \lambda \pi_{n-1} + k\mu \pi_{n+1}
+    \end{align*}
+\end{proof}
+
+\newpage
+\subsection{Distribución estacionaria}
+
+\begin{ejercicio}{Distribución estacionaria M/M/k}{3.2}
+    Para la cola M/M/k, pruebe que si $\rho := \lambda/(k\mu) < 1$, existe una distribución estacionaria. Verifique que satisface el balance detallado y estudie los casos crítico y supercrítico.
+\end{ejercicio}
+
+\begin{proof}[Solución 3.2]
+    \textbf{balance detallado}
+    Para una cadena de nacimiento-muerte, las ecuaciones de balance global se simplifican a las ecuaciones de balance detallado: la tasa de transiciones de $n-1$ a $n$ debe igualar la de $n$ a $n-1$.
+    \[ \lambda \pi_{n-1} = \mu \min\{n, k\} \pi_n \implies \pi_n = \frac{\lambda}{\mu \min\{n, k\}} \pi_{n-1} \]
+    Aplicamos recursión desde $n=1$:
+    \begin{itemize}
+        \item Para $1 \le n \le k$: El denominador es $n\mu$.
+        \[ \pi_n = \frac{\lambda}{n\mu} \pi_{n-1} = \frac{\lambda}{n\mu} \frac{\lambda}{(n-1)\mu} \dots \pi_0 = \frac{\lambda^n}{n! \mu^n} \pi_0 = \frac{(\lambda/\mu)^n}{n!} \pi_0 \]
+        \item Para $n > k$: El denominador es siempre $k\mu$.
+        \[ \pi_n = \frac{\lambda}{k\mu} \pi_{n-1} = \rho \pi_{n-1} \]
+        Aplicando la recursión hasta el estado $k$:
+        \[ \pi_n = \rho^{n-k} \pi_k = \left( \frac{\lambda}{k\mu} \right)^{n-k} \frac{(\lambda/\mu)^k}{k!} \pi_0 = \frac{(\lambda/\mu)^{n-k} (\lambda/\mu)^k}{k^{n-k} k!} \pi_0 = \frac{(\lambda/\mu)^n}{k! k^{n-k}} \pi_0 \]
+    \end{itemize}
+    Esta es exactamente la fórmula solicitada. Su construcción demuestra trivialmente que el balance detallado se satisface.
+
+    \textbf{2. Normalización y estabilidad:}
+    Para que $\pi_n$ sea una probabilidad, debe cumplirse $\sum_{n=0}^\infty \pi_n = 1$.
+    \[ \pi_0^{-1} = \sum_{n=0}^{k-1} \frac{(\lambda/\mu)^n}{n!} + \sum_{n=k}^\infty \frac{(\lambda/\mu)^n}{k! k^{n-k}} \]
+    El segundo término es una serie geométrica. Factorizando el término de $n=k$:
+    \[ \sum_{n=k}^\infty \frac{(\lambda/\mu)^k}{k!} \left( \frac{\lambda}{k\mu} \right)^{n-k} = \frac{(\lambda/\mu)^k}{k!} \sum_{j=0}^\infty \rho^j \]
+    Esta serie converge si y solo si $\rho < 1$. Bajo esta condición:
+    \[ \pi_0 = \left[ \sum_{n=0}^{k-1} \frac{(\lambda/\mu)^n}{n!} + \frac{(\lambda/\mu)^k}{k!(1-\rho)} \right]^{-1} \]
+
+    \textbf{3. Caso crítico ($\rho = 1$) y supercrítico ($\rho > 1$):}
+    Si $\rho \ge 1$, la serie geométrica $\sum_{j=0}^\infty \rho^j$ diverge hacia $+\infty$.
+    En este escenario, $\pi_0^{-1} \to \infty$, lo que implica que la constante de normalización forzaría $\pi_n = 0$ para todo $n$.
+    Físicamente, significa que la cola es inestable (transiente o nula recurrente): los clientes llegan más rápido (o al mismo ritmo) de lo que pueden ser atendidos, y la fila crecerá indefinidamente hacia el infinito.
+\end{proof}
+
+\newpage
+\subsection{Dimensionamiento}
+
+\begin{ejercicio}{Dimensionamiento y Erlang C}{3.3}
+    Sea $C$ el tiempo de espera en cola de un cliente. Demuestre la fórmula de Erlang C para $\mathbb{P}(C>0)$. Obtenga $\mathbb{E}[C]$ y el tiempo total usando Little. Explique cómo dimensionar el número de servidores $k$.
+\end{ejercicio}
+
+\begin{proof}[Solución 3.3]
+    \textbf{1. Probabilidad de esperar (Erlang C):}
+    Por la propiedad PASTA (Poisson Arrivals See Time Averages), un cliente que llega encuentra el sistema en su distribución estacionaria $\pi$. El cliente tendrá que esperar en fila ($C > 0$) si y solo si encuentra $k$ o más clientes en el sistema a su llegada.
+    \begin{align*}
+        \mathbb{P}(C > 0) &= \sum_{n=k}^\infty \pi_n = \sum_{n=k}^\infty \pi_k \rho^{n-k} = \pi_k \sum_{j=0}^\infty \rho^j = \frac{\pi_k}{1-\rho}
+    \end{align*}
+    Sustituyendo $\pi_k = \pi_0 \frac{(\lambda/\mu)^k}{k!}$ y la expresión explícita de $\pi_0$ derivada en el ejercicio anterior, obtenemos la Fórmula de Erlang C:
+    \[ \mathbb{P}(C > 0) = \frac{\frac{(\lambda/\mu)^k}{k!(1-\rho)}}{\sum_{n=0}^{k-1} \frac{(\lambda/\mu)^n}{n!} + \frac{(\lambda/\mu)^k}{k!(1-\rho)}} \]
+
+    \textbf{2. Tiempo medio de espera $\mathbb{E}[C]$:}
+    Si un cliente encuentra $n \ge k$ personas, debe esperar a que ocurran $n - k + 1$ salidas para que se libere un servidor. Cuando todos los servidores están ocupados, el tiempo entre salidas es $\text{Exp}(k\mu)$.
+    El tiempo de espera condicionado es Gamma con media $\frac{n - k + 1}{k\mu}$.
+    Por la ley de la esperanza total:
+    \begin{align*}
+        \mathbb{E}[C] &= \sum_{n=k}^\infty \mathbb{P}(\text{encuentra } n) \cdot \mathbb{E}[C \mid \text{encuentra } n] \\
+        &= \sum_{n=k}^\infty \pi_n \frac{n - k + 1}{k\mu} = \frac{1}{k\mu} \sum_{j=0}^\infty (j+1) \pi_{k+j} \\
+        &= \frac{\pi_k}{k\mu} \sum_{j=0}^\infty (j+1)\rho^j
+    \end{align*}
+    Sabiendo que $\sum_{j=0}^\infty (j+1)\rho^j = \frac{1}{(1-\rho)^2}$, y como $\frac{\pi_k}{1-\rho} = \mathbb{P}(C>0)$:
+    \[ \mathbb{E}[C] = \frac{\pi_k}{k\mu (1-\rho)^2} = \mathbb{P}(C>0) \frac{1}{k\mu (1-\rho)} = \mathbb{P}(C>0) \frac{1}{k\mu - \lambda} \]
+
+    \textbf{3. Tiempo medio total en el sistema ($W$):}
+    El tiempo total es la suma del tiempo de espera en cola más el tiempo de servicio:
+    \[ W = \mathbb{E}[C] + \mathbb{E}[\text{Servicio}] = \mathbb{E}[C] + \frac{1}{\mu} \]
+    (Opcional: Por la ley de Little, $\mathbb{E}[L_q] = \lambda \mathbb{E}[C]$, el número esperado de clientes en fila es $L_q = \mathbb{P}(C>0) \frac{\rho}{1-\rho}$).
+
+    \textbf{4. Aplicación en dimensionamiento:}
+    Para garantizar que no más del $10\%$ de los clientes tengan que esperar ($\mathbb{P}(C>0) \le 0.1$), con parámetros de tráfico $\lambda$ y $\mu$ fijos (donde la carga ofrecida es $a = \lambda/\mu$), se evalúa la función Erlang C para valores iterativos de $k$ (empezando desde el entero más cercano superior a $a$, ya que se necesita $\rho < 1$). El menor valor entero de $k$ que haga que la evaluación de la fórmula sea $\le 0.1$ es el número óptimo de operadores o servidores a contratar.
+\end{proof}
+
+\newpage
+\subsection{Sistema de pérdidas}
+
+\begin{ejercicio}{Sistema de pérdidas M/M/k/k (Erlang B)}{3.4}
+    Considere la versión M/M/k/k donde no se admiten más de $k$ clientes. Encuentre la distribución y pruebe que la probabilidad de bloqueo es Erlang B. Compare con M/M/k.
+\end{ejercicio}
+
+\begin{proof}[Solución  3.4]
+    \textbf{1. Generador y Distribución Estacionaria:}
+    El sistema es una cadena de nacimiento y muerte con un espacio de estados finito $S = \{0, 1, \dots, k\}$.
+    Las tasas de nacimiento son $\alpha(n, n+1) = \lambda$ solo para $n < k$. Si $n = k$, la llegada es rechazada, así que $\alpha(k, k+1) = 0$.
+    Las tasas de servicio son como en M/M/k, $\alpha(n, n-1) = n\mu$ para todo $n \le k$.
+    
+    Aplicando las ecuaciones de balance detallado $\lambda \pi_{n-1} = n\mu \pi_n$:
+    \[ \pi_n = \frac{\lambda}{n\mu} \pi_{n-1} = \frac{(\lambda/\mu)^n}{n!} \pi_0 = \frac{a^n}{n!} \pi_0, \quad \text{para } 0 \le n \le k. \]
+    Para normalizar:
+    \[ 1 = \sum_{n=0}^k \pi_n = \pi_0 \sum_{n=0}^k \frac{a^n}{n!} \implies \pi_0 = \left( \sum_{n=0}^k \frac{a^n}{n!} \right)^{-1}. \]
+    Por lo tanto, la distribución estacionaria es un Poisson truncado:
+    \[ \pi_n = \frac{a^n / n!}{\sum_{j=0}^k a^j / j!}. \]
+
+    \textbf{2. Probabilidad de Bloqueo (Erlang B):}
+    Un cliente es bloqueado y perdido si al llegar encuentra a los $k$ servidores ocupados. Por la propiedad PASTA, la probabilidad de que un cliente de Poisson que llega vea el estado $k$ es exactamente la probabilidad estacionaria de estar en el estado $k$.
+    Sustituyendo $n=k$ en la distribución:
+    \[ B(k, a) = \mathbb{P}(\text{Bloqueo}) = \pi_k = \frac{a^k / k!}{\sum_{j=0}^k a^j / j!}. \]
+
+    \textbf{3. Comparación estructural con M/M/k:}
+    \begin{itemize}
+        \item \textbf{Estabilidad:} La M/M/k exige estrictamente $\rho = \lambda/(k\mu) < 1$ para ser estable. La M/M/k/k tiene un espacio de estados finito, por lo que \textit{siempre} es estable y posee distribución invariante, incluso si la carga $\lambda$ supera masivamente la capacidad de servicio (la red simplemente rechaza el exceso de tráfico).
+        \item \textbf{Cola de la distribución:} En la M/M/k sin pérdidas, los estados más allá de $k$ decaen geométricamente (como $\rho^{n-k}$), lo que permite que se formen filas (colas largas) con baja probabilidad. En la M/M/k/k, la distribución se corta abruptamente en $k$, y no existe fila de espera. El enfoque de M/M/k es "esperar", mientras que el de M/M/k/k es "rechazar".
+    \end{itemize}
+\end{proof}
+
+\newpage
+\subsection{Cola y distribución de Poisson }
+
+\begin{ejercicio}{Cola M/M/$\infty$ y distribución de Poisson}{3.5}
+    Considere una cola M/M/$\infty$ con llegadas de tasa $\lambda$ y tiempos de servicio i.i.d. exponenciales de parámetro $\mu$. Muestre que $X_t$, el número de clientes presentes en el sistema, es una cadena nacimiento-muerte con tasas $\alpha(n, n+1) = \lambda$ y $\alpha(n, n-1) = n\mu$. Encuentre su distribución estacionaria y pruebe que es Poisson con media $\lambda/\mu$.
+\end{ejercicio}
+
+\begin{proof}[Solución 3.5]
+    \textbf{1. Tasas de la Cadena Nacimiento-Muerte:}
+    \begin{itemize}
+        \item \textbf{Tasa de nacimiento $\alpha(n, n+1)$:} El proceso de llegadas es un proceso de Poisson de intensidad $\lambda$, el cual es independiente del estado actual del sistema (número de clientes presentes). Por lo tanto, la tasa de transición hacia un estado superior es constante: $\alpha(n, n+1) = \lambda$ para todo $n \ge 0$.
+        \item \textbf{Tasa de muerte $\alpha(n, n-1)$:} Si el sistema se encuentra en el estado $n$, hay exactamente $n$ clientes siendo atendidos simultáneamente, ya que la capacidad de servidores es infinita y no hay fila de espera. Cada cliente tiene un tiempo de servicio distribuido como $\text{Exp}(\mu)$, independiente de los demás. La tasa a la cual ocurre la primera salida es equivalente a la tasa del mínimo de $n$ variables exponenciales independientes de parámetro $\mu$. Por propiedades de la distribución exponencial, este mínimo se distribuye como $\text{Exp}(n\mu)$. Por lo tanto, la tasa de transición hacia el estado inferior es $\alpha(n, n-1) = n\mu$ para $n \ge 1$.
+    \end{itemize}
+
+    \textbf{2. Distribución Estacionaria:}
+    Para encontrar la distribución invariante $\pi$, aplicamos las ecuaciones de balance detallado, que igualan el flujo entre estados adyacentes:
+    $$ \lambda \pi_{n-1} = n\mu \pi_n $$
+    Despejando $\pi_n$ y aplicando recursión iterativa hasta llegar al estado base $\pi_0$:
+    $$ \pi_n = \frac{\lambda}{n\mu} \pi_{n-1} = \frac{\lambda}{n\mu} \frac{\lambda}{(n-1)\mu} \pi_{n-2} = \dots = \frac{\lambda^n}{n! \mu^n} \pi_0 = \frac{(\lambda/\mu)^n}{n!} \pi_0 $$
+    
+    Para que $\pi$ sea una distribución de probabilidad válida, la suma de todas sus componentes debe ser igual a 1:
+    $$ \sum_{n=0}^\infty \pi_n = 1 \implies \pi_0 \sum_{n=0}^\infty \frac{(\lambda/\mu)^n}{n!} = 1 $$
+    Reconocemos la sumatoria como el desarrollo en serie de Taylor de la función exponencial $e^{\lambda/\mu}$:
+    $$ \pi_0 e^{\lambda/\mu} = 1 \implies \pi_0 = e^{-\lambda/\mu} $$
+    
+    Sustituyendo $\pi_0$ en la expresión general para $\pi_n$:
+    $$ \pi_n = e^{-\lambda/\mu} \frac{(\lambda/\mu)^n}{n!}, \quad n \ge 0 $$
+    Esta expresión corresponde exactamente a la función de masa de probabilidad de una variable aleatoria con distribución de Poisson de parámetro (y media) $\lambda/\mu$.
+\end{proof}
+
+\newpage
+\subsection{servidores en la nube}
+
+\begin{ejercicio}{Granja de servidores en la nube y dinámica transiente}{3.6}
+    Sea $(X_t)_{t \ge 0}$ una cola M/M/$\infty$ con $X_0 = x$. Interprete $X_t$. Demuestre que $X_t \stackrel{d}{=} Y_t + Z_t$, donde $Y_t \sim \text{Bin}(x, e^{-\mu t})$ y $Z_t \sim \text{Poisson}(\frac{\lambda}{\mu}(1-e^{-\mu t}))$ son independientes. Deduzca las fórmulas de $\mathbb{E}[X_t]$ y $\text{Var}(X_t)$, e interprete ambos términos.
+\end{ejercicio}
+
+
+\begin{proof}[Solución 3.6]
+    \textbf{1. Interpretación Física:}
+    $X_t$ modela el número total de trabajos o procesos activos en un instante $t$ dentro de una granja de servidores de capacidad ilimitada (cloud computing). Al no haber restricciones de capacidad, cada trabajo que llega recibe un servidor inmediatamente y no hay interferencia entre los tiempos de procesamiento de distintos trabajos.
+
+    \textbf{2. Demostración de la descomposición $X_t \stackrel{d}{=} Y_t + Z_t$:}
+    Dado que los trabajos no interactúan entre sí, podemos dividir a los clientes presentes en el sistema en el tiempo $t$ en dos grupos mutuamente excluyentes e independientes:
+    \begin{itemize}
+        \item \textbf{Grupo 1 (Trabajos iniciales - $Y_t$):} En $t=0$ hay $X_0 = x$ trabajos en ejecución. El tiempo de servicio de cada uno es $\text{Exp}(\mu)$. La probabilidad de que un trabajo particular iniciado en $t=0$ siga activo (no haya terminado) en el tiempo $t$ es $\mathbb{P}(\text{Servicio} > t) = e^{-\mu t}$. Dado que los $x$ trabajos terminan independientemente, el número de trabajos iniciales que sobreviven hasta el tiempo $t$, denotado como $Y_t$, sigue una distribución Binomial con $x$ ensayos y probabilidad de éxito $p = e^{-\mu t}$:
+        $$ Y_t \sim \text{Bin}(x, e^{-\mu t}) $$
+        
+        \item \textbf{Grupo 2 (Nuevas llegadas - $Z_t$):} Estos son los trabajos que llegaron en el intervalo $(0, t]$ y que aún no han terminado en el tiempo $t$. Las llegadas forman un proceso de Poisson de intensidad $\lambda$. Si un trabajo llega en el instante $s \in (0, t]$, la probabilidad de que siga activo en el tiempo $t$ es $\mathbb{P}(\text{Servicio} > t-s) = e^{-\mu(t-s)}$. 
+        Por el teorema de partición/adelgazamiento de Poisson para procesos no homogéneos, el número de estas llegadas que siguen presentes en $t$ es una variable aleatoria de Poisson $Z_t$ cuya media se obtiene integrando la intensidad de llegadas sobrevivientes a lo largo del intervalo:
+        $$ \mathbb{E}[Z_t] = \int_0^t \lambda e^{-\mu(t-s)} ds = \lambda \int_0^t e^{-\mu u} du = \lambda \left[ \frac{-e^{-\mu u}}{\mu} \right]_0^t = \frac{\lambda}{\mu}(1 - e^{-\mu t}) $$
+        Por lo tanto:
+        $$ Z_t \sim \text{Poisson}\left(\frac{\lambda}{\mu}(1 - e^{-\mu t})\right) $$
+    \end{itemize}
+    Como las dinámicas de los trabajos iniciales y de las nuevas llegadas son independientes (debido a la capacidad infinita), el número total de trabajos es la suma de ambos: $X_t \stackrel{d}{=} Y_t + Z_t$ con $Y_t \perp Z_t$.
+
+    \textbf{3. Momentos y su interpretación:}
+    Utilizando las propiedades de linealidad de la esperanza y la aditividad de la varianza para variables independientes:
+    $$ \mathbb{E}[X_t] = \mathbb{E}[Y_t] + \mathbb{E}[Z_t] = x e^{-\mu t} + \frac{\lambda}{\mu}(1 - e^{-\mu t}) $$
+    $$ \text{Var}(X_t) = \text{Var}(Y_t) + \text{Var}(Z_t) = x e^{-\mu t}(1 - e^{-\mu t}) + \frac{\lambda}{\mu}(1 - e^{-\mu t}) $$
+    
+    \textbf{Interpretación:} La esperanza $\mathbb{E}[X_t]$ es un promedio ponderado que muestra la relajación del sistema. El primer término ($x e^{-\mu t}$) representa la disipación progresiva de la carga inicial del sistema, mientras que el segundo término ($\frac{\lambda}{\mu}(1 - e^{-\mu t})$) representa la acumulación progresiva de la carga de equilibrio. Cuando $t \to \infty$, la "memoria" del estado inicial $x$ desaparece exponencialmente, y la media y varianza convergen asintóticamente a $\lambda/\mu$, recuperando la distribución estacionaria de Poisson demostrada en el Ejercicio 3.5.
+\end{proof}
+
+\newpage
+
+\subsection{servidores en la nube}
+
+\begin{ejercicio}{Reversibilidad de la M/M/$\infty$}{3.7}
+    Pruebe que la M/M/$\infty$ es reversible respecto de su distribución estacionaria $\pi_n = e^{-\lambda/\mu} \frac{(\lambda/\mu)^n}{n!}$. Verifique la identidad $\pi_n \lambda = \pi_{n+1}(n+1)\mu$. Interprete como balance detallado y discuta su simplicidad en redes de colas.
+\end{ejercicio}
+
+\begin{proof}[Solución 3.7]
+    \textbf{1. Verificación Matemática de la Identidad:}
+    Sustituimos la distribución estacionaria de Poisson en el lado izquierdo de la ecuación:
+    $$ \text{Lado Izquierdo} = \pi_n \lambda = e^{-\lambda/\mu} \frac{(\lambda/\mu)^n}{n!} \lambda $$
+    Ahora desarrollamos el lado derecho utilizando la definición para $\pi_{n+1}$:
+    $$ \text{Lado Derecho} = \pi_{n+1}(n+1)\mu = \left( e^{-\lambda/\mu} \frac{(\lambda/\mu)^{n+1}}{(n+1)!} \right) (n+1)\mu $$
+    Descomponiendo el factorial $(n+1)! = (n+1)n!$ y la potencia $(\lambda/\mu)^{n+1} = (\lambda/\mu)^n (\lambda/\mu)$:
+    $$ \text{Lado Derecho} = e^{-\lambda/\mu} \frac{(\lambda/\mu)^n (\lambda/\mu)}{(n+1)n!} (n+1)\mu $$
+    Cancelamos el término $(n+1)$ en el numerador y denominador:
+    $$ \text{Lado Derecho} = e^{-\lambda/\mu} \frac{(\lambda/\mu)^n}{n!} \left( \frac{\lambda}{\mu} \right) \mu = e^{-\lambda/\mu} \frac{(\lambda/\mu)^n}{n!} \lambda $$
+    Ambos lados son idénticamente iguales, verificando la identidad:
+    $$ \pi_n \lambda = \pi_{n+1}(n+1)\mu \quad \forall n \ge 0 $$
+
+    \textbf{2. Interpretación como Balance Detallado y Reversibilidad:}
+    La relación anterior es exactamente la ecuación de balance detallado $\pi_n \alpha(n, n+1) = \pi_{n+1} \alpha(n+1, n)$ para este modelo específico. Dado que es un proceso de nacimiento y muerte unidimensional, la existencia de una distribución estacionaria que satisface el balance detallado implica directamente que el proceso de Markov es estocásticamente reversible en el tiempo cuando está en equilibrio.
+    
+    \textbf{3. Implicaciones y Simplicidad en Teoría de Redes de Colas:}
+    La reversibilidad en tiempo continuo tiene una consecuencia asombrosa para la teoría de redes: por el Teorema de Burke, el proceso de salidas de una cola M/M/$\infty$ en equilibrio es, en sí mismo, un proceso de Poisson con la misma intensidad $\lambda$ que el proceso de llegadas. 
+    Además, la naturaleza de "capacidad infinita" implica que el tiempo que un cliente pasa en el sistema es independiente del tráfico y del estado de los demás clientes. Esto hace que las colas M/M/$\infty$ sean los componentes más simples y dóciles ("well-behaved") al construir Redes de Jackson. En una red de nodos M/M/$\infty$, cada nodo actúa como un filtro de retardo independiente, y el estado conjunto de la red se factoriza de manera perfecta en un producto de distribuciones de Poisson independientes, facilitando enormemente el modelado a gran escala.
+\end{proof}
+
+\newpage
+\subsection{Condición de Foster-Lyapunov}
+
+\begin{ejercicio}{Condición de Foster-Lyapunov para M/M/k}{3.8}
+    Sea $X$ una M/M/k y defina, para $\theta \in \mathbb{R}$, $G_\theta(n) := e^{\theta n}$. Calcule $L G_\theta(n)$ y determine para qué valores de $\theta > 0$ y qué regímenes de tráfico puede obtenerse una condición de tipo Foster-Lyapunov:
+    \[ L G_\theta(n) \le -c G_\theta(n) + b \mathbf{1}_{\{0,1,\dots,m\}}(n) \]
+    con constantes positivas $b, c$ y entero $m$. Use esto para discutir ergodicidad geométrica.
+\end{ejercicio}
+
+\begin{proof}[Solución 3.8]
+    \textbf{1. Cálculo del generador $L G_\theta(n)$:}
+    El operador generador para la cola M/M/k aplicado a una función $f$ es:
+    \[ Lf(n) = \lambda(f(n+1) - f(n)) + \mu \min\{n, k\}(f(n-1) - f(n)). \]
+    Sustituyendo $G_\theta(n) = e^{\theta n}$:
+    \begin{align*}
+        L G_\theta(n) &= \lambda(e^{\theta(n+1)} - e^{\theta n}) + \mu \min\{n, k\}(e^{\theta(n-1)} - e^{\theta n}) \\
+        &= e^{\theta n} \left[ \lambda(e^\theta - 1) + \mu \min\{n, k\}(e^{-\theta} - 1) \right] \\
+        &= G_\theta(n) \left[ \lambda(e^\theta - 1) + \mu \min\{n, k\}(e^{-\theta} - 1) \right].
+    \end{align*}
+
+    \textbf{2. Análisis de la Condición de Foster-Lyapunov:}
+    Queremos que para estados suficientemente grandes (fuera de un conjunto compacto $\{0, \dots, m\}$), el operador muestre una tendencia estrictamente negativa ("drift" negativo).
+    Sea $m = k-1$. Para $n > m$ (es decir, $n \ge k$), el número de servidores ocupados es constante: $\min\{n, k\} = k$.
+    Para $n \ge k$, la ecuación se simplifica a:
+    \[ L G_\theta(n) = G_\theta(n) \left[ \lambda(e^\theta - 1) + k\mu(e^{-\theta} - 1) \right]. \]
+    Para satisfacer $L G_\theta(n) \le -c G_\theta(n)$ con $c > 0$, necesitamos que el término entre corchetes sea estrictamente negativo. Definamos la función $h(\theta) = \lambda(e^\theta - 1) + k\mu(e^{-\theta} - 1)$.
+    Analizamos $h(\theta)$ para $\theta > 0$:
+    \begin{itemize}
+        \item $h(0) = \lambda(1-1) + k\mu(1-1) = 0$.
+        \item Evaluamos la derivada en el origen: $h'(0) = \lambda e^0 - k\mu e^{-0} = \lambda - k\mu$.
+    \end{itemize}
+    Para que $h(\theta)$ decrezca y se vuelva negativa para algún $\theta > 0$, necesitamos que la pendiente inicial sea negativa: $h'(0) < 0 \implies \lambda - k\mu < 0 \implies \frac{\lambda}{k\mu} < 1$.
+    Esto significa que \textbf{el régimen de tráfico debe ser estrictamente subcrítico ($\rho < 1$)}. 
+    
+    Bajo este régimen, por continuidad, existe un $\theta > 0$ suficientemente pequeño tal que $h(\theta) = -c < 0$. 
+    Para $n \le m$, la cantidad $\lambda(e^\theta - 1) + n\mu(e^{-\theta} - 1)$ está acotada por alguna constante $b > 0$.
+    Por lo tanto, reuniendo ambos casos, hemos construido la condición de Foster-Lyapunov:
+    \[ L G_\theta(n) \le -c G_\theta(n) + b \mathbf{1}_{\{0,1,\dots,k-1\}}(n). \]
+
+    \textbf{3. Discusión sobre Ergodicidad Geométrica:}
+    La existencia de una función de Lyapunov $G_\theta(n) = e^{\theta n}$ que crece geométricamente (exponencialmente en el espacio de estados) y que satisface esta desigualdad de deriva negativa (drift condition) garantiza que el sistema no solo es estable (ergódico), sino que es \textbf{geométricamente ergódico}. 
+    Esto significa que las probabilidades de transición convergen a la distribución estacionaria a una velocidad exponencial: $|P_t(x, y) - \pi(y)| \le M(x) e^{-\eta t}$ para constantes positivas $M, \eta$. Físicamente, el sistema "olvida" su estado inicial muy rápido.
+\end{proof}
+
+
+\newpage
+\subsection{Conservación de flujo}
+
+
+\begin{ejercicio}{Conservación de flujo en M/M/k}{3.9}
+    Sea $X_t$ una cola M/M/k en régimen estacionario $\pi$. Demuestre que $\mathbb{E}_\pi[\min\{X_t, k\}] = \frac{\lambda}{\mu}$. Interprete como conservación de flujo y deduzca la fracción de tiempo que un servidor individual está ocupado.
+\end{ejercicio}
+
+\begin{proof}[Solución 3.9]
+    \textbf{1. Demostración mediante Ecuaciones de Balance:}
+    En régimen estacionario, las ecuaciones de balance detallado dictan que el flujo entre los estados $n-1$ y $n$ está equilibrado:
+    \[ \lambda \pi_{n-1} = \mu \min\{n, k\} \pi_n, \quad \forall n \ge 1. \]
+    Sumamos estas ecuaciones sobre todo el espacio de estados $n$ desde $1$ hasta $\infty$:
+    \[ \sum_{n=1}^\infty \lambda \pi_{n-1} = \sum_{n=1}^\infty \mu \min\{n, k\} \pi_n. \]
+    En el lado izquierdo, factorizamos $\lambda$ y reindexamos la suma ($j = n-1$):
+    \[ \lambda \sum_{j=0}^\infty \pi_j = \lambda (1) = \lambda. \]
+    En el lado derecho, factorizamos $\mu$. Notemos que si extendemos la suma para incluir $n=0$, el término es $\min\{0, k\}\pi_0 = 0$, por lo que no altera el resultado:
+    \[ \mu \sum_{n=0}^\infty \min\{n, k\} \pi_n = \mu \mathbb{E}_\pi[\min\{X_t, k\}]. \]
+    Igualando ambos lados:
+    \[ \lambda = \mu \mathbb{E}_\pi[\min\{X_t, k\}] \implies \mathbb{E}_\pi[\min\{X_t, k\}] = \frac{\lambda}{\mu}. \]
+
+    \textbf{2. Interpretación como Ley de Conservación de Flujo:}
+    En un sistema en equilibrio térmico/estocástico, la tasa media de "materia" que entra debe ser igual a la tasa media que sale. 
+    \begin{itemize}
+        \item La tasa de entrada (llegadas) es una constante $\lambda$.
+        \item La tasa de salida instantánea es $\mu \times (\text{número de servidores activos})$. Su valor promedio a largo plazo es $\mu \mathbb{E}_\pi[\text{servidores ocupados}]$.
+    \end{itemize}
+    La identidad $\lambda = \mu \mathbb{E}[\text{ocupados}]$ afirma matemáticamente que lo que entra, sale. 
+
+    \textbf{3. Fracción de tiempo de ocupación por servidor:}
+    El número medio total de servidores ocupados es $\frac{\lambda}{\mu}$. 
+    Como el sistema es simétrico (todos los $k$ servidores son idénticos e indistinguibles en su operación), la carga de trabajo se distribuye uniformemente entre ellos.
+    La fracción de tiempo que \textit{un servidor específico} está ocupado es el número medio de servidores ocupados dividido entre el total de servidores:
+    \[ \text{Fracción ocupado} = \frac{\mathbb{E}_\pi[\text{ocupados}]}{k} = \frac{\lambda / \mu}{k} = \frac{\lambda}{k\mu} = \rho. \]
+    Es decir, la intensidad de tráfico $\rho$ es exactamente la probabilidad de que un servidor individual esté trabajando en un instante dado.
+\end{proof}
+
+\newpage
+\subsection{Dimensionamiento de Grupo de Soporte}
+
+\begin{ejercicio}{Dimensionamiento de Grupo de Soporte (M/M/k vs M/M/$\infty$)}{3.10}
+    Un departamento recibe incidencias a tasa $\lambda = 6$ por hora. Cada técnico resuelve incidencias en tiempo exponencial medio de 20 minutos. Modele como M/M/k, halle el $k$ mínimo estable, calcule su distribución, y compare cualitativamente con M/M/$\infty$.
+\end{ejercicio}
+
+\begin{proof}[Solución 3.10]
+    \textbf{Parámetros iniciales:}
+    La tasa de llegadas es $\lambda = 6 \text{ [incidencias/hora]}$.
+    El tiempo medio de servicio es $1/\mu = 20 \text{ [minutos]} = 1/3 \text{ [horas]}$.
+    Por lo tanto, la tasa de servicio por técnico es $\mu = 3 \text{ [incidencias/hora]}$.
+    La relación de tráfico es $a = \lambda / \mu = 6 / 3 = 2$ Erlangs.
+
+    \textbf{a) Mínimo $k$ para estabilidad:}
+    Para que el modelo M/M/k sea estable, la intensidad de tráfico por servidor debe ser estrictamente menor a 1:
+    \[ \rho = \frac{\lambda}{k\mu} < 1 \implies \frac{6}{3k} < 1 \implies \frac{2}{k} < 1 \implies k > 2. \]
+    Como el número de técnicos $k$ debe ser un número entero, el menor valor posible para garantizar estabilidad es \textbf{$k = 3$}.
+    Con $k=3$, la utilización del sistema es $\rho = 2/3 \approx 66.6\%$.
+
+    \textbf{b) Distribución estacionaria explícita para $k=3$:}
+    Calculamos primero la constante de normalización $\pi_0$. Sustituimos $\lambda/\mu = 2$, $k = 3$ y $\rho = 2/3$:
+    \begin{align*}
+        \pi_0 &= \left[ \sum_{n=0}^{2} \frac{(2)^n}{n!} + \frac{(2)^3}{3!(1 - 2/3)} \right]^{-1} \\
+        &= \left[ \left( \frac{1}{1} + \frac{2}{1} + \frac{4}{2} \right) + \frac{8}{6 (1/3)} \right]^{-1} \\
+        &= \left[ (1 + 2 + 2) + \frac{8}{2} \right]^{-1} = [5 + 4]^{-1} = \frac{1}{9}.
+    \end{align*}
+    La distribución estacionaria explícita queda:
+    \[ \pi_n = \begin{cases} 
+        \frac{2^n}{n!} \left(\frac{1}{9}\right), & \text{si } n \in \{0, 1, 2\} \\
+        \frac{2^n}{3! \cdot 3^{n-3}} \left(\frac{1}{9}\right) = \frac{2^n}{2 \cdot 3^{n-2}} \left(\frac{1}{9}\right), & \text{si } n \ge 3
+    \end{cases} \]
+
+    \textbf{c) Comparación con M/M/$\infty$ e Interpretación:}
+    En un modelo M/M/$\infty$, la distribución es una Poisson con media $\lambda/\mu = 2$, por lo que $\pi_n^{\infty} = e^{-2} \frac{2^n}{n!}$.
+    \begin{itemize}
+        \item \textbf{Diferencia Teórica:} En M/M/3, los clientes que encuentran 3 o más tareas activas deben esperar en fila (cola). Matemáticamente, esto se refleja en que la cola de la distribución $\pi_n$ ($n \ge 3$) decae geométricamente (más lento), creando un sistema propenso a congestión. En M/M/$\infty$, ningún cliente espera, la distribución decae factorialmente (súper rápido), y la probabilidad de colas largas es casi inexistente.
+        \item \textbf{Planeación de Personal (M/M/k):} Es el modelo correcto para seres humanos (técnicos de soporte). Los humanos no son escalables infinitamente, cobran salarios y tienen límites físicos. Usar M/M/k permite dimensionar exactamente el "headcount" (plantilla) para balancear el costo de nómina contra la probabilidad de que los clientes esperen.
+        \item \textbf{Microservicios Cloud (M/M/$\infty$):} Es la abstracción ideal para Serverless/Cloud Computing. Si una plataforma como AWS Lambda recibe 1000 peticiones en un segundo, auto-escala levantando 1000 contenedores instantáneamente. Las tareas no se "encolan" esperando CPU, cada una recibe un servidor dedicado virtual. Modelarlo como M/M/$\infty$ aproxima perfectamente esta elasticidad ilimitada y sin bloqueos de la infraestructura moderna.
+    \end{itemize}
+\end{proof}
+
+\newpage
+\subsection{Simulación en Python}
+
+\begin{ejercicio}{Evento a evento en una M/M/k}{3.11}
+    Considere una cola M/M/k con parámetros $\lambda, \mu$ y $\rho < 1$.
+    a. Diseñe un simulador de eventos discretos que registre llegadas, inicios, salidas y tiempos de espera.
+    b.Estime empíricamente $\mathbb{P}(C>0)$ y $\mathbb{E}[C]$ en régimen estacionario (descartando calentamiento).
+    c. Compare con Erlang C y la ley de Little.
+    d. Discuta qué cambia algorítmicamente al pasar de M/M/1 a M/M/k.
+\end{ejercicio}
+
+\begin{proof}[Solución 3.11]
+    \textbf{Implementación en Python:}
+    Utilizaremos un enfoque basado en vectores (arreglo de clientes)
+     con una cola de prioridad (heap) para gestionar los tiempos de 
+     liberación de los $k$ servidores.
+
+\begin{lstlisting}[language=Python, basicstyle=\footnotesize\ttfamily, frame=single, numbers=left]
+import numpy as np
+import heapq
+import math
+
+def simular_MMk(lam, mu, k, num_clientes, warmup):
+    # Generar tiempos entre llegadas y de servicio
+    inter_llegadas = np.random.exponential(1.0 / lam, num_clientes)
+    tiempos_servicio = np.random.exponential(1.0 / mu, num_clientes)
+    
+    tiempos_llegada = np.cumsum(inter_llegadas)
+    
+    # Estado de los servidores: heap con los tiempos en que se liberan
+    # Inicialmente, los k servidores estan libres en t=0
+    servidores_libres = [0.0] * k
+    heapq.heapify(servidores_libres)
+    
+    tiempos_espera = np.zeros(num_clientes)
+    
+    for i in range(num_clientes):
+        llegada = tiempos_llegada[i]
+        
+        # El servidor disponible mas pronto
+        servidor_pronto = heapq.heappop(servidores_libres)
+        
+        # El servicio inicia cuando el cliente llega o cuando el servidor se libera
+        inicio_servicio = max(llegada, servidor_pronto)
+        espera = inicio_servicio - llegada
+        tiempos_espera[i] = espera
+        
+        # El servidor estara ocupado hasta que termine este servicio
+        fin_servicio = inicio_servicio + tiempos_servicio[i]
+        heapq.heappush(servidores_libres, fin_servicio)
+        
+    # Descartar periodo de calentamiento
+    esperas_estacionarias = tiempos_espera[warmup:]
+    
+    # Estimaciones empiricas
+    P_C_mayor_0 = np.mean(esperas_estacionarias > 0)
+    E_C = np.mean(esperas_estacionarias)
+    
+    return P_C_mayor_0, E_C
+
+# Parametros
+lam = 4.0
+mu = 2.0
+k = 3
+num_clientes = 100000
+warmup = 10000 # Descartamos el 10% inicial
+
+P_C_emp, E_C_emp = simular_MMk(lam, mu, k, num_clientes, warmup)
+
+# Calculo Teorico (Erlang C)
+rho = lam / (k * mu)
+def erlang_c(a, k):
+    sum_term = sum((a**n)/math.factorial(n) for n in range(k))
+    last_term = (a**k)/(math.factorial(k) * (1 - a/k))
+    return last_term / (sum_term + last_term)
+
+a = lam / mu
+P_C_teo = erlang_c(a, k)
+E_C_teo = P_C_teo * (1 / (k * mu - lam)) # Usando la formula derivada en 3.3
+
+print(f"Probabilidad de espera P(C>0): Empirica = {P_C_emp:.4f}, Teorica = {P_C_teo:.4f}")
+print(f"Tiempo medio de espera E[C]:   Empirica = {E_C_emp:.4f}, Teorica = {E_C_teo:.4f}")
+\end{lstlisting}
+
+    \textbf{d. Diferencias entre M/M/1 y M/M/k:}
+    \begin{itemize}
+        \item \textbf{M/M/1:} El algoritmo es trivial. Solo necesitamos rastrear el tiempo de salida del \textit{último} cliente procesado. Si el cliente $i$ llega en $A_i$, su servicio comienza en $B_i = \max(A_i, D_{i-1})$, donde $D_{i-1}$ es la salida del cliente anterior. Solo hay una variable de estado temporal.
+        \item \textbf{M/M/k:} El orden de salida ya no es necesariamente igual al orden de llegada (un cliente con un servicio muy corto puede salir antes que un cliente anterior con un servicio largo). No podemos depender solo del cliente $i-1$. Necesitamos mantener una estructura de datos (como un \textit{Min-Heap} de tamaño $k$) que rastree los tiempos de liberación de \textit{todos} los servidores. El inicio de servicio $B_i$ se calcula usando el mínimo de esa estructura: $B_i = \max(A_i, \min(\text{Servidores}))$.
+    \end{itemize}
+\end{proof}
+
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{../../Archivos/LOGOS_IMG/py311.PNG}
+    \caption{Ejercicio311. Ver en: \url{https://colab.research.google.com/drive/1ChGQFZf-okzXaUiz_oOIWNLeFmy5kWvD?usp=sharing}}
+    \label{python311}
+\end{figure}
+
+\newpage
+
+\begin{ejercicio}{Simulación en Python: relajación hacia equilibrio en M/M/$\infty$}{3.12}
+    Sea $(X_t)$ una M/M/$\infty$ con parámetros $\lambda, \mu$ y condición inicial $X_0 = x$.
+    a) Simule muchas trayectorias independientes hasta tiempo $T$.
+    b) Estime la distribución empírica de $X_t$ para varios tiempos y compare con la ley teórica $Y_t + Z_t$.
+    c) Muestre numéricamente la convergencia de la media y varianza hacia $\lambda/\mu$.
+    d) Interprete como relajación desde una carga inicial.
+\end{ejercicio}
+
+\begin{proof}[Solución Ejercicio 3.12]
+    \textbf{Implementación en Python }
+    Dado que los clientes en un sistema de capacidad infinita no 
+    interactúan, la simulación más eficiente es generar los tiempos 
+    de vida de los clientes iniciales y las llegadas/salidas de los
+     nuevos, evaluándolos en instantes específicos.
+
+\begin{lstlisting}[language=Python, basicstyle=\footnotesize\ttfamily, frame=single, numbers=left]
+import numpy as np
+import scipy.stats as stats
+
+def simular_MMinf_snapshots(lam, mu, x_0, T_eval, num_trayectorias):
+    # T_eval es una lista de tiempos t donde queremos evaluar el estado
+    resultados_X = {t: np.zeros(num_trayectorias) for t in T_eval}
+    
+    for i in range(num_trayectorias):
+        # 1. Simular la supervivencia de los x_0 trabajos iniciales
+        # Cada trabajo dura Exp(mu).
+        vidas_iniciales = np.random.exponential(1.0 / mu, x_0)
+        
+        # 2. Simular nuevas llegadas en [0, max(T_eval)]
+        t_max = max(T_eval)
+        # N total de llegadas es Poisson(lam * t_max)
+        n_llegadas = np.random.poisson(lam * t_max)
+        # Por propiedad condicional, las llegadas son Uniformes en [0, t_max]
+        tiempos_llegada = np.random.uniform(0, t_max, n_llegadas)
+        vidas_nuevas = np.random.exponential(1.0 / mu, n_llegadas)
+        tiempos_salida_nuevas = tiempos_llegada + vidas_nuevas
+        
+        # 3. Evaluar el numero de trabajos activos en cada tiempo t
+        for t in T_eval:
+            # Trabajos iniciales que aun viven
+            y_t = np.sum(vidas_iniciales > t)
+            # Trabajos nuevos que ya llegaron pero aun no salen
+            z_t = np.sum((tiempos_llegada <= t) & (tiempos_salida_nuevas > t))
+            
+            resultados_X[t][i] = y_t + z_t
+            
+    return resultados_X
+
+# Parametros
+lam = 10.0
+mu = 2.0
+x_0 = 20 # Carga inicial alta
+num_trayectorias = 10000
+tiempos_eval = [0.1, 0.5, 1.0, 3.0] # Tiempos de observacion
+
+resultados = simular_MMinf_snapshots(lam, mu, x_0, tiempos_eval, num_trayectorias)
+
+print(f"Estado Inicial X_0 = {x_0}. Equilibrio asintotico = {lam/mu}")
+print("-" * 60)
+for t in tiempos_eval:
+    X_t_emp = resultados[t]
+    media_emp = np.mean(X_t_emp)
+    var_emp = np.var(X_t_emp)
+    
+    # Valores Teoricos
+    media_Y_teo = x_0 * np.exp(-mu * t)
+    media_Z_teo = (lam / mu) * (1 - np.exp(-mu * t))
+    media_teo_total = media_Y_teo + media_Z_teo
+    
+    var_Y_teo = x_0 * np.exp(-mu * t) * (1 - np.exp(-mu * t))
+    var_teo_total = var_Y_teo + media_Z_teo # var(Z) = media(Z)
+    
+    print(f"Tiempo t = {t}:")
+    print(f"  Media Empirica: {media_emp:.3f} | Teorica: {media_teo_total:.3f}")
+    print(f"  Var Empirica:   {var_emp:.3f} | Teorica: {var_teo_total:.3f}")
+
+# Asintoticamente (para t grande)
+print("-" * 60)
+print(f"Limite teorico t->inf: Media = {lam/mu}, Varianza = {lam/mu}")
+\end{lstlisting}
+
+    \textbf{d. Interpretación del experimento (Relajación):}
+    \begin{itemize}
+        \item \textbf{Carga inicial disipativa ($Y_t$):} Empezamos con un estado $X_0 = 20$, que está muy por encima del promedio de equilibrio ($\lambda/\mu = 5$). En los tiempos tempranos ($t = 0.1$), la granja está purgando este exceso de trabajos. La componente Binomial domina la distribución.
+        \item \textbf{Carga transitoria creciente ($Z_t$):} A medida que el tiempo avanza, los trabajos iniciales mueren exponencialmente, y la componente Poisson (las nuevas llegadas) comienza a llenar el sistema. 
+        \item \textbf{Equilibrio ($t \ge 3.0$):} El sistema se "relaja". Pierde memoria de que alguna vez hubo 20 trabajos iniciales. La media y la varianza empíricas convergen hacia el mismo valor (5.0), que es la firma clásica de una distribución de Poisson, confirmando numéricamente el Teorema Ergódico para la cola M/M/$\infty$.
+    \end{itemize}
+\end{proof}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{../../Archivos/LOGOS_IMG/py312.PNG}
+    \caption{Ejercicio311. Ver en: \url{https://colab.research.google.com/drive/1ogUSDLQd-6GM02XNAVi8WQ-rYOQpnkEH?usp=sharing}}
+    \label{python312}
+\end{figure}
+
+\newpage
+
+\section{Optimal stopping para cadenas de Markov}
+\subsection{Recursión de Bellman}
+
+\begin{ejercicio}{Recursión de Bellman para horizonte finito}{4.1}
+    Sea $(X_n)_{n\ge 0}$ una cadena de Markov en tiempo discreto con espacio de estados finito $S$, matriz de transición $P$ y función de ganancia $g: S \to \mathbb{R}$. Para un horizonte finito $N$, defina el valor
+    \[ V_n(x) := \sup_{\tau \in \mathcal{T}_{n,N}} \mathbb{E}_x[g(X_\tau)], \]
+    donde $\mathcal{T}_{n,N}$ es el conjunto de tiempos de paro con valores en $\{n, n+1, \dots, N\}$. Demuestre que la programación dinámica da lugar a la recursión de Bellman:
+    \[ V_N = g, \qquad V_n(x) = \max \{g(x), (PV_{n+1})(x)\}, \quad 0 \le n < N. \]
+\end{ejercicio}
+
+\begin{proof}[Solución 4.1]
+    \textbf{1. Condición Terminal (Caso base):}
+    En el tiempo $n = N$, el conjunto de tiempos de paro admisibles es $\mathcal{T}_{N,N} = \{N\}$. El único tiempo de paro posible es detenerse inmediatamente $\tau = N$.
+    Por lo tanto:
+    \[ V_N(x) = \mathbb{E}_x[g(X_N)] = g(x) \implies V_N = g. \]
+
+    \textbf{2. Paso Inductivo (Principio de Programación Dinámica):}
+    Para $0 \le n < N$, un tiempo de paro $\tau \in \mathcal{T}_{n,N}$ implica tomar una decisión fundamental en el instante $n$: 
+    \begin{itemize}
+        \item \textbf{Detenerse:} $\tau = n$, lo que otorga una ganancia inmediata de $g(x)$.
+        \item \textbf{Continuar:} $\tau \ge n+1$, lo que implica aplazar la decisión al menos un paso.
+    \end{itemize}
+    Cualquier tiempo de paro $\tau$ que decide continuar en $n$ puede verse como un tiempo de paro de $\mathcal{T}_{n+1, N}$ a partir del estado $X_{n+1}$.
+    Usando la propiedad de la torre de la esperanza condicional y la propiedad de Markov:
+    \begin{align*}
+        \sup_{\tau \in \mathcal{T}_{n,N}, \tau \ge n+1} \mathbb{E}_x[g(X_\tau)] &= \sup_{\tau \in \mathcal{T}_{n+1,N}} \mathbb{E}_x \left[ \mathbb{E}_x[g(X_\tau) \mid \mathcal{F}_{n+1}] \right] \\
+        &= \sup_{\tau \in \mathcal{T}_{n+1,N}} \mathbb{E}_x \left[ \mathbb{E}_{X_{n+1}}[g(X_\tau)] \right]
+    \end{align*}
+    Como el supremo puede intercambiarse con la esperanza (ya que estamos optimizando sobre decisiones futuras que dependen del estado en $n+1$), obtenemos:
+    \begin{align*}
+        \mathbb{E}_x \left[ \sup_{\tau \in \mathcal{T}_{n+1,N}} \mathbb{E}_{X_{n+1}}[g(X_\tau)] \right] &= \mathbb{E}_x [V_{n+1}(X_{n+1})] \\
+        &= \sum_{y \in S} P(x, y) V_{n+1}(y) = (P V_{n+1})(x).
+    \end{align*}
+    El operador $P V_{n+1}(x)$ representa el \textit{valor de continuación} esperado.
+    
+    Como el supremo sobre todo el conjunto $\mathcal{T}_{n,N}$ es simplemente el máximo entre la decisión de detenerse ahora y la decisión de continuar de manera óptima, concluimos:
+    \[ V_n(x) = \max \left\{ g(x), (P V_{n+1})(x) \right\}. \]
+\end{proof}
+
+\newpage
+\subsection{Región de paro Snell}
+
+\begin{ejercicio}{Región de paro y sobre de Snell}{4.2}
+    En las hipótesis del ejercicio anterior, 
+    defina la región de paro 
+    $D_n := \{x \in S : g(x) \ge (PV_{n+1})(x)\}$. 
+    Demuestre que el tiempo de primer ingreso 
+    $\tau^* := \inf\{n \le N : X_n \in D_n\}$ 
+    es óptimo. Interprete el resultado como una versión 
+    markoviana del sobre de Snell.
+\end{ejercicio}
+
+\begin{proof}[Solución 4.2]
+    \textbf{1. Demostración de optimalidad:}
+    Por construcción de la recursión de Bellman, sabemos que $V_k(x) \ge (PV_{k+1})(x)$ para todo $k$. Por lo tanto, el proceso $M_k = V_k(X_k)$ es una supermartingala.
+    
+    Analicemos el proceso evaluado a lo largo de la trayectoria definida por la regla $\tau^*$. 
+    Para todo instante $k < \tau^*$, por definición el sistema no ha entrado en la región de paro, es decir, $X_k \notin D_k$.
+    Esto implica estrictamente que $g(X_k) < (PV_{k+1})(X_k)$. 
+    Revisando la ecuación de Bellman:
+    \[ V_k(X_k) = \max\{g(X_k), (PV_{k+1})(X_k)\} = (PV_{k+1})(X_k). \]
+    Por definición de la transición de Markov, $(PV_{k+1})(X_k) = \mathbb{E}[V_{k+1}(X_{k+1}) \mid \mathcal{F}_k]$.
+    Por tanto, en el evento $\{k < \tau^*\}$, tenemos:
+    \[ \mathbb{E}[V_{k+1}(X_{k+1}) \mid \mathcal{F}_k] = V_k(X_k). \]
+    Esto significa que el proceso $V_{k \land \tau^*}(X_{k \land \tau^*})$ (el proceso detenido en $\tau^*$) es una verdadera \textbf{martingala}.
+
+    Como es una martingala y el horizonte $N$ es finito y acotado, podemos aplicar el Teorema de Paro Opcional:
+    \[ \mathbb{E}_x[V_{\tau^*}(X_{\tau^*})] = V_0(X_0) = V_0(x). \]
+    Dado que $\tau^*$ es exactamente el momento en que entramos a $D_n$, sabemos que $V_{\tau^*}(X_{\tau^*}) = g(X_{\tau^*})$. Sustituyendo esto en la esperanza:
+    \[ \mathbb{E}_x[g(X_{\tau^*})] = V_0(x) = \sup_{\tau \in \mathcal{T}_{0,N}} \mathbb{E}_x[g(X_\tau)]. \]
+    Esto demuestra formalmente que $\tau^*$ alcanza el supremo, por lo que es una estrategia de paro óptima.
+
+    \textbf{Interpretación Snell:}
+    En la teoría general de martingalas, el \textit{Sobre de Snell} de un proceso de ganancia $Y_n = g(X_n)$ se define como la menor supermartingala $Z_n$ que domina a $Y_n$ ($Z_n \ge Y_n$ casi seguramente). 
+    En nuestro contexto markoviano, el proceso $V_n(X_n)$ es exactamente el Sobre de Snell de $g(X_n)$.
+    La demostración que acabamos de hacer muestra la propiedad geométrica fundamental del Sobre de Snell: la supermartingala se comporta como una martingala plana ("vuela en línea recta") exactamente hasta el momento en que "toca" por primera vez al proceso subyacente $g(X_n)$, lo cual ocurre en la región de paro $D_n$.
+\end{proof}
+
+\newpage
+\subsection{stopping con descuento}
+
+\begin{ejercicio}{Problema de stopping con descuento en $\mathbb{Z}$}{4.3}
+    Considere una caminata aleatoria sesgada en $\mathbb{Z}$ dada por $X_{n+1} = X_n + \xi_{n+1}$, $\mathbb{P}(\xi=1)=p, \mathbb{P}(\xi=-1)=q$. Y la ganancia descontada $e^{-\alpha n}(K - X_n)^+$. Formule el problema de stopping óptimo infinito y demuestre que $v$ satisface la ecuación variacional. Discuta la regla de umbral.
+\end{ejercicio}
+
+\begin{proof}[Solución 4.3]
+    \textbf{1. Formulación del Problema Infinito:}
+    El problema busca maximizar la ganancia esperada descontada a lo largo de un horizonte infinito. Definimos la función de valor $v(x)$:
+    \[ v(x) = \sup_{\tau} \mathbb{E}_x \left[ e^{-\alpha \tau} (K - X_\tau)^+ \right], \]
+    donde el supremo se toma sobre todos los tiempos de paro finitos $\tau$ adaptados a la filtración generada por la caminata. Notemos que la función de pago es $g(x) = (K - x)^+$ y el factor de descuento por paso es $\beta = e^{-\alpha}$ con $\alpha > 0$.
+
+    \textbf{2. Demostración de la Ecuación Variacional:}
+    Por el principio de programación dinámica para problemas homogéneos en el tiempo con horizonte infinito, el valor en el estado actual es el máximo entre detenerse hoy (recibiendo la recompensa actual $g(x)$) y continuar un paso de manera óptima (recibiendo el valor futuro descontado).
+    Es decir:
+    \[ v(x) = \max \left\{ g(x), \beta \mathbb{E}_x[v(X_1)] \right\}. \]
+    Para nuestra caminata aleatoria discreta, la esperanza del siguiente paso evaluada en la función de valor es:
+    \[ \mathbb{E}_x[v(X_1)] = \sum_{y \in \mathbb{Z}} P(x, y) v(y) = p v(x+1) + q v(x-1). \]
+    Sustituyendo $g(x)$ y la esperanza, obtenemos directamente la ecuación variacional solicitada:
+    \[ v(x) = \max \left\{ (K - x)^+, e^{-\alpha} (p v(x+1) + q v(x-1)) \right\}. \]
+
+    \textbf{3. Discusión de la Regla de Umbral:}
+    Este problema es el análogo discreto de una \textbf{Opción Put Americana Perpetua} en finanzas.
+    Analicemos los componentes de la ecuación variacional:
+    \begin{itemize}
+        \item La ganancia por detenerse es $(K - x)^+$, la cual es estrictamente decreciente para $x < K$ y plana (cero) para $x \ge K$.
+        \item El valor de continuar es el promedio descontado $e^{-\alpha}(pv(x+1)+qv(x-1))$. Dado que existe el factor $e^{-\alpha} < 1$, aplazar la decisión tiene un "costo de oportunidad" (el valor del dinero en el tiempo).
+    \end{itemize}
+    Intuitivamente, si el proceso toma valores grandes ($x \ge K$), la ganancia inmediata es 0. Como continuar siempre tiene la posibilidad de alcanzar valores $< K$ en el futuro, el valor de continuar es estrictamente positivo. Por tanto, nunca es óptimo detenerse si $x \ge K$.
+    
+    A medida que $x$ se hace más y más pequeño (profundamente negativo, "in the money"), el valor intrínseco $(K-x)$ crece linealmente. Esperar un paso adicional proporciona una ganancia marginal nula o negativa debido a la penalización del factor de descuento $e^{-\alpha}$. 
+    
+    Debido a la convexidad y monotonicidad decreciente de la función de pago, existe un punto de equilibrio crítico, un umbral $x^* \in \mathbb{Z}$, tal que para cualquier estado $x \le x^*$, el beneficio de continuar no alcanza a compensar la pérdida por el descuento temporal. 
+    Por consiguiente, la región de paro tendrá la forma topológica de una semirrecta izquierda:
+    \[ D = \{x \in \mathbb{Z} : x \le x^*\}. \]
+    La regla de decisión óptima es de la forma: "Esperar mientras $X_n > x^*$, y detener el proceso en el primer instante en que $X_n \le x^*$".
+\end{proof}
+
+\newpage
+\subsection{Detección de alarma Dirichlet}
+
+\begin{ejercicio}{Detección de alarma y problema de Dirichlet}{4.4}
+    Sea $(X_n)$ una cadena de Markov irreducible sobre un espacio numerable $S$ y sea $A \subset S$ el conjunto de estados de alarma. Defina $\tau_A := \inf\{n \ge 0 : X_n \in A\}$. Pruebe que la función $h(x) := \mathbb{E}_x[r^{\tau_A}]$, con $r \in (0,1]$, es la mínima solución no negativa del problema de Dirichlet discreto:
+    \[ h(x) = 1, \ x \in A; \qquad h(x) = r \sum_{y \in S} P(x,y)h(y), \ x \notin A. \]
+    Interprete $h(x)$ como una medida de tiempo descontado.
+\end{ejercicio}
+
+\begin{proof}[Solución  4.4]
+    \textbf{1. Satisfacción de la ecuación (Principio de primer paso):}
+    \begin{itemize}
+        \item Si $x \in A$, el proceso ya se encuentra en el conjunto de alarma en el instante $n=0$. Por lo tanto, el tiempo de primer ingreso es $\tau_A = 0$. Evaluando la función:
+        \[ h(x) = \mathbb{E}_x[r^0] = \mathbb{E}_x[1] = 1. \]
+        \item Si $x \notin A$, sabemos que $\tau_A \ge 1$. Podemos descomponer el valor esperado condicionando sobre el primer paso de la cadena $X_1$, utilizando la propiedad de Markov:
+        \begin{align*}
+            h(x) &= \mathbb{E}_x[r^{\tau_A}] = \mathbb{E}_x \left[ \mathbb{E}_x[r^{\tau_A} \mid X_1] \right].
+        \end{align*}
+        Dado que $\tau_A$ cuenta el número de pasos desde $x$, visto desde $X_1$, el número de pasos restantes es $\tau_A - 1$. Por lo tanto, $\tau_A = 1 + \tau_A \circ \theta_1$ (donde $\theta_1$ es el operador de desplazamiento).
+        \begin{align*}
+            h(x) &= \mathbb{E}_x \left[ r \cdot \mathbb{E}_{X_1}[r^{\tau_A}] \right] = r \mathbb{E}_x[h(X_1)] = r \sum_{y \in S} P(x,y)h(y).
+        \end{align*}
+    \end{itemize}
+    Esto prueba que $h(x)$ es una solución.
+
+    \textbf{2. Mínima solución no negativa:}
+    Sea $u(x) \ge 0$ otra solución al problema de Dirichlet. 
+    Para $x \in A$, $u(x) = 1 = h(x)$.
+    Para $x \notin A$, aplicamos la ecuación iterativamente:
+    \[ u(x) = r \mathbb{E}_x[u(X_1)] = r^2 \mathbb{E}_x[u(X_2) \mathbf{1}_{\{\tau_A > 1\}}] + \mathbb{E}_x[r u(X_1) \mathbf{1}_{\{\tau_A = 1\}}]. \]
+    En general, tras $n$ pasos:
+    \[ u(x) = \mathbb{E}_x[r^{\tau_A} u(X_{\tau_A}) \mathbf{1}_{\{\tau_A \le n\}}] + \mathbb{E}_x[r^n u(X_n) \mathbf{1}_{\{\tau_A > n\}}]. \]
+    Dado que en el evento $\{\tau_A \le n\}$ el proceso se detiene en $A$, sabemos que $u(X_{\tau_A}) = 1$. Además, como $u \ge 0$, el segundo término de la derecha es $\ge 0$. Descartándolo, obtenemos una cota inferior:
+    \[ u(x) \ge \mathbb{E}_x[r^{\tau_A} \mathbf{1}_{\{\tau_A \le n\}}]. \]
+    Tomando el límite cuando $n \to \infty$ y aplicando el Teorema de Convergencia Monótona (ya que el integrando es positivo y creciente con $n$):
+    \[ u(x) \ge \mathbb{E}_x[r^{\tau_A} \mathbf{1}_{\{\tau_A < \infty\}}] = \mathbb{E}_x[r^{\tau_A}] = h(x). \]
+    (Convención $r^\infty = 0$). Así, $h(x)$ es la menor de todas las soluciones no negativas.
+
+    \textbf{3. Interpretación:}
+    La función $h(x)$ representa el \textit{valor presente} de recibir un pago de 1 unidad monetaria en el instante exacto en que suena la alarma, donde $r$ actúa como un factor de descuento por periodo (e.g., $r = 1/(1+tasa)$). Si la alarma está muy "lejos" probabilísticamente, el exponente $\tau_A$ será grande y el valor descontado $r^{\tau_A}$ será muy cercano a cero.
+\end{proof}
+
+\newpage
+\subsection{Identidad de Dynkin}
+
+\begin{ejercicio}{Identidad de Dynkin discreta}{4.5}
+    Sea $(X_n)$ una cadena de Markov y $f$ integrable. Defina $M_n := f(X_n) - f(X_0) - \sum_{j=0}^{n-1} (Pf - f)(X_j)$. Pruebe que $(M_n)$ es martingala. Deduzca la identidad de Dynkin y explique su uso en optimal stopping.
+\end{ejercicio}
+
+\begin{proof}[Solución 4.5]
+    \textbf{1. Demostración de Martingala:}
+    Debemos probar que $\mathbb{E}[M_{n+1} \mid \mathcal{F}_n] = M_n$. Observamos el incremento $M_{n+1} - M_n$:
+    \begin{align*}
+        M_{n+1} - M_n &= f(X_{n+1}) - f(X_n) - (Pf - f)(X_n).
+    \end{align*}
+    Tomamos la esperanza condicional respecto a $\mathcal{F}_n$:
+    \begin{align*}
+        \mathbb{E}[M_{n+1} - M_n \mid \mathcal{F}_n] &= \mathbb{E}[f(X_{n+1}) \mid \mathcal{F}_n] - f(X_n) - (Pf)(X_n) + f(X_n).
+    \end{align*}
+    Por la propiedad de Markov, $\mathbb{E}[f(X_{n+1}) \mid \mathcal{F}_n] = (Pf)(X_n)$. Sustituyendo:
+    \begin{align*}
+        \mathbb{E}[M_{n+1} - M_n \mid \mathcal{F}_n] &= (Pf)(X_n) - (Pf)(X_n) = 0.
+    \end{align*}
+    Por lo tanto, $\mathbb{E}[M_{n+1} \mid \mathcal{F}_n] = M_n$, verificando la propiedad de martingala.
+
+    \textbf{2. Deducción de la Identidad de Dynkin discreta:}
+    Para un tiempo de paro acotado $\tau$ (es decir, $\tau \le N$ para alguna constante $N$), aplicamos el Teorema de Paro Opcional de Doob a la martingala $M_n$:
+    \[ \mathbb{E}_x[M_\tau] = \mathbb{E}_x[M_0]. \]
+    Calculamos ambos lados. En $n=0$, la suma es vacía, por lo que $M_0 = f(X_0) - f(X_0) - 0 = 0$.
+    Sustituyendo $M_\tau$ y tomando esperanza condicionada al estado inicial $x$:
+    \[ \mathbb{E}_x \left[ f(X_\tau) - f(x) - \sum_{j=0}^{\tau-1} (Pf - f)(X_j) \right] = 0. \]
+    Reordenando los términos, obtenemos la Identidad de Dynkin discreta:
+    \[ \mathbb{E}_x[f(X_\tau)] = f(x) + \mathbb{E}_x \left[ \sum_{j=0}^{\tau-1} (Pf - f)(X_j) \right]. \]
+
+    \textbf{3. Uso en Optimal Stopping:}
+    Esta identidad es el puente entre el análisis de trayectorias (martingalas) y la teoría de potencial (operadores). En problemas de parada óptima, queremos evaluar reglas del tipo "detente cuando $X \in D$". La fórmula nos permite calcular esperanzas de la forma $\mathbb{E}_x[f(X_\tau)]$ transformando un problema de "evaluar el futuro aleatorio" en un problema de "sumar un costo de paso conocido" $(Pf - f)$ a lo largo de la región de continuación, lo cual facilita la resolución de ecuaciones de Bellman y problemas de frontera libre.
+\end{proof}
+
+\newpage
+\subsection{ariacional de Reemplazo HJB}
+
+\begin{ejercicio}{Ecuación Variacional de Reemplazo (HJB)}{4.6}
+    Sea $V(x) := \sup_\tau \mathbb{E}_x[e^{-\alpha \tau} g(X_\tau)]$ para una CTMC con generador $L$. Muestre formalmente que la ecuación variacional asociada es $\max\{g(x) - V(x), LV(x) - \alpha V(x)\} = 0$. Discuta qué significa en la región de continuación y el umbral de reemplazo.
+\end{ejercicio}
+
+\begin{proof}[Solución 4.6]
+    \textbf{1. Derivación formal de la Inecuación Variacional (HJB):}
+    Para un problema de parada óptima en tiempo continuo, la Teoría de Programación Dinámica divide el espacio de estados en dos regiones mutuamente excluyentes:
+    \begin{itemize}
+        \item \textbf{Región de Paro ($D$):} Donde es óptimo detenerse inmediatamente. Aquí, $V(x) = g(x)$.
+        \item \textbf{Región de Continuación ($C$):} Donde es óptimo esperar. En esta región, la ganancia esperada descontada es estrictamente mayor a la ganancia inmediata, por lo que $V(x) > g(x)$.
+    \end{itemize}
+    Dado que $V(x)$ es el supremo sobre todas las estrategias, debe dominar siempre a la detención inmediata: $V(x) \ge g(x)$ para todo $x$, lo que equivale a $g(x) - V(x) \le 0$.
+    
+    Por otro lado, consideremos el proceso descontado $M_t = e^{-\alpha t}V(X_t)$. Por el principio de optimalidad, si no nos hemos detenido (estamos en $C$), $M_t$ debe ser una martingala local (no se gana ni se pierde valor esperado al aplazar la decisión óptimamente). La fórmula de Dynkin para tiempo continuo dicta que la "deriva" infinitesimal de este proceso está gobernada por $LV - \alpha V$. 
+    Para que sea una martingala en $C$, su deriva debe ser nula:
+    \[ LV(x) - \alpha V(x) = 0 \quad \text{para } x \in C. \]
+    Para cualquier otro punto (en $D$), aplazar la decisión es subóptimo, lo que hace de $M_t$ una supermartingala, requiriendo que la deriva sea negativa o cero: $LV(x) - \alpha V(x) \le 0$ para todo $x$.
+
+    Ambas condiciones se combinan en un problema de complementariedad (Obstacle Problem). En todo punto, o bien paramos ($V=g$) o bien la deriva es cero ($LV-\alpha V = 0$). Y ninguna de las dos cantidades puede ser positiva. Esto se compacta de forma elegante en:
+    \[ \max \{ g(x) - V(x), \ LV(x) - \alpha V(x) \} = 0. \]
+
+    \textbf{2. Interpretación Física y Umbral de Reemplazo:}
+    $X_t$ modela el nivel de desgaste de una máquina (e.g., $X_t = 0, 1, 2, \dots$, donde mayor significa más desgastada). $g(x)$ es el valor de rescate/reemplazo de la máquina.
+    En la región de continuación, $LV(x) = \alpha V(x)$ significa que la "tasa de degradación esperada" más los saltos ($LV$) es exactamente igual al "interés" que la máquina debe rendir por el factor de descuento ($\alpha V$). 
+    Eventualmente, el desgaste llega a un estado $x^*$ donde el generador proyecta caídas tan drásticas en el valor ($LV(x^*) < \alpha V(x^*)$) que la ecuación de martingala se rompe. Ese estado $x^*$ define el \textbf{umbral óptimo de reemplazo}: la regla maestra de mantenimiento dictará no hacer nada mientras $X_t < x^*$, y detener la producción para reemplazar el equipo en el instante exacto en que $X_t \ge x^*$.
+\end{proof}
+
+\newpage
+\subsection{stopping en Caminata Aleatoria absorbente}
+
+\begin{ejercicio}{Optimal stopping en Caminata Aleatoria absorbente}{4.7}
+    Sea $(X_n)$ en $\{0,1,\dots,m\}$ con $P(i,i+1)=p$ y $P(i,i-1)=q=1-p$, absorbente en $0$ y $m$. Ganancia $g(i) = i$. Determine la estrategia óptima para maximizar $\mathbb{E}_i[X_\tau]$ con $\tau \le \tau_{\{0,m\}}$. Justifique en función de $p$ y $q$.
+\end{ejercicio}
+
+\begin{proof}[Solución 4.7]
+    Analizamos el comportamiento de la cadena evaluando la esperanza condicional de un paso (la deriva local del proceso):
+    \[ \mathbb{E}[X_{n+1} - X_n \mid X_n = i] = (+1)p + (-1)q = p - q. \]
+    Dependiendo de los valores de $p$ y $q$, la caminata se comporta como una submartingala, martingala o supermartingala. El pago es la función identidad $g(x) = x$. Analicemos los tres casos:
+
+    \textbf{Caso 1: $p = q = 1/2$ (Caminata Simétrica)}
+    Aquí $p - q = 0$, por lo que $X_n$ es una martingala estricta. 
+    Por el Teorema de Paro Opcional, para cualquier tiempo de paro acotado por absorción $\tau \le \tau_{\{0,m\}}$, la esperanza se conserva:
+    \[ \mathbb{E}_i[X_\tau] = \mathbb{E}_i[X_0] = i. \]
+    \textit{Decisión óptima:} Cualquier regla es óptima. Detenerse inmediatamente da $i$. Esperar hasta la absorción también tiene valor esperado $i$. Todas las estrategias rinden lo mismo.
+
+    \textbf{Caso 2: $p < 1/2$ (Tendencia hacia la izquierda)}
+    Aquí $p - q < 0$, la deriva es negativa. El proceso $X_n$ es una \textbf{supermartingala}. 
+    En una supermartingala, el valor esperado del proceso decrece con el tiempo. Jugar más pasos solo "destruye" el valor esperado.
+    \[ \mathbb{E}_i[X_\tau] \le \mathbb{E}_i[X_0] = i. \]
+    \textit{Decisión óptima:} El máximo posible se alcanza maximizando la cota, lo cual ocurre si no damos ningún paso. La estrategia óptima es \textbf{detenerse inmediatamente}: $\tau^* = 0$.
+
+    \textbf{Caso 3: $p > 1/2$ (Tendencia hacia la derecha)}
+    Aquí $p - q > 0$, la deriva es positiva. El proceso $X_n$ es una \textbf{submartingala}.
+    En una submartingala, el valor esperado aumenta con cada paso que damos. "Jugar" el juego nos favorece estadísticamente, por lo que queremos jugar el mayor tiempo posible. 
+    Dado que nuestra restricción es detenernos a más tardar cuando el sistema se absorbe ($\tau \le \tau_{\{0,m\}}$), el mayor valor esperado se obtendrá apurando el juego hasta su límite legal.
+    \textit{Decisión óptima:} La estrategia óptima es \textbf{esperar hasta la absorción}: $\tau^* = \tau_{\{0,m\}}$. (Si no nos obligaran a detenernos en las fronteras, jugaríamos hasta el infinito).
+\end{proof}
+
+\newpage
+\subsection{Bellman y Convergencia}
+
+\begin{ejercicio}{Operador de Bellman y Convergencia}{4.8}
+    Sea $(X_n)$ una cadena de Markov con matriz $P$ y sea $g: S \to \mathbb{R}$ acotada superiormente. Defina el operador de Bellman $(Tu)(x) := \max\{g(x), (Pu)(x)\}$.
+    Suponga que $S$ es finito. Pruebe que $T$ es monótono y que, si $u_0 = g$ y $u_{n+1} = Tu_n$, entonces $(u_n)$ converge puntualmente al valor del problema de stopping óptimo infinito $v(x) = \sup_\tau \mathbb{E}_x[g(X_\tau)]$. Discuta qué cambia al introducir descuento.
+\end{ejercicio}
+
+\begin{proof}[Solución  4.8]
+    \textbf{1. Monotonicidad de $T$:}
+    Sean $u, w: S \to \mathbb{R}$ dos funciones tales que $u(x) \le w(x)$ para todo $x \in S$ (denotado $u \le w$).
+    Dado que las probabilidades de transición son no negativas ($P(x,y) \ge 0$), la esperanza preserva el orden:
+    \[ (Pu)(x) = \sum_{y \in S} P(x,y)u(y) \le \sum_{y \in S} P(x,y)w(y) = (Pw)(x). \]
+    Por las propiedades de la función máximo, si $a \le b$, entonces $\max\{c, a\} \le \max\{c, b\}$. Aplicando esto:
+    \[ (Tu)(x) = \max\{g(x), (Pu)(x)\} \le \max\{g(x), (Pw)(x)\} = (Tw)(x). \]
+    Por lo tanto, $T$ es un operador monótono.
+
+    \textbf{2. Convergencia de la sucesión $(u_n)$:}
+    Empezamos con $u_0 = g$. Calculamos el siguiente término:
+    \[ u_1(x) = (Tg)(x) = \max\{g(x), (Pg)(x)\} \ge g(x) = u_0(x). \]
+    Así que $u_0 \le u_1$. Como $T$ es monótono, aplicar $T$ a ambos lados preserva la desigualdad:
+    \[ u_1 \le u_2 \implies u_2 \le u_3 \implies \dots \implies u_n \le u_{n+1}. \]
+    La sucesión de funciones $(u_n)$ es monótona creciente.
+    Además, como $S$ es finito y $g$ está acotada superiormente, existe una constante $M$ tal que $g(x) \le M$. Es fácil ver por inducción que $u_n(x) \le M$ para todo $n$.
+    Por el teorema de convergencia monótona para sucesiones reales acotadas, la sucesión converge puntualmente a un límite $u^*$:
+    \[ u^*(x) = \lim_{n \to \infty} u_n(x). \]
+    Como $S$ es finito, la suma matricial $(Pu)$ es finita y por lo tanto continua respecto al límite. Así, $u^* = Tu^*$, es decir, $u^*$ es un punto fijo de $T$. En la teoría de programación dinámica, este mínimo punto fijo que domina a $g$ coincide exactamente con la función de valor $v(x)$ (el sobre de Snell). Por tanto, $u_n \to v$.
+
+    \textbf{3. El efecto de introducir un factor de descuento:}
+    Si introducimos un factor de descuento $\beta \in (0,1)$, el operador se convierte en $(T_\beta u)(x) = \max\{g(x), \beta(Pu)(x)\}$.
+    Este pequeño cambio transforma a $T_\beta$ en una \textbf{contracción estricta} respecto a la norma del supremo ($||T_\beta u - T_\beta w||_\infty \le \beta ||u - w||_\infty$).
+    Por el Teorema del Punto Fijo de Banach, el operador tendrá un único punto fijo $v$, y la sucesión $u_{n+1} = T_\beta u_n$ convergerá a $v$ independientemente de la condición inicial $u_0$. Además, la convergencia será geométricamente rápida, a diferencia del caso sin descuento que puede ser sublineal.
+\end{proof}
+
+\newpage
+\subsection{Costo de espera}
+
+\begin{ejercicio}{Costo de espera en optimal stopping}{4.9}
+    Sea $(X_n)$ una cadena de Markov sobre un espacio finito $S$ y sea $c: S \to [0,\infty)$ un costo de espera. Para una ganancia terminal $g: S \to \mathbb{R}$, considere
+    \[ v(x) = \sup_\tau \mathbb{E}_x \left[ g(X_\tau) - \sum_{j=0}^{\tau-1} c(X_j) \right]. \]
+    Demuestre que la ecuación de Bellman toma la forma $v(x) = \max \left\{ g(x), -c(x) + \sum_{y \in S} P(x,y)v(y) \right\}$. Explique cómo el costo modifica la región de continuación.
+\end{ejercicio}
+
+\begin{proof}[Solución 4.9]
+    \textbf{1. Derivación de la Ecuación de Bellman:}
+    Evaluamos las decisiones disponibles en el instante $n=0$ desde el estado inicial $X_0 = x$:
+    \begin{itemize}
+        \item \textbf{Decisión de Parar ($\tau = 0$):} Si nos detenemos inmediatamente, la ganancia terminal es $g(x)$. La suma de costos de espera va de $j=0$ a $-1$, la cual por convención es vacía y vale $0$. El valor de parar es $g(x)$.
+        \item \textbf{Decisión de Continuar ($\tau \ge 1$):} Si decidimos aplazar la decisión al menos un paso, incurrimos de inmediato en el costo de espera del estado actual, es decir, pagamos $-c(x)$. 
+        El sistema transita al estado aleatorio $X_1$ según las probabilidades $P(x,y)$. A partir de $X_1$, debido a que la cadena y los pagos son estacionarios, el problema que enfrentamos es idéntico al problema original pero iniciando en $X_1$. Por el Principio de Optimalidad, el valor esperado máximo a partir del siguiente paso es $\mathbb{E}_x[v(X_1)]$.
+        El valor total de continuar es la suma del costo inmediato más el valor futuro esperado: $-c(x) + (Pv)(x)$.
+    \end{itemize}
+    Dado que $v(x)$ busca maximizar el valor esperado general, debe elegir la mejor entre estas dos opciones mutuamente excluyentes:
+    \[ v(x) = \max \left\{ g(x), -c(x) + \sum_{y \in S} P(x,y)v(y) \right\}. \]
+
+    \textbf{2. Modificación de la Región de Continuación:}
+    La región de continuación está definida por el conjunto de estados $C$ donde aplazar es estrictamente mejor que detenerse:
+    \[ C = \{ x \in S : -c(x) + (Pv)(x) > g(x) \} \iff \{ x \in S : (Pv)(x) - g(x) > c(x) \}. \]
+    En el problema sin costo ($c(x)=0$), uno continúa si el mero incremento esperado supera a 0. Al introducir un costo $c(x) > 0$, la barrera para continuar se eleva. La ganancia marginal esperada de dar un paso extra, $(Pv)(x) - g(x)$, ya no solo debe ser positiva, sino que debe ser lo suficientemente grande para cubrir el costo del "peaje" $c(x)$. Como consecuencia, la introducción de un costo de espera penaliza la inacción y \textbf{reduce o contrae la región de continuación}, forzando a la estrategia óptima a detenerse más temprano.
+\end{proof}
+
+\newpage
+\subsection{Activo en una rejilla discreta}
+
+\begin{ejercicio}{Venta óptima de un activo en una rejilla discreta}{4.10}
+    Sea $(X_n)$ una cadena de Markov en $\{0, 1, \dots, m\}$ (precio de un activo). La ganancia por vender en $i$ es $g(i) = i - K$. El inversionista puede esperar o vender una sola vez. Formule con descuento $\beta \in (0,1)$ y pruebe $v(i) = \max\{i - K, \beta(Pv)(i)\}$. Bajo la hipótesis de $v$ creciente, muestre que la región de paro es $\{i \ge i^*\}$. Discuta el umbral.
+\end{ejercicio}
+
+\begin{proof}[Solución al Ejercicio 4.10]
+    \textbf{1. Formulación y Ecuación Variacional:}
+    El inversionista busca el tiempo de paro óptimo $\tau$ que maximice la ganancia descontada. La función de valor es:
+    \[ v(i) = \sup_\tau \mathbb{E}_i \left[ \beta^\tau (X_\tau - K) \right]. \]
+    Por programación dinámica estándar, en cada paso compara la ejecución inmediata del contrato de venta (con ganancia $i-K$) frente a mantener el activo un periodo más (cuyo valor esperado futuro es descontado al presente multiplicándolo por $\beta$). Esto da lugar inmediatamente a la ecuación de Bellman:
+    \[ v(i) = \max \{ i - K, \ \beta(Pv)(i) \}. \]
+
+    \textbf{2. Demostración de la Regla de Umbral ($D = \{i \ge i^*\}$):}
+    Definamos la función de ventaja de parar sobre continuar: $A(i) = (i - K) - \beta(Pv)(i)$.
+    La región de paro es el conjunto $D = \{i : A(i) \ge 0\}$.
+    
+    Supongamos por hipótesis que $v(i)$ es una función creciente en $i$. Como $P$ modela un precio aleatorio normal, $(Pv)(i)$ también será creciente o a lo sumo crecerá de forma acotada (por ejemplo, con pendiente menor a 1 en las partes altas del dominio debido al factor de atenuación de la caminata). 
+    Al multiplicar por el factor de descuento estricto $\beta < 1$, la pendiente de $\beta(Pv)(i)$ está fuertemente amortiguada. 
+    Por el contrario, la función de ganancia inmediata $i - K$ es una recta con pendiente exacta de 1.
+    
+    Por lo tanto, la resta $A(i) = i - [K + \beta(Pv)(i)]$ es una función estrictamente creciente respecto a $i$ (la recta con pendiente 1 eventualmente "le gana" y cruza desde abajo a la curva suavizada $\beta(Pv)$).
+    Debido a esta monotonicidad creciente, si existe un punto donde $A(i) \ge 0$, para todos los valores posteriores también se cumplirá la desigualdad. 
+    Definimos el umbral crítico como el primer punto de cruce:
+    \[ i^* = \min \{ i \in \{0, \dots, m\} : i - K \ge \beta(Pv)(i) \}. \]
+    Se deduce trivialmente que la región de paro es $\{i \ge i^*\}$.
+
+    \textbf{3. Significado Económico del Umbral $i^*$:}
+    En la teoría financiera, $i^*$ representa el \textbf{precio de reserva} o el \textbf{umbral de ejercicio óptimo} de una opción americana de compra (Call option intrínseca). 
+    \begin{itemize}
+        \item Si el precio de mercado del activo es bajo ($i < i^*$), el beneficio de vender ahora es pequeño (o incluso negativo si $i < K$). El descuento temporal $\beta$ es preferible al riesgo de vender barato, así que se retiene el activo esperando un rebote del mercado.
+        \item Si el precio de mercado alcanza o supera $i^*$, las ganancias son tan atractivas que el costo de oportunidad del dinero en el tiempo ($\beta$) domina a la posibilidad estadística de que el precio suba aún más. En ese momento, la decisión racional es "tomar ganancias" y vender inmediatamente.
+    \end{itemize}
+\end{proof}
+
+\newpage
+\subsection{Simulación en Python}
+
+\begin{ejercicio}{iteración de Bellman y región de paro}{4.11}
+    Sea $(X_n)$ una cadena finita con matriz $P$ y ganancia $g$ sobre horizonte $N$.
+    a. Implemente en Python la recursión $V_N = g$, $V_n = \max\{g, PV_{n+1}\}$ para calcular el valor y la región $D_n$.
+    b. Aplique a una caminata en $\{0, 1, \dots, m\}$ con reflexión en los extremos y una ganancia concreta.
+    c. Grafique la evolución de las regiones $D_n$ al retroceder en el tiempo.
+    d. Explique cómo el cálculo numérico ayuda a conjeturar reglas de umbral.
+\end{ejercicio}
+
+\begin{proof}[Solución 4.11]
+    \textbf{Implementación en Python:}
+    Utilizaremos una caminata aleatoria simple con reflexión en los bordes $0$ y $m$. Elegiremos como ganancia una "Opción Put" financiera $g(x) = \max(0, K - x)$, donde ganar es más probable si el estado (precio) es bajo.
+
+\begin{lstlisting}[language=Python, basicstyle=\footnotesize\ttfamily, frame=single, numbers=left]
+import numpy as np
+import matplotlib.pyplot as plt
+
+def build_reflecting_rw_matrix(m, p, q):
+    P = np.zeros((m+1, m+1))
+    for i in range(m+1):
+        if i == 0:
+            P[i, 0] = q
+            P[i, 1] = p
+        elif i == m:
+            P[i, m-1] = q
+            P[i, m] = p
+        else:
+            P[i, i-1] = q
+            P[i, i+1] = p
+    return P
+
+def bellman_finite_horizon(P, g, N):
+    m = len(g) - 1
+    V = np.zeros((N+1, m+1))
+    D = np.zeros((N+1, m+1), dtype=bool)
+    
+    # Condicion terminal: n = N
+    V[N, :] = g
+    D[N, :] = True # En el ultimo paso, parar es obligatorio/optimo
+    
+    # Recursion hacia atras
+    for n in range(N-1, -1, -1):
+        continuation_value = P @ V[n+1, :]
+        V[n, :] = np.maximum(g, continuation_value)
+        # La region de paro son los estados donde g >= E[V_{n+1}]
+        D[n, :] = (g >= continuation_value)
+        
+    return V, D
+
+# Parametros del modelo
+m = 50
+p, q = 0.5, 0.5
+N = 100
+K = 25 # Precio de ejercicio (Strike)
+
+# Ganancia: Put option g(x) = (K - x)^+
+states = np.arange(m+1)
+g = np.maximum(0, K - states)
+
+P = build_reflecting_rw_matrix(m, p, q)
+V, D = bellman_finite_horizon(P, g, N)
+
+# Graficar la evolucion de la region de paro D_n
+plt.figure(figsize=(10, 6))
+plt.imshow(D.T, aspect='auto', origin='lower', cmap='Blues', 
+           extent=[0, N, 0, m])
+plt.colorbar(ticks=[0, 1], label='0: Continuar, 1: Parar')
+plt.title('Evolucion de la Region de Paro $D_n$ (Opcion Put en RW)')
+plt.xlabel('Tiempo $n$')
+plt.ylabel('Estado $x$')
+plt.show()
+\end{lstlisting}
+
+    \textbf{d. El rol del cálculo numérico en la conjetura de teoremas:}
+    En la investigación matemática real, demostrar analíticamente que una región de paro $D$ tiene una forma "bonita" (como ser un intervalo cerrado continuo $[0, x^*]$) suele requerir pruebas complejas de preservación de concavidad y dominancia estocástica. 
+    
+    Al calcular iterativamente $D_n$ de forma numérica y graficarlo como un mapa de calor (Heatmap), podemos \textit{ver} la frontera de la región. Si la simulación revela consistentemente que para todo $n$ la región de paro es siempre de la forma $\{x \le x^*_n\}$, el matemático adquiere la certeza empírica de que existe una "Regla de Umbral". Esta visualización dirige los esfuerzos de demostración analítica, indicando exactamente qué propiedades geométricas (monotonicidad, convexidad) deben ser probadas en la ecuación de Bellman para formalizar el teorema.
+\end{proof}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{../../Archivos/LOGOS_IMG/py411.PNG}
+    \caption{Ejercicio411. Ver en: \url{https://colab.research.google.com/drive/1WlcazkP5eOaqUnlE7pbYocIM6sXsM7yA?usp=sharing}}
+    \label{python411}
+\end{figure}
+
+\newpage
+
+\begin{ejercicio}{Simulación Monte Carlo de una regla de umbral}{4.12}
+    Considere el precio de un activo en $\{0, 1, \dots, m\}$ con $g(i) = i - K$ y descuento $\beta \in (0,1)$.
+    a. Fije un umbral $i^*$ y simule en Python la política "vender al primer tiempo $X_n \ge i^*$".
+    b. Estime por Monte Carlo la ganancia media descontada.
+    c. Compare varios umbrales y confróntelos con la región por programación dinámica.
+    d. Discuta por qué la simulación sugiere una política de barrera bajo monotonicidad.
+\end{ejercicio}
+
+\begin{proof}[Solución 4.12]
+    \textbf{Implementación en Python (Respuestas a, b y c):}
+
+    me exta indicando un error en latex. me ayudas:\begin{lstlisting}[language=Python, basicstyle=\footnotesize\ttfamily, frame=single, numbers=left]
+ import numpy as np
+
+
+# Matriz de transicion RW 
+
+def build_reflecting_rw_matrix(m, p_up, p_down):
+    P = np.zeros((m+1, m+1))
+    
+    for i in range(m+1):
+        if i == 0:
+            P[i, i] = p_down      # reflejo en 0
+            P[i, i+1] = p_up
+        elif i == m:
+            P[i, i-1] = p_down
+            P[i, i] = p_up        # reflejo en m
+        else:
+            P[i, i-1] = p_down
+            P[i, i+1] = p_up
+    
+    return P
+
+
+# Simu Monte Carlo
+
+def simulate_threshold_policy(P, g, beta, start_state, threshold, num_paths, max_steps=1000):
+    m = len(g) - 1
+    total_payoff = 0.0
+
+    for _ in range(num_paths):
+        x = start_state
+        n = 0
+
+        # Simular trayectoria hasta cruzar el umbral
+        while x < threshold and n < max_steps:
+            x = np.random.choice(m+1, p=P[x, :])
+            n += 1
+
+        if x >= threshold:
+            total_payoff += (beta**n) * g[x]
+        else:
+            total_payoff += 0.0  
+
+    return total_payoff / num_paths
+
+# Parametros
+
+m = 40
+K = 20
+beta = 0.95
+start_state = 10
+num_paths = 5000
+
+# Ganancia 
+states = np.arange(m+1)
+g = np.maximum(0, states - K)
+
+# Matriz de transicion
+P = build_reflecting_rw_matrix(m, 0.6, 0.4)
+
+
+# Evaluacion Monte Carlo
+
+candidate_thresholds = list(range(K, m+1))
+mc_values = []
+
+print("Evaluacion Monte Carlo de Umbrales:")
+for thresh in candidate_thresholds:
+    val = simulate_threshold_policy(P, g, beta, start_state, thresh, num_paths)
+    mc_values.append(val)
+    print(f"Umbral i* = {thresh}: Valor Esperado MC = {val:.4f}")
+
+best_idx = np.argmax(mc_values)
+best_threshold = candidate_thresholds[best_idx]
+
+print(f"\nMejor umbral empirico: {best_threshold} con valor {mc_values[best_idx]:.4f}")
+
+
+V_exact = np.zeros(m+1)
+
+for _ in range(1000):  
+    V_new = np.maximum(g, beta * (P @ V_exact))
+    
+    if np.max(np.abs(V_new - V_exact)) < 1e-8:
+        break
+        
+    V_exact = V_new
+
+# Region de paro 
+continuation_value = beta * (P @ V_exact)
+D_exact = (g >= continuation_value)
+
+opt_states = np.where(D_exact)[0]
+exact_threshold = opt_states[0] if len(opt_states) > 0 else None
+
+print(f"Umbral exacto por Bellman: {exact_threshold}")
+print(f"Valor exacto en X_0 = {start_state}: {V_exact[start_state]:.4f}")
+\end{lstlisting}
+
+
+    \textbf{d monotonicidad:}
+    Si sabemos teóricamente que la función de valor $v(i)$ es monótonamente creciente, la diferencia entre detenerse y continuar, expresada como $A(i) = g(i) - \beta(Pv)(i)$, a menudo resulta ser estrictamente creciente y cruza el eje horizontal (cero) una sola vez. 
+    
+    Cuando la simulación computacional (incisos b y c) evalúa exclusivamente políticas de la forma $\tau_{i^*} = \inf\{n : X_n \ge i^*\}$ y encuentra que el máximo valor devuelto por Monte Carlo coincide exactamente con el valor óptimo irrestricto de Bellman, se confirma una propiedad estructural poderosa: \textbf{el espacio de búsqueda de la estrategia óptima colapsa}. 
+    
+    En lugar de buscar en un espacio masivo de todas las posibles funciones booleanas de estados (de tamaño $2^{m+1}$), la monotonicidad garantiza que la estrategia óptima pertenece a la pequeña familia unidimensional de "políticas de umbral" (de tamaño $m+1$). La simulación sugiere que optimizar la regla de paro es simplemente un problema de encontrar el parámetro óptimo $i^*$, transformando un problema de control estocástico complejo en una simple optimización escalar.
+\end{proof}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{../../Archivos/LOGOS_IMG/py412.PNG}
+    \caption{Ejercicio412. Ver en: \url{https://colab.research.google.com/drive/1__zmDiqprUBJiVOQX5wwGcOaA9qq_pIW?usp=sharing}}
+    \label{python412}
+\end{figure}
+
+
+\newpage
+\section{Martingalas asociadas y cambios de medida}
+\subsection{Martingala del generador y Dynkin}
+
+\begin{ejercicio}{Martingala del generador y fórmula de Dynkin}{5.1}
+    Sea $(X_t)_{t\ge 0}$ una cadena de Markov a tiempo continuo con generador $L$, y sea $f: S \to \mathbb{R}$ acotada. Pruebe que el proceso
+    \[ M_t^f := f(X_t) - f(X_0) - \int_0^t Lf(X_s) ds \]
+    es una martingala. Deduzca la fórmula de Dynkin continua y aplíquela al proceso de Poisson con $f(n)=n$ y $f(n)=n^2$.
+\end{ejercicio}
+
+\begin{proof}[Solución 5.1]
+    \textbf{1. Prueba de la propiedad de Martingala:}
+    Para demostrar que $(M_t^f)$ es una martingala respecto a la filtración natural $\mathcal{F}_t$, verificamos que para $0 \le s < t$:
+    \[ \mathbb{E}[M_t^f - M_s^f \mid \mathcal{F}_s] = 0. \]
+    Desarrollamos el incremento:
+    \[ M_t^f - M_s^f = f(X_t) - f(X_s) - \int_s^t Lf(X_u) du. \]
+    Tomando la esperanza condicional y aplicando la propiedad de Markov:
+    \[ \mathbb{E}[M_t^f - M_s^f \mid \mathcal{F}_s] = \mathbb{E}_{X_s}[f(X_{t-s})] - f(X_s) - \mathbb{E}_{X_s} \left[ \int_0^{t-s} Lf(X_u) du \right]. \]
+    Por la definición del semigrupo $P_t = e^{tL}$, sabemos que para cualquier función acotada, $\frac{d}{dt}P_t f = P_t Lf = L P_t f$. Integrando esta ecuación diferencial respecto al tiempo desde $0$ hasta $t-s$:
+    \[ P_{t-s}f(x) - f(x) = \int_0^{t-s} P_u Lf(x) du. \]
+    Reescribiendo esto en notación de esperanza:
+    \[ \mathbb{E}_x[f(X_{t-s})] - f(x) = \int_0^{t-s} \mathbb{E}_x[Lf(X_u)] du = \mathbb{E}_x \left[ \int_0^{t-s} Lf(X_u) du \right] \quad \text{(por Fubini)}. \]
+    Evaluando esto en $x = X_s$, los términos se cancelan exactamente, concluyendo que $\mathbb{E}[M_t^f - M_s^f \mid \mathcal{F}_s] = 0$.
+
+    \textbf{2. Deducción de la Fórmula de Dynkin:}
+    Dado que $M_t^f$ es una martingala con $M_0^f = 0$, su esperanza incondicional es cero: $\mathbb{E}_x[M_t^f] = \mathbb{E}_x[M_0^f] = 0$.
+    Sustituyendo la definición de $M_t^f$ y usando la linealidad de la esperanza:
+    \[ \mathbb{E}_x \left[ f(X_t) - f(x) - \int_0^t Lf(X_s) ds \right] = 0 \implies \mathbb{E}_x[f(X_t)] = f(x) + \mathbb{E}_x \left[ \int_0^t Lf(X_s) ds \right]. \]
+
+    \textbf{3. Aplicación al proceso de Poisson:}
+    Para un proceso de Poisson $N_t$ de intensidad $\lambda$, sabemos que $X_0 = 0$ y $Lf(n) = \lambda(f(n+1) - f(n))$.
+    \begin{itemize}
+        \item \textbf{Para $f(n) = n$:}
+        Calculamos el generador: $Lf(n) = \lambda((n+1) - n) = \lambda$.
+        Aplicamos Dynkin:
+        \[ \mathbb{E}_0[N_t] = 0 + \mathbb{E}_0 \left[ \int_0^t \lambda ds \right] = \lambda t. \]
+        Hemos recuperado la media del proceso de Poisson de forma puramente analítica.
+        
+        \item \textbf{Para $f(n) = n^2$:}
+        Calculamos el generador: $Lf(n) = \lambda((n+1)^2 - n^2) = \lambda(2n + 1)$.
+        Aplicamos Dynkin:
+        \begin{align*}
+            \mathbb{E}_0[N_t^2] &= 0 + \mathbb{E}_0 \left[ \int_0^t \lambda(2N_s + 1) ds \right] \\
+            &= \lambda \int_0^t (2\mathbb{E}_0[N_s] + 1) ds \quad \text{(por Fubini)} \\
+            &= \lambda \int_0^t (2\lambda s + 1) ds = \lambda \left[ \lambda s^2 + s \right]_0^t = \lambda^2 t^2 + \lambda t.
+        \end{align*}
+        Esto es consistente con la varianza conocida: $\text{Var}(N_t) = \mathbb{E}[N_t^2] - (\mathbb{E}[N_t])^2 = (\lambda^2 t^2 + \lambda t) - (\lambda t)^2 = \lambda t$.
+    \end{itemize}
+\end{proof}
+
+\newpage
+\subsection{Variación cuadrática para Poisson}
+
+\begin{ejercicio}{Variación cuadrática e isometría para Poisson}{5.2}
+    Sea $M_t = N_t - \lambda t$. Calcule la variación cuadrática previsible y opcional de $M$. Pruebe que $M_t^2 - N_t$ es una martingala e interprete como versión elemental de isometría.
+\end{ejercicio}
+
+\begin{proof}[Solución 5.2]
+    \textbf{1. Variaciones cuadráticas:}
+    \begin{itemize}
+        \item \textbf{Variación Cuadrática Opcional $[M]_t$:} Para procesos de salto puro de variación acotada en intervalos compactos, el corchete de M (variación opcional) se define como la suma de los cuadrados de sus saltos. 
+        Dado que $M_t = N_t - \lambda t$, la parte continua $-\lambda t$ no tiene saltos, por lo que $\Delta M_s = \Delta N_s$. Como el proceso de Poisson solo tiene saltos de tamaño $1$, $(\Delta N_s)^2 = \Delta N_s$.
+        Por lo tanto:
+        \[ [M]_t = \sum_{0 < s \le t} (\Delta M_s)^2 = \sum_{0 < s \le t} (\Delta N_s)^2 = \sum_{0 < s \le t} \Delta N_s = N_t. \]
+        
+        \item \textbf{Variación Cuadrática Previsible $\langle M \rangle_t$:} Es el único proceso continuo, previsible y creciente tal que $M_t^2 - \langle M \rangle_t$ es una martingala local. Como demostraremos en el siguiente paso, el proceso de compensación para los saltos al cuadrado es $\lambda t$.
+        Por lo tanto:
+        \[ \langle M \rangle_t = \lambda t. \]
+        \textit{Nota teórica:} Nótese que la variación opcional $N_t$ es estocástica, mientras que la previsible $\lambda t$ es su compensador determinista (y la esperanza de ambas coincide).
+    \end{itemize}
+
+    \textbf{2. Demostración de que $M_t^2 - N_t$ es martingala:}
+    Calculamos la esperanza condicional del incremento para $s < t$:
+    \begin{align*}
+        \mathbb{E}[(M_t^2 - N_t) - (M_s^2 - N_s) \mid \mathcal{F}_s] &= \mathbb{E}[(M_t - M_s + M_s)^2 - M_s^2 - (N_t - N_s) \mid \mathcal{F}_s] \\
+        &= \mathbb{E}[(M_t - M_s)^2 + 2M_s(M_t - M_s) - (N_t - N_s) \mid \mathcal{F}_s].
+    \end{align*}
+    Sabemos que $M_s$ es medible respecto a $\mathcal{F}_s$, y el incremento $(M_t - M_s)$ es independiente de $\mathcal{F}_s$ con esperanza $0$. Por tanto, el término cruzado $\mathbb{E}[2M_s(M_t-M_s) \mid \mathcal{F}_s] = 2M_s \mathbb{E}[M_t-M_s] = 0$.
+    Para el término cuadrático, como $M_t - M_s = (N_t - N_s) - \lambda(t-s)$ tiene media cero, su esperanza al cuadrado es su varianza:
+    \[ \mathbb{E}[(M_t - M_s)^2 \mid \mathcal{F}_s] = \text{Var}(M_t - M_s) = \text{Var}(N_t - N_s) = \lambda(t-s). \]
+    Para el término lineal:
+    \[ \mathbb{E}[-(N_t - N_s) \mid \mathcal{F}_s] = -\lambda(t-s). \]
+    Sumando los componentes:
+    \[ \lambda(t-s) + 0 - \lambda(t-s) = 0. \]
+    Al ser la esperanza condicional del incremento igual a $0$, se concluye que $M_t^2 - N_t$ es una martingala. (Esto también verifica directamente que $[M]_t - \langle M \rangle_t = N_t - \lambda t = M_t$ es martingala).
+
+    \textbf{3. Interpretación como Isometría de Itô:}
+    La identidad fundamental de la isometría de Itô para integrales estocásticas respecto a martingalas $M$ dicta que $\mathbb{E} [ (\int_0^t H_s dM_s)^2 ] = \mathbb{E} [ \int_0^t H_s^2 d\langle M \rangle_s ]$.
+    Para el proceso $M_t = N_t - \lambda t$, si evaluamos para el integrando constante $H_s = 1$, la identidad se reduce a:
+    \[ \mathbb{E}[M_t^2] = \mathbb{E}[\langle M \rangle_t] = \mathbb{E}[\lambda t] = \lambda t. \]
+    Y dado que $\mathbb{E}[N_t] = \lambda t$, nuestra martingala construida $M_t^2 - N_t$ es simplemente la expresión puntual (antes de tomar esperanzas incondicionales) de esta isometría que ancla el espacio $L^2$ de las variables aleatorias con la métrica del tiempo $\lambda t$.
+\end{proof}
+
+\newpage
+\subsection{Transformación-h de Doob}
+
+\begin{ejercicio}{Cambio de medida y Transformación-h de Doob}{5.3}
+    Sea $f>0$ tal que $Lf = \lambda_f f$. Demuestre que $Z_t := \exp(-\lambda_f t) \frac{f(X_t)}{f(X_0)}$ es martingala positiva. Si $\frac{d\mathbb{P}_x^{(f)}}{d\mathbb{P}_x}\big|_{\mathcal{F}_t} = Z_t$, pruebe que bajo la nueva medida el generador es $L^{(f)}g = \frac{1}{f}L(fg) - \lambda_f g$. Interprete como transformación-h.
+\end{ejercicio}
+
+\begin{proof}[Solución  5.3]
+    \textbf{1. Propiedad de Martingala para $Z_t$:}
+    Dado que $f>0$, $Z_t$ es estrictamente positiva. Usando el sistema de autovalores del generador $Lf = \lambda_f f$, sabemos que al aplicarle el semigrupo $P_t$, la función crece exponencialmente a la tasa del autovalor: $P_t f = e^{\lambda_f t} f$.
+    Verificamos la condición de martingala evaluando el incremento multiplicativo para $s < t$:
+    \begin{align*}
+        \mathbb{E}[Z_t \mid \mathcal{F}_s] &= \mathbb{E} \left[ e^{-\lambda_f t} \frac{f(X_t)}{f(X_0)} \ \middle| \ \mathcal{F}_s \right] = \frac{e^{-\lambda_f t}}{f(X_0)} \mathbb{E}[f(X_t) \mid \mathcal{F}_s].
+    \end{align*}
+    Por la propiedad de Markov, la esperanza condicional de $f(X_t)$ depende de $X_s$:
+    \[ \mathbb{E}[f(X_t) \mid \mathcal{F}_s] = P_{t-s} f(X_s) = e^{\lambda_f(t-s)} f(X_s). \]
+    Sustituyendo en la ecuación original:
+    \[ \mathbb{E}[Z_t \mid \mathcal{F}_s] = \frac{e^{-\lambda_f t}}{f(X_0)} e^{\lambda_f(t-s)} f(X_s) = e^{-\lambda_f s} \frac{f(X_s)}{f(X_0)} = Z_s. \]
+    
+    \textbf{2. Transformación del Generador $L^{(f)}$:}
+    Queremos encontrar la "deriva" infinitesimal para una función $g$ bajo la nueva medida $\mathbb{P}^{(f)}$. 
+    La definición formal del nuevo generador es la derivada del nuevo semigrupo en $t=0$:
+    \[ L^{(f)}g(x) = \lim_{t \downarrow 0} \frac{\mathbb{E}_x^{(f)}[g(X_t)] - g(x)}{t} = \left. \frac{d}{dt} \mathbb{E}_x^{(f)}[g(X_t)] \right|_{t=0}. \]
+    Usando el Teorema de Radon-Nikodym, expresamos la esperanza bajo la nueva medida en términos de la medida original usando la derivada (martingala) $Z_t$:
+    \begin{align*}
+        \mathbb{E}_x^{(f)}[g(X_t)] &= \mathbb{E}_x[Z_t g(X_t)] = \mathbb{E}_x \left[ e^{-\lambda_f t} \frac{f(X_t)}{f(x)} g(X_t) \right] \\
+        &= \frac{e^{-\lambda_f t}}{f(x)} \mathbb{E}_x[(fg)(X_t)] = \frac{e^{-\lambda_f t}}{f(x)} P_t(fg)(x).
+    \end{align*}
+    Derivamos respecto a $t$ evaluando en $t=0$ utilizando la regla del producto (notando que $P_0(fg) = fg$ y $\frac{d}{dt}P_t|_{t=0} = L$):
+    \begin{align*}
+        \left. \frac{d}{dt} \right|_{t=0} \left( e^{-\lambda_f t} P_t(fg)(x) \right) &= -\lambda_f e^0 P_0(fg)(x) + e^0 \left. \frac{d}{dt} P_t(fg)(x) \right|_{t=0} \\
+        &= -\lambda_f (fg)(x) + L(fg)(x).
+    \end{align*}
+    Multiplicando por la constante externa $1/f(x)$:
+    \[ L^{(f)}g(x) = \frac{1}{f(x)} \Big( L(fg)(x) - \lambda_f f(x)g(x) \Big) = \frac{1}{f(x)} L(fg)(x) - \lambda_f g(x). \]
+
+    \textbf{3. Interpretación como Transformación-h de Doob:}
+    En la teoría del potencial estocástico, la transformación-h de Doob (o *h-transform*) se usa para "condicionar" una cadena de Markov para que tenga un comportamiento específico a largo plazo.
+    \begin{itemize}
+        \item Si $\lambda_f = 0$, la función es armónica ($Lf=0$). La martingala es simplemente $f(X_t)/f(X_0)$. El cambio de medida "condiciona" el proceso a alcanzar eventualmente ciertos estados límite (generalmente infinito) sin ser absorbido en el camino, sesgando las probabilidades de transición hacia los estados donde $f(x)$ es grande.
+        \item Al ser $\lambda_f \neq 0$, la función es un eigen-estado del operador. El término de descuento exponencial compensa la tendencia "creciente o decreciente" del generador. Esto permite crear probabilidades de transición genuinas (conservativas) para estudiar cuasi-estacionariedad o procesos que son penalizados o "aniquilados" continuamente a una tasa relacionada con su estado, transformando un sistema disipativo en uno conservativo que puede ser analizado con ergodicidad estándar.
+    \end{itemize}
+\end{proof}
+
+\newpage
+\subsection{Girsanov para Poisson}
+
+\begin{ejercicio}{Cambio de escenario de riesgo }{5.4}
+    Sea $(N_t)$ Poisson de intensidad $\lambda$ y, para $\theta \in \mathbb{R}$, defina la martingala $Z_t^{(\theta)} = \exp(\theta N_t - \lambda t(e^\theta - 1))$. Defina la medida $\mathbb{Q}^{(\theta)}$ por $d\mathbb{Q}^{(\theta)} / d\mathbb{P}|_{\mathcal{F}_t} = Z_t^{(\theta)}$. Demuestre que bajo $\mathbb{Q}^{(\theta)}$ el proceso $N$ es Poisson de intensidad $\lambda e^\theta$. Interprete.
+\end{ejercicio}
+
+\begin{proof}[Solución  5.4]
+    Para demostrar que bajo la nueva medida $\mathbb{Q}^{(\theta)}$ el proceso sigue siendo de Poisson pero con intensidad modificada, calcularemos la función de masa de probabilidad condicional de un incremento, es decir $\mathbb{Q}^{(\theta)}(N_t = n)$.
+    
+    Por la definición de la derivada de Radon-Nikodym, la esperanza bajo la medida $\mathbb{Q}^{(\theta)}$ se calcula integrando con la martingala de cambio de medida $Z_t^{(\theta)}$ bajo la medida original $\mathbb{P}$:
+    \begin{align*}
+        \mathbb{Q}^{(\theta)}(N_t = n) &= \mathbb{E}^{\mathbb{P}} \left[ \mathbf{1}_{\{N_t = n\}} Z_t^{(\theta)} \right] \\
+        &= \mathbb{E}^{\mathbb{P}} \left[ \mathbf{1}_{\{N_t = n\}} \exp(\theta N_t - \lambda t(e^\theta - 1)) \right].
+    \end{align*}
+    Dado que estamos evaluando en el evento donde $N_t = n$, podemos sustituir $N_t$ por la constante $n$ dentro de la exponencial:
+    \begin{align*}
+        \mathbb{Q}^{(\theta)}(N_t = n) &= \exp(\theta n - \lambda t(e^\theta - 1)) \mathbb{E}^{\mathbb{P}} \left[ \mathbf{1}_{\{N_t = n\}} \right] \\
+        &= \exp(\theta n) \exp(-\lambda t e^\theta + \lambda t) \ \mathbb{P}(N_t = n).
+    \end{align*}
+    Sustituimos la probabilidad original $\mathbb{P}(N_t = n) = e^{-\lambda t} \frac{(\lambda t)^n}{n!}$:
+    \begin{align*}
+        \mathbb{Q}^{(\theta)}(N_t = n) &= e^{\theta n} e^{-\lambda t e^\theta} e^{\lambda t} e^{-\lambda t} \frac{(\lambda t)^n}{n!} \\
+        &= e^{-\lambda t e^\theta} \frac{(e^\theta \lambda t)^n}{n!} = e^{-(\lambda e^\theta) t} \frac{((\lambda e^\theta) t)^n}{n!}.
+    \end{align*}
+    Esta es exactamente la función de masa de una distribución de Poisson con nuevo parámetro $\lambda^* = \lambda e^\theta$. El mismo argumento aplica para incrementos independientes $N_{t+s} - N_t$.
+    
+    \textbf{Interpretación (Teorema de Girsanov):} 
+    Este es el análogo discreto del Teorema de Girsanov. Al multiplicar las probabilidades originales por la martingala $Z_t^{(\theta)}$, "inclinamos" (tilt) la distribución del proceso. Si $\theta > 0$, inflamos artificialmente la probabilidad de trayectorias con muchos saltos (escenario de estrés severo en riesgos/seguros). La belleza matemática es que la estructura del proceso de Poisson es tan robusta que este "estrés" no destruye la naturaleza del proceso, simplemente reescala su intensidad base $\lambda$ a una intensidad estresada $\lambda e^\theta$.
+\end{proof}
+
+\newpage
+\subsection{Medida en caminata aleatoria continua}
+
+\begin{ejercicio}{Cambio de medida en caminata aleatoria continua}{5.5}
+    Considere una caminata en $\mathbb{Z}$ con tasas $\alpha$ (derecha) y $\beta$ (izquierda). Muestre que para toda $\theta \in \mathbb{R}$ el proceso $Z_t^{(\theta)} := \exp(\theta X_t - t[\alpha(e^\theta - 1) + \beta(e^{-\theta} - 1)])$ es martingala. Use esto para construir un cambio de medida con nuevas tasas $\alpha_\theta, \beta_\theta$.
+\end{ejercicio}
+
+\begin{proof}[Solución 5.5]
+    \textbf{1. Propiedad de Martingala:}
+    Recordemos (del Ejercicio 1.7) que la caminata puede expresarse como la diferencia de dos procesos de Poisson independientes: $X_t = N_t^+ - N_t^-$, donde $N_t^+ \sim \text{Poisson}(\alpha t)$ y $N_t^- \sim \text{Poisson}(\beta t)$.
+    Sustituimos esto en la expresión de $Z_t^{(\theta)}$:
+    \begin{align*}
+        Z_t^{(\theta)} &= \exp\left( \theta(N_t^+ - N_t^-) - \alpha t(e^\theta - 1) - \beta t(e^{-\theta} - 1) \right) \\
+        &= \exp\left( \theta N_t^+ - \alpha t(e^\theta - 1) \right) \exp\left( -\theta N_t^- - \beta t(e^{-\theta} - 1) \right).
+    \end{align*}
+    Notamos que $Z_t^{(\theta)}$ se factoriza perfectamente en el producto de dos martingalas exponenciales independientes (del tipo estudiado en 5.4):
+    \[ Z_t^{(\theta)} = M_t^{(+)} M_t^{(-)} \]
+    donde $M_t^{(+)}$ es la martingala exponencial para $N^+$ con parámetro $\theta$, y $M_t^{(-)}$ es la martingala para $N^-$ con parámetro $-\theta$.
+    Como es el producto de dos martingalas independientes (con valor esperado inicial 1), $Z_t^{(\theta)}$ hereda la propiedad de ser una martingala respecto a la filtración conjunta.
+
+    \textbf{2. Cambio de Medida:}
+    Definimos la nueva medida $\mathbb{Q}^{(\theta)}$ usando $Z_t^{(\theta)}$ como derivada de Radon-Nikodym.
+    Debido a la factorización independiente, el cambio de medida aplica simultáneamente (y de forma aislada) a ambos procesos subyacentes.
+    Aplicando el resultado del Ejercicio 5.4:
+    \begin{itemize}
+        \item Bajo $\mathbb{Q}^{(\theta)}$, el proceso $N_t^+$ sigue siendo Poisson, pero su nueva intensidad es $\alpha_\theta = \alpha e^\theta$.
+        \item Bajo $\mathbb{Q}^{(\theta)}$, el proceso $N_t^-$ sigue siendo Poisson, pero su nueva intensidad (usando parámetro $-\theta$) es $\beta_\theta = \beta e^{-\theta}$.
+    \end{itemize}
+    Por consiguiente, bajo la nueva medida estresada, la caminata aleatoria sigue dando pasos unitarios independientes, pero con un sesgo modificado (drift alterado), donde la tendencia de saltar a la derecha se multiplica por $e^\theta$ y la de saltar a la izquierda por $e^{-\theta}$.
+\end{proof}
+
+\newpage
+\subsection{Martingalas polinómicas}
+
+\begin{ejercicio}{Monitoreo de carga y martingalas polinómicas en M/M/$\infty$}{5.6}
+    Sea $X$ una M/M/$\infty$. Explique por qué no existe una martingala $M_t = e^{\theta X_t - \psi(\theta)t}$. Luego construya, usando el generador, martingalas polinómicas de primer y segundo orden.
+\end{ejercicio}
+
+\begin{proof}[Solución  5.6]
+    \textbf{1. Imposibilidad de la martingala exponencial pura:}
+    Para que un proceso de la forma $M_t = f(X_t)e^{-\lambda_f t}$ (donde $f(x) = e^{\theta x}$ y $\lambda_f = \psi(\theta)$) sea una martingala, $f(x)$ debe ser una función propia (eigen-función) del generador, es decir, $Lf(x) = \psi(\theta)f(x)$ para alguna constante $\psi(\theta)$ que NO dependa de $x$.
+    Calculamos el generador $L$ para $f(x) = e^{\theta x}$ en la cola M/M/$\infty$:
+    \begin{align*}
+        Lf(x) &= \lambda(e^{\theta(x+1)} - e^{\theta x}) + x\mu(e^{\theta(x-1)} - e^{\theta x}) \\
+        &= e^{\theta x} \left[ \lambda(e^\theta - 1) + x\mu(e^{-\theta} - 1) \right] = f(x) \left[ \lambda(e^\theta - 1) + x\mu(e^{-\theta} - 1) \right].
+    \end{align*}
+    Observamos que la "tasa" $\psi(\theta, x) = \lambda(e^\theta - 1) + x\mu(e^{-\theta} - 1)$ depende linealmente del estado $x$. Como la tasa de salida (muertes $x\mu$) depende de la carga del sistema (fuerza de reversión a la media), es imposible compensar el proceso exponencial solo con el tiempo $t$. Se requeriría un compensador integral dependiente de la trayectoria $\int_0^t X_s ds$.
+
+    \textbf{2. Martingalas Polinómicas asociadas al proceso:}
+    Utilizaremos la martingala de Dynkin $M_t^f = f(X_t) - f(X_0) - \int_0^t Lf(X_s)ds$.
+    
+    \textit{Polinomio de Primer Orden ($f(x) = x$):}
+    Calculamos el generador: $Lf(x) = \lambda(x+1-x) + x\mu(x-1-x) = \lambda - \mu x$.
+    La martingala resultante es:
+    \[ M_t^{(1)} = X_t - X_0 - \int_0^t (\lambda - \mu X_s) ds. \]
+    \textit{Interpretación:} Compara el estado actual de la carga $X_t$ contra el crecimiento esperado. Mide si el sistema está "sorprendiendo" al alza o a la baja en función de la deriva instantánea.
+
+    \textit{Polinomio de Segundo Orden ($f(x) = x^2$):}
+    Calculamos el generador: 
+    \begin{align*}
+        Lf(x) &= \lambda((x+1)^2 - x^2) + x\mu((x-1)^2 - x^2) \\
+        &= \lambda(2x + 1) + x\mu(-2x + 1) = 2x(\lambda - \mu x) + \lambda + \mu x.
+    \end{align*}
+    La martingala resultante es:
+    \[ M_t^{(2)} = X_t^2 - X_0^2 - \int_0^t \Big[ 2X_s(\lambda - \mu X_s) + \lambda + \mu X_s \Big] ds. \]
+    \textit{Interpretación:} Aporta información operacional sobre la \textit{volatilidad} o varianza de la carga en el clúster (muy útil para dimensionar márgenes de seguridad en el aprovisionamiento de CPU).
+\end{proof}
+
+
+\newpage
+\subsection{Martingala de Dynkin}
+
+\begin{ejercicio}{Problema de Dirichlet con Martingala de Dynkin}{5.7}
+    Sea $(X_t)$ irreducible reversible y $A \subset S$ finito. $u(x) := \mathbb{E}_x[\tau_A]$. Muestre que, fuera de $A$, $Lu(x) = -1$ y $u|_A = 0$. Discuta la unicidad.
+\end{ejercicio}
+
+\begin{proof}[Solución al Ejercicio 5.7]
+    \textbf{1. Condiciones de frontera y ecuación de Poisson:}
+    Para $x \in A$, el tiempo para alcanzar $A$ es trivialmente $0$, por lo que $u(x) = \mathbb{E}_x[0] = 0$. Esto demuestra la condición de frontera $u|_A = 0$.
+    
+    Para $x \notin A$, usamos el Principio de la Programación Dinámica (o equivalentemente, la martingala de Dynkin detenida). Sabemos que para un tiempo $h$ muy pequeño antes de tocar $A$ (asumiendo que $h < \tau_A$), el tiempo esperado restante es el tiempo transcurrido $h$ más el tiempo esperado desde el nuevo estado $X_h$:
+    \[ u(x) = \mathbb{E}_x[h + u(X_h)] \implies \mathbb{E}_x[u(X_h)] - u(x) = -h. \]
+    Dividiendo por $h$ y tomando el límite cuando $h \downarrow 0$:
+    \[ Lu(x) = \lim_{h \downarrow 0} \frac{\mathbb{E}_x[u(X_h)] - u(x)}{h} = \lim_{h \downarrow 0} \frac{-h}{h} = -1. \]
+    Por lo tanto, la función de esperanza de impacto satisface la ecuación de Poisson $Lu(x) = -1$ fuera de la región absorbente.
+
+    \textbf{2. Unicidad bajo hipótesis razonables:}
+    La solución $u(x)$ representa un "tiempo de vida esperado" en el complemento $S \setminus A$. Si la cadena es positiva recurrente, la probabilidad de llegar a cualquier conjunto finito $A$ (alcanzabilidad) es $1$ y el tiempo esperado $\mathbb{E}_x[\tau_A]$ es estrictamente finito para todo $x$. 
+    Bajo el requerimiento de que buscamos soluciones \textbf{no negativas} ($u \ge 0$), el Teorema de Representación Probabilística de Ecuaciones de Poisson garantiza que $u(x) = \mathbb{E}_x[\tau_A]$ es la mínima solución no negativa (análogo a la demostración que hicimos en el Ejercicio 4.4). Si el espacio es finito o se asumen condiciones de crecimiento acotado, la solución es única. (Si el sistema fuera transiente, $\mathbb{E}_x[\tau_A] = \infty$, y la ecuación podría carecer de soluciones finitas).
+\end{proof}
+
+
+\newpage
+\subsection{Foster-Lyapunov para tiempos de retorno}
+
+\begin{ejercicio}{Condición de Foster-Lyapunov para tiempos de retorno}{5.8}
+    Sea $V: S \to [1, \infty)$ tal que $LV(x) \le -cV(x) + b \mathbf{1}_C(x)$ ($C$ finito, $b, c > 0$). Use la martingala $V(X_t) - V(X_0) - \int_0^t LV(X_s)ds$ para obtener cotas sobre tiempos de retorno a $C$. Explique el enlace con la ergodicidad.
+\end{ejercicio}
+
+\begin{proof}[Solución al Ejercicio 5.8]
+    \textbf{1. Cotas sobre el tiempo de retorno a $C$:}
+    Sea $\tau_C := \inf\{t \ge 0 : X_t \in C\}$. Iniciamos la cadena en un estado $x \notin C$. 
+    Aplicamos el Teorema de Paro Opcional a la martingala de Dynkin evaluada en el tiempo detenido $\tau_C \wedge t$:
+    \[ \mathbb{E}_x[V(X_{\tau_C \wedge t})] - V(x) = \mathbb{E}_x \left[ \int_0^{\tau_C \wedge t} LV(X_s) ds \right]. \]
+    Dado que hasta el tiempo $\tau_C$ la cadena se encuentra fuera de $C$, el indicador $\mathbf{1}_C(X_s) = 0$. Por lo tanto, en el integrando usamos la condición de Foster-Lyapunov $LV(X_s) \le -cV(X_s)$:
+    \[ \mathbb{E}_x[V(X_{\tau_C \wedge t})] - V(x) \le \mathbb{E}_x \left[ \int_0^{\tau_C \wedge t} -c V(X_s) ds \right] = -c \mathbb{E}_x \left[ \int_0^{\tau_C \wedge t} V(X_s) ds \right]. \]
+    Como $V \ge 1$ estrictamente en todo el espacio, la integral del lado derecho está acotada inferiormente por la integral de $1$:
+    \[ \int_0^{\tau_C \wedge t} V(X_s) ds \ge \int_0^{\tau_C \wedge t} 1 ds = \tau_C \wedge t. \]
+    Sustituyendo esto y reordenando (y notando que $\mathbb{E}_x[V(X_{\tau_C \wedge t})] \ge 0$):
+    \[ 0 - V(x) \le -c \mathbb{E}_x[\tau_C \wedge t] \implies \mathbb{E}_x[\tau_C \wedge t] \le \frac{V(x)}{c}. \]
+    Tomando el límite cuando $t \to \infty$ y usando el Teorema de Convergencia Monótona:
+    \[ \mathbb{E}_x[\tau_C] \le \frac{V(x)}{c} < \infty. \]
+
+    \textbf{2. Enlace con la Ergodicidad:}
+    El análisis de cadenas de Markov en espacios infinitos (como grandes redes de colas) es difícil porque la masa de probabilidad puede "escaparse al infinito" (transiencia).
+    La función $V(x)$ actúa como una "energía" o "función de Lyapunov". La condición $LV \le -cV$ fuera de un conjunto central $C$ garantiza que, si el sistema se aleja demasiado (alta energía), experimentará un "drift" negativo o fuerza restauradora muy fuerte hacia el centro. 
+    Al demostrar rigurosamente que el tiempo esperado de retorno $\mathbb{E}_x[\tau_C]$ está acotado finitamente por la energía inicial $V(x)/c$, garantizamos que la cadena siempre regresa al núcleo $C$. Esta es la condición suficiente y necesaria para la \textbf{recurrencia positiva}, lo que asegura matemáticamente la existencia de una distribución de probabilidad estacionaria única (ergodicidad).
+\end{proof}
+
+\newpage
+\subsection{Teorema de paro opcional}
+
+\begin{ejercicio}{Teorema de paro opcional en Poisson y tiempo acotado}{5.9}
+    Sea $(N_t)$ un proceso de Poisson de intensidad $\lambda$ y sea $\tau_a := \inf\{t \ge 0 : N_t - \lambda t \ge a\}$ para $a > 0$. Suponga que $\tau_a$ es casi seguramente finito o trabaje con $\tau_a \wedge T$. Use la martingala compensada $M_t = N_t - \lambda t$ y el teorema de paro opcional para obtener una relación entre $\mathbb{E}[\tau_a \wedge T]$ y $\mathbb{E}[N_{\tau_a \wedge T}]$. Explique qué impide aplicar el teorema ingenuamente cuando $T = \infty$.
+\end{ejercicio}
+
+\begin{proof}[Solución 5.9]
+    \textbf{1. Relación en tiempo acotado:}
+    Sabemos por el Ejercicio 2.8 que $M_t = N_t - \lambda t$ es una martingala respecto a su filtración natural, con $\mathbb{E}[M_0] = 0$.
+    Definimos el tiempo de paro acotado $\tau = \tau_a \wedge T$. Como $T$ es una constante determinista finita, $\tau$ está trivialmente acotado por $T$.
+    Aplicamos la versión estándar del Teorema de Paro Opcional (TPO) de Doob para tiempos acotados, lo cual garantiza que la esperanza de la martingala detenida se conserva:
+    \[ \mathbb{E}[M_{\tau_a \wedge T}] = \mathbb{E}[M_0] = 0. \]
+    Sustituyendo la definición de $M_t$:
+    \[ \mathbb{E}[N_{\tau_a \wedge T} - \lambda (\tau_a \wedge T)] = 0. \]
+    Por la linealidad de la esperanza:
+    \[ \mathbb{E}[N_{\tau_a \wedge T}] - \lambda \mathbb{E}[\tau_a \wedge T] = 0 \implies \mathbb{E}[N_{\tau_a \wedge T}] = \lambda \mathbb{E}[\tau_a \wedge T]. \]
+    Esta es la relación solicitada (una variante de la Identidad de Wald para tiempo continuo).
+
+    \textbf{2. ¿Por qué falla el TPO cuando $T = \infty$?}
+    Si aplicáramos el TPO ingenuamente asumiendo $T \to \infty$ y suponiendo que $\tau_a < \infty$ a.s., tendríamos $\mathbb{E}[M_{\tau_a}] = 0$.
+    Analicemos el valor de la martingala en el momento exacto $\tau_a$. Por definición de $\tau_a$, este es el primer instante donde $N_t - \lambda t$ supera o iguala la barrera $a$. 
+    Debido a que el proceso de Poisson tiene saltos positivos, en el momento del cruce invariablemente se cumple que $M_{\tau_a} = N_{\tau_a} - \lambda \tau_a \ge a$.
+    Tomando esperanza a esta desigualdad:
+    \[ \mathbb{E}[M_{\tau_a}] \ge a > 0. \]
+    ¡Obtenemos una contradicción! $\mathbb{E}[M_{\tau_a}] \ge a$, pero el TPO ingenuo nos decía que debía ser $0$.
+    
+    \textit{¿Qué falló?} El Teorema de Paro Opcional para tiempos infinitos requiere condiciones adicionales que aquí no se cumplen. Específicamente, requiere que el proceso detenido $M_{t \wedge \tau_a}$ sea uniformemente integrable, o que exista una variable aleatoria integrable $Y$ tal que $|M_{t \wedge \tau_a}| \le Y$ casi seguramente.
+    Para el proceso compensado, la varianza crece linealmente con el tiempo, y al no estar acotado el tiempo de espera por la barrera, la familia de variables aleatorias no está uniformemente dominada. De hecho, para este proceso (que es un proceso de Lévy centrado), el tiempo esperado de primer paso a una barrera positiva es infinito: $\mathbb{E}[\tau_a] = \infty$.
+\end{proof}
+
+\newpage
+\subsection{Modelo de riesgo de Cramér-Lundberg}
+
+\begin{ejercicio}{Modelo de riesgo de Cramér-Lundberg y probabilidad de ruina}{5.10}
+    En un modelo colectivo de riesgo, el capital es $R_t = u + ct - \sum_{j=1}^{N_t} Y_j$, donde $N_t$ es Poisson$(\lambda)$ e $Y_j$ son reclamaciones i.i.d. positivas. Suponga que existe $\theta > 0$ tal que $c\theta - \lambda(\mathbb{E}[e^{\theta Y_1}] - 1) = 0$.
+    Demuestre que $Z_t := e^{-\theta R_t}$ es martingala. Interprete $\theta$ y explique por qué es útil para estudiar probabilidades de ruina.
+\end{ejercicio}
+
+\begin{proof}[Solución  5.10]
+    \textbf{1. Propiedad de Martingala de $Z_t$:}
+    Desarrollamos la expresión para $Z_t$:
+    \[ Z_t = \exp\left(-\theta \left( u + ct - \sum_{j=1}^{N_t} Y_j \right)\right) = e^{-\theta u} e^{-\theta c t} \exp\left( \theta \sum_{j=1}^{N_t} Y_j \right). \]
+    Calculamos la esperanza condicional del incremento multiplicativo para $s < t$:
+    \begin{align*}
+        \mathbb{E} \left[ \frac{Z_t}{Z_s} \ \middle| \ \mathcal{F}_s \right] &= \mathbb{E} \left[ \exp(-\theta c (t-s)) \exp\left( \theta \sum_{j=N_s+1}^{N_t} Y_j \right) \ \middle| \ \mathcal{F}_s \right].
+    \end{align*}
+    El término $e^{-\theta c (t-s)}$ es determinista. El segundo término es el exponencial de los siniestros acumulados en el intervalo $(s, t]$. Por los incrementos independientes del proceso de Poisson, esta suma es independiente de $\mathcal{F}_s$ y tiene la misma distribución que $\sum_{k=1}^{N_{t-s}} Y_k$ (un proceso de Poisson compuesto).
+    
+    Por lo tanto, la esperanza condicional se convierte en la esperanza incondicional (que calculamos en el Ejercicio 2.6 vía la función generadora de momentos del proceso compuesto):
+    \[ \mathbb{E} \left[ \exp\left( \theta \sum_{k=1}^{N_{t-s}} Y_k \right) \right] = \exp \left( \lambda(t-s) \left( \mathbb{E}[e^{\theta Y_1}] - 1 \right) \right). \]
+    Sustituyendo esto de vuelta:
+    \[ \mathbb{E} \left[ \frac{Z_t}{Z_s} \ \middle| \ \mathcal{F}_s \right] = \exp(-\theta c (t-s)) \exp \left( \lambda(t-s) \left( \mathbb{E}[e^{\theta Y_1}] - 1 \right) \right). \]
+    Factorizando $(t-s)$ en el exponente:
+    \[ \mathbb{E} \left[ \frac{Z_t}{Z_s} \ \middle| \ \mathcal{F}_s \right] = \exp \left( -(t-s) \Big[ c\theta - \lambda \left( \mathbb{E}[e^{\theta Y_1}] - 1 \right) \Big] \right). \]
+    Usando la hipótesis fundamental (la ecuación de Lundberg) $c\theta - \lambda(\mathbb{E}[e^{\theta Y_1}] - 1) = 0$, el exponente entero se vuelve cero:
+    \[ \mathbb{E} \left[ \frac{Z_t}{Z_s} \ \middle| \ \mathcal{F}_s \right] = e^0 = 1 \implies \mathbb{E}[Z_t \mid \mathcal{F}_s] = Z_s. \]
+    Por tanto, $Z_t$ es una martingala.
+
+    \textbf{2. Interpretación de $\theta$ y su utilidad (Desigualdad de Lundberg):}
+    \begin{itemize}
+        \item \textbf{El parámetro $\theta$ (Coeficiente de ajuste de Lundberg):} Representa una inclinación exponencial (Esscher transform) de la ley de los siniestros. La condición de ganancia de la aseguradora exige que las primas recaudadas sean mayores que los siniestros esperados ($c > \lambda \mathbb{E}[Y_1]$). Bajo la medida de probabilidad original, el capital $R_t$ tiene una deriva positiva (tiende a crecer). $\theta$ es la constante mágica de "castigo" que engorda la cola derecha de la distribución de los siniestros exactamente lo suficiente para que la deriva del capital sea nula, convirtiendo un negocio rentable en un juego justo (martingala).
+        
+        \item \textbf{Estudio de la probabilidad de ruina:} La utilidad principal de esta martingala es derivar la célebre \textbf{Desigualdad de Cramér-Lundberg}.
+        Definimos el tiempo de ruina $\tau = \inf\{t > 0 : R_t < 0\}$.
+        Si aplicamos el Teorema de Paro Opcional a $Z_{t \wedge \tau}$ y dejamos $t \to \infty$, obtenemos que $1 = \mathbb{E}[Z_0] = \mathbb{E}[Z_\tau \mathbf{1}_{\{\tau < \infty\}}]$.
+        Sabiendo que $Z_\tau = e^{-\theta R_\tau}$ y que en el momento de la ruina el capital es estrictamente negativo ($R_\tau < 0$), tenemos que $Z_\tau > 1$. Sin embargo, si obviamos el "overshoot" (el exceso sobre cero al momento de la ruina) y asumimos $R_\tau \approx 0$, entonces $Z_\tau \approx e^0 = 1$.
+        Considerando el capital inicial $u$, tenemos $\mathbb{E}[e^{-\theta R_0}] = e^{-\theta u}$.
+        A través de manipulación formal de la martingala se demuestra que:
+        \[ \psi(u) = \mathbb{P}(\tau < \infty) \le e^{-\theta u}. \]
+        Esta es la herramienta más poderosa de la actuaría clásica: garantiza que la probabilidad de que la aseguradora quiebre $\psi(u)$ decae exponencialmente a medida que incrementamos el capital inicial $u$, donde el ritmo de decaimiento está dictado exactamente por nuestro parámetro de inclinación $\theta$.
+    \end{itemize}
+\end{proof}
+
+\newpage
+\subsection{Simulación en Python}
+
+\begin{ejercicio}{Martingala compensada del Poisson}{5.11}
+    Sea $(N_t)$ un proceso de Poisson de intensidad $\lambda$ y $M_t = N_t - \lambda t$.
+    a. Simule en Python muchas trayectorias de $M$ en un intervalo $[0,T]$.
+    b. Para una malla $0 = t_0 < \dots < t_m = T$, estime empíricamente $\mathbb{E}[M_{t_j}]$ y verifique que es $\approx 0$.
+    c. Estime $\mathbb{E}[M_{t_j}^2]$ y compárela con $\lambda t_j$.
+    d. Represente la variación cuadrática opcional y compárela con el compensador.
+\end{ejercicio}
+
+\begin{proof}[Solución  5.11]
+    \textbf{Implementación en Python :}
+    Utilizaremos incrementos independientes para simular el proceso sobre una cuadrícula de tiempo de manera eficiente.
+
+\begin{lstlisting}[language=Python, basicstyle=\footnotesize\ttfamily, frame=single, numbers=left]
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Parametros del proceso
+lam = 3.0
+T = 10.0
+m_steps = 100
+num_trayectorias = 10000
+
+# Malla temporal
+t_grid = np.linspace(0, T, m_steps + 1)
+dt = T / m_steps
+
+# a) Simular trayectorias
+# Los incrementos N(t) - N(t-1) son Poisson(lam * dt)
+incrementos = np.random.poisson(lam * dt, size=(num_trayectorias, m_steps))
+# Agregamos la condicion inicial N_0 = 0
+N_t = np.hstack([np.zeros((num_trayectorias, 1)), np.cumsum(incrementos, axis=1)])
+
+# Calcular el compensador determinista y la martingala M_t
+compensador = lam * t_grid
+M_t = N_t - compensador
+
+# b) Estimar empiricamente E[M_{t_j}]
+E_M_empirico = np.mean(M_t, axis=0)
+
+# c) Estimar empiricamente E[M_{t_j}^2]
+E_M2_empirico = np.mean(M_t**2, axis=0)
+Var_teorica = lam * t_grid
+
+# Mostrar resultados para unos puntos especificos
+print(f"Intensidad lambda = {lam}")
+print(f"{'Tiempo (t)':<12} | {'E[M_t] (aprox 0)':<18} | {'E[M_t^2] Empirico':<18} | {'E[M_t^2] Teorico (lam*t)'}")
+print("-" * 75)
+for idx in [10, 50, 100]: # t=1, t=5, t=10
+    print(f"{t_grid[idx]:<12.1f} | {E_M_empirico[idx]:<18.4f} | {E_M2_empirico[idx]:<18.4f} | {Var_teorica[idx]:<18.4f}")
+
+# d) Variacion cuadratica opcional [M]_t y previsible <M>_t
+# Recordando la demostracion del Ejercicio 5.2: [M]_t = N_t y <M>_t = lam*t
+# Graficamos el promedio de la variacion opcional frente al compensador
+promedio_opcional = np.mean(N_t, axis=0)
+
+plt.figure(figsize=(9, 5))
+plt.plot(t_grid, promedio_opcional, 'b-', linewidth=2, label='E[ Variacion Opcional $[M]_t$ ] (Empirico)')
+plt.plot(t_grid, compensador, 'r--', linewidth=2, label='Variacion Previsible $\langle M \\rangle_t$ (Teorico)')
+plt.title('Comparacion de Variaciones Cuadraticas')
+plt.xlabel('Tiempo $t$')
+plt.ylabel('Valor de la Variacion')
+plt.legend()
+plt.grid(True, alpha=0.3)
+plt.show()
+\end{lstlisting}
+
+    \textbf{Resultados:}
+    Al ejecutar la simulación, observaremos que $\mathbb{E}[M_{t_j}]$ oscila en torno a valores minúsculos (ej. $0.002$), validando su propiedad de martingala. Para el segundo momento, $\mathbb{E}[M_{t_j}^2]$ empírico rastrea de manera casi idéntica a la línea teórica $\lambda t_j$, ilustrando visualmente la Isometría de Itô para procesos con saltos. 
+    Finalmente, en el inciso d, el promedio de la variación opcional (los saltos al cuadrado, que suman $N_t$) converge exactamente a la variación previsible (el compensador $\lambda t$), demostrando numéricamente la relación $\mathbb{E}[[M]_t] = \langle M \rangle_t$.
+\end{proof}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{../../Archivos/LOGOS_IMG/py511.PNG}
+    \caption{Ejercicio 5.11. Ver en: \url{https://colab.research.google.com/drive/1aXbBgFZScy5HWli5NR2zYpYJx4TZAO-x?usp=sharing}}
+    \label{python511}
+\end{figure}
+
+\newpage
+
+\begin{ejercicio}{Simulación en Python: cambio de medida exponencial}{5.12}
+    Sea $(N_t)$ Poisson de intensidad $\lambda$ y $Z_t^{(\theta)} = \exp(\theta N_t - \lambda t(e^\theta - 1))$.
+    a) Simule bajo $\mathbb{P}$ y use pesos $Z_T^{(\theta)}$ para estimar la distribución de $N_T$ bajo la medida inclinada.
+    b) Compare frecuencias ponderadas con Poisson$(\lambda e^\theta T)$.
+    c) Estudie numéricamente la varianza del estimador cuando $\theta$ es grande.
+    d) Interprete como comprobación del cambio de medida.
+\end{ejercicio}
+
+\begin{proof}[Solución5.12]
+    \textbf{Implementación en Python :}
+
+\begin{lstlisting}[language=Python, basicstyle=\footnotesize\ttfamily, frame=single, numbers=left]
+import numpy as np
+import scipy.stats as stats
+import matplotlib.pyplot as plt
+
+def simulacion_cambio_medida(lam, T, theta, n_paths):
+    # a) Simular bajo la medida original P (intensidad lam)
+    N_T = np.random.poisson(lam * T, n_paths)
+    
+    # Calcular los pesos de Radon-Nikodym (Martingala Z_T)
+    Z_T = np.exp(theta * N_T - lam * T * (np.exp(theta) - 1))
+    
+    # b) Estimar la distribucion ponderada (Medida Q)
+    max_k = int(np.max(N_T))
+    valores_k = np.arange(max_k + 1)
+    
+    # Frecuencias ponderadas (Importance Sampling)
+    frecuencias_ponderadas = np.zeros_like(valores_k, dtype=float)
+    for k in valores_k:
+        # Sumamos los pesos de las trayectorias que terminaron en el estado k
+        mascara = (N_T == k)
+        frecuencias_ponderadas[k] = np.sum(Z_T[mascara]) / n_paths
+        
+    # Ley Teorica Poisson con parametro lam * e^theta * T
+    ley_teorica = stats.poisson.pmf(valores_k, lam * np.exp(theta) * T)
+    
+    return valores_k, frecuencias_ponderadas, ley_teorica, Z_T
+
+# Parametros experimentales
+lam = 2.0
+T = 1.0
+n_paths = 500000
+
+print(f"Intensidad Original (P): lambda = {lam}")
+
+# c) Estudio para distintos valores de theta
+for theta in [0.5, 2.0]:
+    val_k, freq_Q, prob_teo, pesos = simulacion_cambio_medida(lam, T, theta, n_paths)
+    
+    var_pesos = np.var(pesos)
+    peso_max = np.max(pesos)
+    
+    print(f"\n--- Resultados para theta = {theta} ---")
+    print(f"Intensidad Inclinada Teorica (Q): lambda*e^theta = {lam * np.exp(theta):.4f}")
+    print(f"Varianza de los pesos Z_T: {var_pesos:.4e}")
+    print(f"Peso maximo observado:     {peso_max:.4e}")
+    
+    # Calcular el error medio cuadratico de la estimacion
+    mse = np.mean((freq_Q - prob_teo)**2)
+    print(f"Error cuadratico medio de la distribucion: {mse:.4e}")
+
+# Grafico ilustrativo para theta = 0.5
+val_k, freq_Q, prob_teo, _ = simulacion_cambio_medida(lam, T, 0.5, n_paths)
+plt.figure(figsize=(8, 5))
+plt.bar(val_k, freq_Q, alpha=0.6, color='orange', label='Estimacion Muestreo por Importancia (Q)')
+plt.plot(val_k, prob_teo, 'ko--', linewidth=2, label='Teorica Poisson($\\lambda e^\\theta T$)')
+plt.title(f'Distribucion bajo Cambio de Medida ($\\theta = 0.5$)')
+plt.xlabel('Numero de saltos $N_T$')
+plt.ylabel('Probabilidad')
+plt.legend()
+plt.grid(alpha=0.3)
+plt.show()
+\end{lstlisting}
+
+    \textbf{d. Resultados y varianza para $\theta$ grande:}
+    El experimento es una confirmación hermosa del Teorema de Girsanov discreto. Al simular trayectorias bajo la medida barata $\mathbb{P}$ (baja intensidad) y simplemente multiplicarlas por el factor $Z_T^{(\theta)}$, la distribución empírica se "desliza" y reconstruye a la perfección la campana de la medida estresada $\mathbb{Q}$ (alta intensidad), comprobando numéricamente el cambio analítico de medida del Ejercicio 5.4.
+    
+    Sin embargo, el inciso c revela la vulnerabilidad práctica de esta técnica (\textit{Importance Sampling}). Cuando evaluamos un $\theta$ grande (ej. $\theta = 2.0$), observamos que la \textbf{varianza de los pesos $Z_T$ explota exponencialmente}. Esto se debe a que la inmensa mayoría de las trayectorias simuladas bajo $\mathbb{P}$ producen pesos minúsculos cercanos a cero, mientras que una pequeñísima fracción de trayectorias anómalas (que tuvieron muchísimos saltos por puro azar) reciben pesos monstruosos. Esta "degeneración de los pesos" hace que el estimador, aunque matemáticamente insesgado, sea computacionalmente inútil para $\theta$ grandes debido al abrumador error de muestreo (varianza infinita en el límite).
+\end{proof}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{../../Archivos/LOGOS_IMG/py512.PNG}
+    \caption{Ejercicio 5.12. Ver en: \url{https://colab.research.google.com/drive/1a2UmSImJuW7blOxjl8F949w3RyW3U2Tg?usp=sharing}}
+    \label{python512}
+\end{figure}
+
+\newpage
+\section{referencias bibliográficas}
+
+\renewcommand{\refname}{Referencias}
+\begin{thebibliography}{99}
+
+\bibitem{Galindo2026}
+Galindo, C. (2026).
+\textit{Tarea de Procesos Estocásticos: Cadenas de Markov a tiempo continuo, proceso de Poisson, colas M/M/k y M/M/$\infty$, optimal stopping, martingalas y cambios de medida}.
+Universidad Nacional Autónoma de México, FES Acatlán.
+
+\bibitem{Gemini2026}
+Google. (2026).
+\textit{Gemini (modelo 3.1 Pro)}. 
+Asistente de inteligencia artificial generativa. \texttt{https://gemini.google.com}
+
+\bibitem{Ross1996}
+Ross, S. M. (1996).
+\textit{Stochastic Processes} (2da ed.).
+John Wiley \& Sons.
+
+\bibitem{Norris1998}
+Norris, J. R. (1998).
+\textit{Markov Chains}.
+Cambridge University Press.
+
+\bibitem{Karlin1975}
+Karlin, S., \& Taylor, H. M. (1975).
+\textit{A First Course in Stochastic Processes} (2da ed.).
+Academic Press.
+
+\bibitem{Durrett2016}
+Durrett, R. (2016).
+\textit{Essentials of Stochastic Processes} (3ra ed.).
+Springer Texts in Statistics.
+
+\bibitem{Lawler2006}
+Lawler, G. F. (2006).
+\textit{Introduction to Stochastic Processes} (2da ed.).
+Chapman and Hall/CRC.
+
+\bibitem{Grimmett2020}
+Grimmett, G. R., \& Stirzaker, D. R. (2020).
+\textit{Probability and Random Processes} (4ta ed.).
+Oxford University Press.
+
+\end{thebibliography}
 
 \end{document}

@@ -1,0 +1,285 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish, es-tabla]{babel}
+\usepackage{amsmath, amsfonts, amssymb, amsthm}
+\usepackage{graphicx}
+\usepackage[left=2.54cm, right=2.54cm, top=2.54cm, bottom=2.54cm]{geometry}
+\usepackage{tikz}
+\usepackage{soul}
+\usepackage{listings}
+\usepackage[most]{tcolorbox}
+\tcbset{shield externalize}
+\usetikzlibrary{arrows.meta, positioning, automata}
+\usetikzlibrary{babel}
+\usetikzlibrary{external}
+\tikzexternalize[prefix=build-tikz/]
+\usepackage{hyperref}
+\usepackage{xcolor}
+%--------------------------------------------------------------------------------
+\lstset{
+    language=Python,
+    basicstyle=\footnotesize\ttfamily,
+    frame=single,
+    numbers=left,
+    inputencoding=utf8,
+    extendedchars=true,
+    breaklines=true,
+    showstringspaces=false
+}
+
+\newtcbtheorem[number within=section]{ejercicio}{Ejercicio}{
+    enhanced,
+    sharp corners,
+    boxrule=0pt,
+    leftrule=5pt,
+    colframe=gray!30!black,
+    colback=gray!5!white,
+    coltitle=white,
+    fonttitle=\bfseries,
+    separator sign={.\ },
+    before skip=10pt,
+    after skip=10pt
+}{ej}
+
+
+
+% Bloque de Teoremas
+\newtcbtheorem[number within=section]{mytheo}{Teorema}{
+    enhanced,
+    sharp corners,
+    boxrule=0pt,
+    leftrule=5pt,
+    colframe=blue!40!black,
+    colback=blue!5!white,
+    coltitle=white,
+    fonttitle=\bfseries,
+    separator sign={.\ },
+    before skip=10pt,
+    after skip=10pt
+}{th}
+
+ % Bloque de Alerta
+\newtcolorbox{alerta}[1]{
+    enhanced,
+    sharp corners,
+    boxrule=0pt,
+    leftrule=5pt,
+    colframe=red!40!black,
+    colback=red!5!white,
+    coltitle=white,
+    fonttitle=\bfseries,
+    title=#1,
+    before skip=10pt,
+    after skip=10pt
+}
+
+% Bloque de Notas
+\newtcolorbox{nota}[1]{
+    enhanced,
+    sharp corners,
+    boxrule=0pt,
+    leftrule=5pt,
+    colframe=orange!40!black,
+    colback=yellow!5!white,
+    coltitle=white,
+    fonttitle=\bfseries,
+    title=#1,
+    before skip=10pt,
+    after skip=10pt
+}
+
+% ---------------------------------------------------------------------------------------------
+\begin{document}
+
+\begin{titlepage}
+    \centering
+    {\huge \textbf{Universidad Nacional Autónoma de México}}\\[0.3cm]
+    \rule{\linewidth}{2mm}\\[0.3cm]
+    {\large \textbf{Facultad de Estudios Superiores Acatlán}}\\[1cm]
+    
+    \includegraphics[width=6cm]{../../Archivos/LOGOS_IMG/acatlan.png}\\[1cm]
+    
+    {\Large \textbf{Matemáticas Aplicadas y Computación}}\\[1cm]
+    {\huge \textbf{Procesos Estocásticos}}\\[0.5cm]
+    \rule{\linewidth}{1mm}\\[0.3cm]
+    \vfill
+
+    {\Large \textit{Cadenas de Markov}}\\[0.5cm]
+  
+    \vfill
+    \rule{\linewidth}{0.5mm}\\[0.3cm]
+    {\Large \textit{Ricardo López Ramírez}}\\
+    \rule{\linewidth}{0.5mm}\\[0.8cm]
+    
+
+    \small
+    Actualización: \today \hfill Página: \thepage
+\end{titlepage}
+
+% ÍNDICE 
+\pagenumbering{roman}
+\tableofcontents
+\cleardoublepage
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+% CONTENIDO 
+
+\section{Generador Infinitesimal en Tiempo Continuo}
+
+Dada una Cadena de Markov en Tiempo Continuo $\{X(t)\}_{t \ge 0}$, el sistema se rige por el límite de sus probabilidades de transición. Se definen:
+
+\begin{itemize}
+    \item \textbf{Tasa de salto hacia $j \neq i$:} $q_{ij} = \lim_{h \to 0} \frac{P_{ij}(h)}{h}$
+    \item \textbf{Tasa de salida del estado $i$:} $q_i = \lim_{h \to 0} \frac{1 - P_{ii}(h)}{h}$
+\end{itemize}
+
+Agrupando estos elementos, construimos la \textbf{matriz generadora $Q$}. Esta matriz nos ayuda a simular la trayectoria del proceso, indicando cuándo y a dónde salta el sistema.
+
+\begin{nota}{Propiedades del Generador}
+\begin{itemize}
+    \item \textbf{Tiempo de permanencia:} $T_i \sim \text{Exp}(q_i) \implies \mathbb{E}[T_i] = \frac{1}{q_i}$
+    \item \textbf{Cadena de saltos embebida:} Las probabilidades de transición de la cadena discreta subyacente son $\pi_{ij} = \frac{q_{ij}}{q_i}$ para $i \neq j$.
+    \item \textbf{Generador de semigrupo:} $Q = P'(0) = \lim_{h \to 0^+} \frac{P(h) - I}{h}$
+\end{itemize}
+\end{nota}
+
+La \textbf{exponencial matricial} se define a través de su serie de Taylor:
+\[ P(t) = e^{tQ} = \sum_{n=0}^\infty \frac{t^n Q^n}{n!} = I + tQ + \frac{t^2 Q^2}{2!} + \dots \]
+
+\subsection{Definición de Explosión}
+Sea $T_n \sim \text{Exp}(-q_{X_n X_n})$ el tiempo pasado en el $n$-ésimo estado visitado. El tiempo total para dar infinitos saltos es:
+\[ \zeta = \sum_{n=0}^\infty T_n \]
+Si $\zeta < \infty$, el sistema realiza infinitos saltos en un tiempo finito, y decimos que \textbf{la cadena explota}. Si por el contrario, $\mathbb{P}(\zeta = \infty) = 1$, el sistema es regular.
+
+\begin{ejercicio}{Condición de explosión}
+Un proceso de nacimiento puro con tasas $\lambda_n$ explota si y solo si los tiempos esperados convergen:
+\[ \sum_{n=0}^\infty \frac{1}{\lambda_n} < \infty \]
+\textbf{Ejemplos:}
+\begin{itemize}
+    \item Sistema regular: $\sum_{n=1}^\infty \frac{1}{n} = \infty$ (Serie armónica divergente).
+    \item Sistema explosivo: $\sum_{n=1}^\infty \frac{1}{n^2} = \frac{\pi^2}{6} < \infty$.
+\end{itemize}
+\end{ejercicio}
+
+
+\section{Proceso de Poisson Compuesto}
+
+Sea $(\Omega, \mathcal{F}, \mathbb{P})$ un espacio de probabilidad filtrado. Un proceso de Poisson $N = \{N(t)\}_{t \ge 0}$ con intensidad $\lambda > 0$ adaptado a $\mathbb{F}$.
+
+El \textbf{proceso de Poisson compuesto} $X = \{X(t)\}_{t \ge 0}$ se define como:
+\[ X(t) = \sum_{i=1}^{N(t)} Y_i , \quad t > 0 \]
+
+\begin{alerta}{Esperanza (Aplicación de la identidad de Wald)}
+Suponga que $\mathbb{E}[|Y_i|] < \infty$ y denotemos $\mathbb{E}[Y_i] = \mu$. Para hallar el primer momento de $X(t)$ condicionamos:
+\begin{align*}
+    \mathbb{E}[X(t)] &= \mathbb{E}\left[ \mathbb{E}\left[ \sum_{i=1}^{N(t)} Y_i \ \middle|\ N(t) \right] \right] \\
+    &= \mathbb{E}[N(t) \cdot \mathbb{E}[Y_i]] \\
+    &= \mu \mathbb{E}[N(t)]
+\end{align*}
+Puesto que $N(t) \sim \text{Poisson}(\lambda t)$, sabemos que $\mathbb{E}[N(t)] = \lambda t$. Por lo tanto:
+\[ \mathbb{E}[X(t)] = \lambda t \mu \]
+\end{alerta}
+
+\subsection{Deducción de la Función Característica}
+Sea $\varphi_Y(u) = \mathbb{E}[e^{iuY}]$ la función característica de los saltos. Condicionando sobre el número de eventos $N(t)$:
+\[ \varphi_{X(t)}(u) = \mathbb{E}\left[ \mathbb{E}\left[ e^{iu \sum_{i=1}^{N(t)} Y_i} \ \middle|\ N(t) \right] \right] \]
+
+Dado $N(t) = n$, por independencia de los saltos utilizamos:
+\[ \mathbb{E}\left[ \prod_{j=1}^n e^{iu Y_j} \right] = (\varphi_Y(u))^n \]
+
+Sustituyendo en la esperanza exterior respecto a la distribución de $N(t)$:
+\begin{align*}
+    \varphi_{X(t)}(u) &= \sum_{n=0}^\infty (\varphi_Y(u))^n \cdot e^{-\lambda t} \frac{(\lambda t)^n}{n!} \\
+    &= e^{-\lambda t} \sum_{n=0}^\infty \frac{(\lambda t \varphi_Y(u))^n}{n!} \\
+    &= e^{-\lambda t + \lambda t \varphi_Y(u)}
+\end{align*}
+
+
+
+\section{Integral Estocástica Discreta}
+
+Consideremos un proceso predecible $H_n \in \mathcal{F}_{n-1}$. Además, se tiene una martingala $M$ que satisface $\mathbb{E}[M_m \mid \mathcal{F}_n] = M_n$ para $n \le m$.
+
+Denotamos el incremento de la martingala como $\Delta M_k = M_k - M_{k-1}$. La integral estocástica discreta se expresa como la transformada:
+\[ (H \cdot M)_n = \sum_{k=1}^n H_k \Delta M_k \]
+
+\begin{mytheo}{Isometría y Norma}{isometria}
+El cálculo de la norma al cuadrado del proceso integral es:
+\begin{align*}
+    ((H \cdot M)_n)^2 &= \left( \sum_{k=1}^n H_k \Delta M_k \right)^2 \\
+    &= \sum_{k=1}^n H_k^2 (\Delta M_k)^2 + 2 \sum_{j < k} H_j \Delta M_j H_k \Delta M_k
+\end{align*}
+
+Tomando esperanza a ambos lados, los términos cruzados se anulan por las propiedades de la martingala, resultando en:
+\[ \mathbb{E}[((H \cdot M)_n)^2] = \mathbb{E}\left[ \sum_{k=1}^n H_k^2 (\Delta M_k)^2 \right] \]
+\end{mytheo}
+
+
+\section{Paro Óptimo y Envolvente de Snell}
+
+Sea $(\Omega, \mathcal{F}, \mathbb{P})$ un espacio de probabilidad y $\mathbb{F} = \{\mathcal{F}_n\}_{n=0}^N$ una filtración en tiempo discreto, con $\mathcal{F}_0 = \{\emptyset, \Omega\}$ y $\mathcal{F}_N = \mathcal{F}$. Consideramos un proceso estocástico adaptado $X = \{X_n\}_{n=0}^N$ con $\mathbb{E}[|X_n|] < \infty, \ \forall n$.
+
+\begin{nota}{Tiempo de Paro}
+Una variable aleatoria $T: \Omega \to \{0, 1, \dots, N\} \cup \{\infty\}$ es un tiempo de paro respecto a $\mathbb{F}$ si el evento $\{T=n\} \in \mathcal{F}_n, \ \forall n$.
+\end{nota}
+
+\subsection{La Envolvente de Snell}
+Para maximizar el valor esperado global, se construye un nuevo proceso $Z = \{Z_n\}_{n=0}^N$, definido de la siguiente forma (mediante inducción hacia atrás):
+\begin{align*}
+    Z_N &= X_N \\
+    Z_n &= \max(X_n, \mathbb{E}[Z_{n+1} \mid \mathcal{F}_n]), \quad \text{para } n = N-1, \dots, 0
+\end{align*}
+El proceso $Z_n$ es el \textbf{menor proceso que es una supermartingala} y que domina a $X_n$.
+
+\begin{alerta}{Tiempo de paro óptimo}
+El tiempo de paro óptimo se define como:
+\[ \tau^* = \inf\{ 0 \le n \le N : Z_n = X_n \} \]
+Bajo este tiempo de paro, se garantiza que el valor esperado máximo se alcanza:
+\[ \mathbb{E}[X_{\tau^*}] = Z_0 \]
+\end{alerta}
+
+En aplicaciones computacionales (como el problema del Caballo de Snell en juegos finitos sobre un tablero de $8 \times 8$), la esperanza condicional para la inducción hacia atrás se calcula como:
+\[ \mathbb{E}[Z_{t+1} \mid S_t] = \frac{1}{|M(S_t)|} \sum_{S' \in M(S_t)} Z(S', t+1) \]
+
+
+\section{Teoremas Límite en Procesos Estocásticos}
+
+\subsection{Teorema de Donsker}
+Demuestra que, para $0 \le s \le t \le 1$, el proceso de caminata aleatoria reescalado $W_n(t) = \frac{1}{\sqrt{n}} S_{\lfloor nt \rfloor}$ satisface las siguientes propiedades que convergen al Movimiento Browniano:
+
+\begin{itemize}
+    \item \textbf{Esperanza nula:} Usando la linealidad de la esperanza:
+    \[ \mathbb{E}[W_n(t)] = \mathbb{E}\left[ \frac{1}{\sqrt{n}} S_{\lfloor nt \rfloor} \right] = \frac{1}{\sqrt{n}} \sum \mathbb{E}[X_i] = \frac{1}{\sqrt{n}}(0) = 0 \]
+    
+    \item \textbf{Varianza:}
+    \[ \text{Var}(W_n(t)) = \text{Var}\left( \frac{1}{\sqrt{n}} S_{\lfloor nt \rfloor} \right) = \frac{1}{n} \sum \text{Var}(X_i) = \frac{1}{n}(\lfloor nt \rfloor \cdot 1) = \frac{\lfloor nt \rfloor}{n} \]
+    
+    \item \textbf{Límite asintótico:} Analizando el límite de la varianza cuando $n \to \infty$:
+    Dado que $t - \frac{1}{n} < \frac{\lfloor nt \rfloor}{n} \le t$, al aplicar el límite obtenemos:
+    \[ \lim_{n \to \infty} \frac{\lfloor nt \rfloor}{n} = t \]
+\end{itemize}
+
+\subsection{Lema de Borel-Cantelli}
+
+\begin{mytheo}{Lema 1 y 2 de Borel-Cantelli}{borel_cantelli}
+\textbf{Lema 1:} Si la suma de las probabilidades es finita, $\sum \mathbb{P}(A_n) < \infty$, entonces $\mathbb{P}(A_n \text{ i.o.}) = 0$.
+\textit{Prueba:}
+\[ \mathbb{P}(A_n \text{ i.o.}) = \lim_{n \to \infty} \mathbb{P}\left( \bigcup_{k=n}^\infty A_k \right) \le \sum_{k=n}^\infty \mathbb{P}(A_k) \implies \mathbb{P}(A_n \text{ i.o.}) = 0 \]
+
+\textbf{Lema 2:} Si los eventos $A_n$ son mutuamente independientes y $\sum \mathbb{P}(A_n) = \infty$, entonces $\mathbb{P}(A_n \text{ i.o.}) = 1$.
+\textit{Prueba:}
+\[ \mathbb{P}\left( \bigcap A_k^c \right) = \prod (1 - \mathbb{P}(A_k)) \le \exp\left( -\sum \mathbb{P}(A_k) \right) \]
+Como la serie diverge a infinito, la exponencial tiende a 0, demostrando que la probabilidad del complemento es nula.
+\end{mytheo}
+
+
+
+
+
+
+
+
+
+\end{document}

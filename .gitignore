@@ -9,7 +9,7 @@ build/
 out/
 *.auxlock
 build-tikz/
-
+.venv/
 # OS
 .DS_Store
 Thumbs.db
